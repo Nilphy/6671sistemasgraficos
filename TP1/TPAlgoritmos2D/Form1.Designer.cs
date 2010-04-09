@@ -44,18 +44,20 @@
             this.glControl.Dock = System.Windows.Forms.DockStyle.Fill;
             this.glControl.Location = new System.Drawing.Point(0, 0);
             this.glControl.Name = "glControl";
-            this.glControl.Size = new System.Drawing.Size(792, 573);
+            this.glControl.Size = new System.Drawing.Size(1016, 741);
             this.glControl.StencilBits = ((byte)(0));
             this.glControl.TabIndex = 0;
             this.glControl.Paint += new System.Windows.Forms.PaintEventHandler(this.glControl_Paint);
+            this.glControl.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.glControl_KeyPress);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(792, 573);
+            this.ClientSize = new System.Drawing.Size(1016, 741);
             this.Controls.Add(this.glControl);
             this.Name = "Form1";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Form1";
             this.ResumeLayout(false);
 
