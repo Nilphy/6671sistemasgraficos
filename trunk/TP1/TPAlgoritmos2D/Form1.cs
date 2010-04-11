@@ -18,7 +18,7 @@ namespace TPAlgoritmos2D
         {
             InitializeComponent();
             glControl.InitializeContexts();
-            //Initialize2DConfiguration();
+            //Initialize2DConfiguration(); //
             Init();
         }
 
