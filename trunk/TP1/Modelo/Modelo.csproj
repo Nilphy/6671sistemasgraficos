@@ -45,14 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Circulo.cs" />
-    <Compile Include="ComparadorPuntosCirculo.cs" />
-    <Compile Include="ColorRGB.cs" />
-    <Compile Include="Linea.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Punto.cs" />
-    <Compile Include="PuntoEntero.cs" />
-    <Compile Include="PuntoFlotante.cs" />
     <Compile Include="Rueda.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
