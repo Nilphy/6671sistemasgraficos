@@ -50,6 +50,13 @@
     <Reference Include="Tao.Platform.Windows, Version=1.0.0.5, Culture=neutral, PublicKeyToken=701104b2da67a104" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EntidadesVista\Circulo.cs" />
+    <Compile Include="EntidadesVista\ColorRGB.cs" />
+    <Compile Include="EntidadesVista\ComparadorPuntosCirculo.cs" />
+    <Compile Include="EntidadesVista\Linea.cs" />
+    <Compile Include="EntidadesVista\Punto.cs" />
+    <Compile Include="EntidadesVista\PuntoEntero.cs" />
+    <Compile Include="EntidadesVista\PuntoFlotante.cs" />
     <Compile Include="EstrategiasDibujo\Bresenham.cs" />
     <Compile Include="EstrategiasDibujo\Pintar.cs" />
     <Compile Include="EstrategiasDibujo\DDA.cs" />
