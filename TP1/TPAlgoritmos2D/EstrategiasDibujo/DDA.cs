@@ -7,7 +7,7 @@ using SistemasGraficos.Entidades;
 
 namespace SistemasGraficos.EstrategiasDibujo
 {
-    public static class DDALinea
+    public static class DDA
     {
         public static void DibujarLinea(Linea linea)
         {

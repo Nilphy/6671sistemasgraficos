@@ -47,6 +47,7 @@
   <ItemGroup>
     <Compile Include="Circulo.cs" />
     <Compile Include="ComparadorPuntosCirculo.cs" />
+    <Compile Include="ColorRGB.cs" />
     <Compile Include="Linea.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Punto.cs" />
