@@ -46,18 +46,22 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="Tao.FreeGlut, Version=2.4.0.2, Culture=neutral, PublicKeyToken=6e602a6ad6c0d06d, processorArchitecture=MSIL" />
     <Reference Include="Tao.OpenGl, Version=2.1.0.12, Culture=neutral, PublicKeyToken=1ca010269a4501ef" />
     <Reference Include="Tao.Platform.Windows, Version=1.0.0.5, Culture=neutral, PublicKeyToken=701104b2da67a104" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EntidadesVista\Circulo.cs" />
-    <Compile Include="EntidadesVista\ColorRGB.cs" />
-    <Compile Include="EntidadesVista\ComparadorPuntosCirculo.cs" />
-    <Compile Include="EntidadesVista\Linea.cs" />
-    <Compile Include="EntidadesVista\Punto.cs" />
-    <Compile Include="EntidadesVista\PuntoEntero.cs" />
-    <Compile Include="EntidadesVista\PuntoFlotante.cs" />
+    <Compile Include="Entidades\Circulo.cs" />
+    <Compile Include="Entidades\ComparadorPuntosCirculo.cs" />
+    <Compile Include="Entidades\ViewPort.cs" />
+    <Compile Include="Entidades\Vista.cs" />
+    <Compile Include="Entidades\Poligono.cs" />
+    <Compile Include="Entidades\Linea.cs" />
+    <Compile Include="Entidades\Punto.cs" />
+    <Compile Include="Entidades\PuntoEntero.cs" />
+    <Compile Include="Entidades\PuntoFlotante.cs" />
     <Compile Include="EstrategiasDibujo\Bresenham.cs" />
+    <Compile Include="EstrategiasDibujo\Clipping.cs" />
     <Compile Include="EstrategiasDibujo\Pintar.cs" />
     <Compile Include="EstrategiasDibujo\DDA.cs" />
     <Compile Include="Form1.cs">

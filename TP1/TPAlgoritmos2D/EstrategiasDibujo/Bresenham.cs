@@ -88,7 +88,7 @@ namespace SistemasGraficos.EstrategiasDibujo
         {
             int x0 = circulo.Centro.GetXEntero();
             int y0 = circulo.Centro.GetYEntero();
-            int radius = circulo.Radio;
+            int radius = (int)circulo.Radio;
 
             int f = 1 - radius;
             int ddF_x = 1;
@@ -135,18 +135,18 @@ namespace SistemasGraficos.EstrategiasDibujo
 
             int x0 = circulo.Centro.GetXEntero();
             int y0 = circulo.Centro.GetYEntero();
-            int radius = circulo.Radio;
+            float radius = circulo.Radio;
 
-            int f = 1 - radius;
+            float f = 1 - radius;
             int ddF_x = 1;
-            int ddF_y = -2 * radius;
+            float ddF_y = -2 * radius;
             int x = 0;
-            int y = radius;
+            float y = radius;
             
-            puntos.Add(new PuntoEntero(x0, y0 + radius, circulo.Centro));
-            puntos.Add(new PuntoEntero(x0, y0 - radius, circulo.Centro));
-            puntos.Add(new PuntoEntero(x0 + radius, y0, circulo.Centro));
-            puntos.Add(new PuntoEntero(x0 - radius, y0, circulo.Centro));
+            puntos.Add(new PuntoFlotante(x0, y0 + radius, circulo.Centro));
+            puntos.Add(new PuntoFlotante(x0, y0 - radius, circulo.Centro));
+            puntos.Add(new PuntoFlotante(x0 + radius, y0, circulo.Centro));
+            puntos.Add(new PuntoFlotante(x0 - radius, y0, circulo.Centro));
 
             while (x < y)
             {
@@ -163,14 +163,14 @@ namespace SistemasGraficos.EstrategiasDibujo
                 ddF_x += 2;
                 f += ddF_x;
 
-                puntos.Add(new PuntoEntero(x0 + x, y0 + y, circulo.Centro));
-                puntos.Add(new PuntoEntero(x0 - x, y0 + y, circulo.Centro));
-                puntos.Add(new PuntoEntero(x0 + x, y0 - y, circulo.Centro));
-                puntos.Add(new PuntoEntero(x0 - x, y0 - y, circulo.Centro));
-                puntos.Add(new PuntoEntero(x0 + y, y0 + x, circulo.Centro));
-                puntos.Add(new PuntoEntero(x0 - y, y0 + x, circulo.Centro));
-                puntos.Add(new PuntoEntero(x0 + y, y0 - x, circulo.Centro));
-                puntos.Add(new PuntoEntero(x0 - y, y0 - x, circulo.Centro));
+                puntos.Add(new PuntoFlotante(x0 + x, y0 + y, circulo.Centro));
+                puntos.Add(new PuntoFlotante(x0 - x, y0 + y, circulo.Centro));
+                puntos.Add(new PuntoFlotante(x0 + x, y0 - y, circulo.Centro));
+                puntos.Add(new PuntoFlotante(x0 - x, y0 - y, circulo.Centro));
+                puntos.Add(new PuntoFlotante(x0 + y, y0 + x, circulo.Centro));
+                puntos.Add(new PuntoFlotante(x0 - y, y0 + x, circulo.Centro));
+                puntos.Add(new PuntoFlotante(x0 + y, y0 - x, circulo.Centro));
+                puntos.Add(new PuntoFlotante(x0 - y, y0 - x, circulo.Centro));
             }
 
             CollectionUtils.Sort(puntos, new ComparadorPuntosCirculo());
@@ -182,7 +182,7 @@ namespace SistemasGraficos.EstrategiasDibujo
 
             for (int i = 0; i < cantidadPuntos; i++)
             {
-                indice = i == 0 ? 0 : (i*cantidadSaltoPuntos) - 1;
+                indice = (i == 0) ? 0 : (i*cantidadSaltoPuntos) - 1;
                 retorno.Add(puntos[indice]);
             }
 

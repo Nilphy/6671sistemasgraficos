@@ -45,6 +45,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ColorRGB.cs" />
+    <Compile Include="Vertice.cs" />
+    <Compile Include="Terreno.cs" />
+    <Compile Include="Escena.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Rueda.cs" />
   </ItemGroup>

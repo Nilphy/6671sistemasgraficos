@@ -9,11 +9,19 @@ using System.Windows.Forms;
 
 using Tao.Platform.Windows;
 using Tao.OpenGl;
+using Tao.FreeGlut;
+using Modelo;
+using SistemasGraficos.Entidades;
+using System.Collections;
+using SistemasGraficos.EstrategiasDibujo;
 
 namespace TPAlgoritmos2D
 {
     public partial class Form1 : Form
     {
+        public static Escena escena = new Escena();
+        public static Vista vista = new Vista();
+
         public Form1()
         {
             InitializeComponent();
@@ -99,16 +107,194 @@ namespace TPAlgoritmos2D
             if (view_grid)
                 Gl.glCallList(DL_GRID);
 
-            //
-            ///////////////////////////////////////////////////
-
-
+            this.DibujarPoligonos(false);
+          
             ///////////////////////////////////////////////////
             // Panel 2D para la vista de la camara
             SetCamera();
+            
+            // Acá se dibuja solo la parte de la pelota... etonces tomamos centro pelota como centro de la ventana
+            // y dos radios para todos lados y movemos eso por matriz de transformación a la cámara... 
+
+            // Matriz de transformación!!!
+            // 
+            // poner en 0,0 -> (centox - 2radiox, centroy - 2 radio y)
+            // escalar para que entre en 0 1 0 1
+            
+            // clipping
+            //this.DibujarPoligonos(true);
+            // Se obtienen todos los polígonos que forman parte del dibujo
+            // (dibujarlos teniendo en cuenta que tienen que estar entre -10 10 -5 5)
+            // Se dibujan, se pintan y listo 
+            // La posición de la rueda tiene que depender de una variable global
+
 
             //
             ///////////////////////////////////////////////////
+
+            // Se setea el temporizador para actualizar los datos del modelo 30 frames por segundo
+            // osea cada 6000/30 milisegundos = 200 milisegundos
+            //Glut.glutTimerFunc(200, actualizarModelo, 0);
+        }
+
+        public static void actualizarModelo(int extra)
+        {
+            Glut.glutTimerFunc(200, actualizarModelo, 0);
+
+            escena.Rueda.Centro.X = (float)((escena.Rueda.Centro.X + 0.1 > 0) ? escena.Rueda.Centro.X + 0.1 % 10 : escena.Rueda.Centro.X + 0.1);
+            escena.Rueda.Omega = escena.Rueda.Omega + 5 % 360;
+            
+            Glut.glutPostRedisplay();
+        }
+
+        /// <summary>
+        /// convierte en polígonos todos los cuerpos del modelo
+        /// si aplicar clipping es true aplica clipping a todos los polígonos
+        /// dibuja todos los polígonos resultantes y los pinta del color que corresponda
+        /// </summary>
+        /// <param name="aplicarClipping"></param>
+        private void DibujarPoligonos(bool aplicarClipping)
+        {
+            if (vista.PoligonosTerreno.Count == 0) this.GenerarPoligonosTerreno();
+            // this.GenerarPoligonosRueda(); // siempre se generan porque cambian
+
+            if (aplicarClipping) this.AplicarClipping();
+
+            foreach (Poligono poligono in vista.PoligonosTerreno)
+            {
+                Gl.glPushMatrix();
+
+                // Se rellena el polígono
+                Pintar.RellenarPoligonoScanLine(poligono.Puntos, poligono.ColorRelleno);
+
+                Gl.glColor3f(poligono.ColorLinea.Red, poligono.ColorLinea.Green, poligono.ColorLinea.Blue);
+
+                // Todos los puntos van a ser unidos por segmentos y el último se une al primero
+                Gl.glBegin(Gl.GL_LINE_LOOP);
+
+                foreach (Punto punto in poligono.Puntos) 
+                {
+                    Gl.glVertex2f(punto.GetXFlotante(), punto.GetYFlotante());
+                }
+                
+                Gl.glEnd();
+
+                Gl.glPopMatrix();
+            }
+
+            // Estos se van a dibujar -> mover al origen -> rotar -> mover adonde estaban
+            /*
+            foreach (Poligono poligono in vista.PoligonosRueda)
+            {
+                Gl.glPushMatrix();
+
+                Gl.glTranslatef(escena.Rueda.Centro.X, escena.Rueda.Centro.Y, 0);
+                Gl.glRotatef(escena.Rueda.Omega, 0, 0, 1);
+                Gl.glTranslatef(-escena.Rueda.Centro.X, -escena.Rueda.Centro.Y, 0);
+
+                Gl.glColor3f(poligono.ColorLinea.Red, poligono.ColorLinea.Green, poligono.ColorLinea.Blue);
+
+                // Todos los puntos van a ser unidos por segmentos y el último se une al primero
+                Gl.glBegin(Gl.GL_LINE_LOOP);
+
+                foreach (Punto punto in poligono.Puntos)
+                {
+                    Gl.glVertex2f(punto.GetXFlotante(), punto.GetYFlotante());
+                }
+
+                Gl.glEnd();
+
+                // Se rellena el polígono
+                Pintar.RellenarPoligonoScanLine(poligono.Puntos, poligono.ColorRelleno);
+
+                Gl.glPopMatrix();
+            }*/
+        }
+
+        private void GenerarPoligonosTerreno()
+        {
+            Vertice verticeAnterior = null;
+
+            foreach (Vertice vertice in escena.Terreno.Vertices)
+            {
+                if (verticeAnterior != null)
+                {
+                    Poligono poligono = new Poligono();
+
+                    poligono.ColorLinea = escena.Terreno.Color;
+                    poligono.ColorRelleno = escena.Terreno.Color;
+                    
+                    poligono.Puntos.Add(new PuntoFlotante(verticeAnterior.X, -5));
+                    poligono.Puntos.Add(new PuntoFlotante(vertice.X, -5));
+                    poligono.Puntos.Add(new PuntoFlotante(vertice.X, vertice.Y));
+                    poligono.Puntos.Add(new PuntoFlotante(verticeAnterior.X, verticeAnterior.Y));
+
+                    vista.PoligonosTerreno.Add(poligono);
+                }
+
+                verticeAnterior = vertice;
+            }
+        }
+
+        private void GenerarPoligonosRueda()
+        {
+            // primero agrego la rueda externa
+            Poligono ruedaExterna = new Poligono();
+            ruedaExterna.ColorLinea = new ColorRGB(255, 0, 0);
+            ruedaExterna.ColorRelleno = new ColorRGB(255, 0, 0);
+            ruedaExterna.Puntos = Bresenham.ObtenerPuntosEquidistantesCirculo(
+                new Circulo(
+                    new PuntoFlotante(escena.Rueda.Centro.X, escena.Rueda.Centro.Y), 
+                    escena.Rueda.RadioExterno),
+                8);
+
+            vista.PoligonosRueda.Add(ruedaExterna);
+
+            // agrego a rueda interna
+            Poligono ruedaInterna = new Poligono();
+            ruedaInterna.ColorLinea = new ColorRGB(255, 255, 255);
+            ruedaInterna.ColorRelleno = new ColorRGB(255, 255, 255);
+            ruedaInterna.Puntos = Bresenham.ObtenerPuntosEquidistantesCirculo(
+                new Circulo(
+                    new PuntoFlotante(escena.Rueda.Centro.X, escena.Rueda.Centro.Y),
+                    escena.Rueda.RadioInterno),
+                8);
+
+            vista.PoligonosRueda.Add(ruedaInterna);
+
+            // agrego los triangulos
+            Poligono triangulo1 = new Poligono();
+            triangulo1.ColorLinea = new ColorRGB(0, 0, 0);
+            triangulo1.ColorRelleno = new ColorRGB(0, 0, 0);
+            triangulo1.Puntos.Add(new PuntoFlotante(escena.Rueda.Centro.X, escena.Rueda.Centro.Y));
+            triangulo1.Puntos.Add(ruedaInterna.Puntos[0]);
+            triangulo1.Puntos.Add(ruedaInterna.Puntos[1]);
+            triangulo1.Puntos.Add(ruedaInterna.Puntos[2]);
+
+            vista.PoligonosRueda.Add(triangulo1);
+
+            Poligono triangulo2 = new Poligono();
+            triangulo2.ColorLinea = new ColorRGB(0, 0, 0);
+            triangulo2.ColorRelleno = new ColorRGB(0, 0, 0);
+            triangulo2.Puntos.Add(new PuntoFlotante(escena.Rueda.Centro.X, escena.Rueda.Centro.Y));
+            triangulo2.Puntos.Add(ruedaInterna.Puntos[4]);
+            triangulo2.Puntos.Add(ruedaInterna.Puntos[5]);
+            triangulo2.Puntos.Add(ruedaInterna.Puntos[6]);
+
+            vista.PoligonosRueda.Add(triangulo2);
+        }
+
+        private void AplicarClipping()
+        {
+            foreach (Poligono poligono in vista.PoligonosTerreno)
+            {
+                poligono.Puntos = Clipping.RecortarPoligono(poligono.Puntos, new ViewPort(escena.Rueda));
+            }
+
+            foreach (Poligono poligono in vista.PoligonosRueda)
+            {
+                poligono.Puntos = Clipping.RecortarPoligono(poligono.Puntos, new ViewPort(escena.Rueda));
+            }
         }
 
         private void DrawAxis()
