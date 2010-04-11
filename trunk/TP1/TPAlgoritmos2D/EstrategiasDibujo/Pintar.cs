@@ -5,6 +5,7 @@ using System.Text;
 using Tao.OpenGl;
 using SistemasGraficos.Entidades;
 using System.Collections;
+using Modelo;
 
 namespace SistemasGraficos.EstrategiasDibujo
 {
@@ -68,10 +69,14 @@ namespace SistemasGraficos.EstrategiasDibujo
                 }
             }
         }
+        
         #region Métodos auxiliares para rellenado
+        
+
+
         private static void pintar(int xInicial, int xFinal, int y, ColorRGB color)
         {
-            Gl.glBegin(Gl.GL_POINTS);
+            Gl.glBegin(Gl.GL_LINES);
             Gl.glColor3f(color.Red, color.Green, color.Blue);
             //desde xInicial+1 para no pintar el borde
             int x = xInicial + 1;
@@ -83,6 +88,7 @@ namespace SistemasGraficos.EstrategiasDibujo
             }
             Gl.glEnd();
         }
+
         private static void agregarPunto(Dictionary<int, ArrayList> segmentos, int x, int y)
         {
             if (!segmentos.ContainsKey(y))
@@ -91,6 +97,7 @@ namespace SistemasGraficos.EstrategiasDibujo
             }
             segmentos[y].Add(x);
         }
+        
         private static void procesarSegmento(Punto inicial, Punto final, Dictionary<int, ArrayList> segmentos)
         {
             int dy = final.GetYEntero() - inicial.GetYEntero();
@@ -189,6 +196,9 @@ namespace SistemasGraficos.EstrategiasDibujo
                 segmentos[final.GetYEntero()].RemoveAt(segmentos[final.GetYEntero()].LastIndexOf(final.GetXEntero()));
             }
         }
+        
+        
+        
         #endregion
     }
 }
