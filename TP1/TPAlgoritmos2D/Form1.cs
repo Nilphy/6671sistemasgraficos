@@ -14,6 +14,17 @@ namespace TPAlgoritmos2D
 {
     public partial class Form1 : Form
     {
+        public Form1()
+        {
+            InitializeComponent();
+            glControl.InitializeContexts();
+            //Initialize2DConfiguration();
+            Init();
+        }
+
+        #region Propiedades
+
+        private int dl_handle;
 
         private int W_WIDTH = 1024;
         private int W_HEIGHT = 768;
@@ -30,18 +41,6 @@ namespace TPAlgoritmos2D
         private float[] light_color = new float[4] { 1.0f, 1.0f, 1.0f, 1.0f };
         private float[] light_position = new float[3] { 10.0f, 10.0f, 8.0f };
         private float[] light_ambient = new float[4] { 0.05f, 0.05f, 0.05f, 1.0f };
-
-        private int dl_handle;
-
-        public Form1()
-        {
-            InitializeComponent();
-            glControl.InitializeContexts();
-            //Initialize2DConfiguration();
-            Init();
-        }
-
-        #region Propiedades
 
         private int TOP_VIEW_POSX
         {
@@ -152,7 +151,6 @@ namespace TPAlgoritmos2D
             Gl.glEnable(Gl.GL_LIGHTING);
         }
 
-
         private void DrawXYGrid()
         {
             int i;
@@ -187,7 +185,7 @@ namespace TPAlgoritmos2D
             Gl.glViewport(TOP_VIEW_POSX, TOP_VIEW_POSY, TOP_VIEW_W, TOP_VIEW_H);
             Gl.glMatrixMode(Gl.GL_PROJECTION);
             Gl.glLoadIdentity();
-            Glu.gluOrtho2D(-0.10, 1.05, -0.10, 1.05);
+            Glu.gluOrtho2D(-0.0, 1.0, -0.0, 1.0);
             Gl.glMatrixMode(Gl.GL_MODELVIEW);
             Gl.glLoadIdentity();
             Glu.gluLookAt(0, 0, 0.5, 0, 0, 0, 0, 1, 0);
