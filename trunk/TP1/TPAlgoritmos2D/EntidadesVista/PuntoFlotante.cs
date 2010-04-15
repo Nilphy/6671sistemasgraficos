@@ -27,6 +27,13 @@ namespace SistemasGraficos.Entidades
             this.Y = y;
         }
 
+        public PuntoFlotante(float x, float y, Punto origenCoordenadas)
+        {
+            this.X = x;
+            this.Y = y;
+            this.OrigenCoordenadas = origenCoordenadas;
+        }
+
         public override float GetXFlotante()
         {
             return this.X;
