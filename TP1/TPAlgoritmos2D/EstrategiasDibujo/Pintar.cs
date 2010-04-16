@@ -197,8 +197,6 @@ namespace SistemasGraficos.EstrategiasDibujo
             }
         }
         
-        
-        
         #endregion
     }
 }
