@@ -34,14 +34,14 @@ namespace SistemasGraficos.Entidades
             this.Y = y;
         }
 
-        public override float GetXFlotante()
+        public override double GetXFlotante()
         {
-            return (float)this.X;
+            return (double)this.X;
         }
 
-        public override float GetYFlotante()
+        public override double GetYFlotante()
         {
-            return (float)this.Y;
+            return (double)this.Y;
         }
 
         public override int GetXEntero()

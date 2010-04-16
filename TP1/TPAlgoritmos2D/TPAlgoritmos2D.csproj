@@ -51,15 +51,15 @@
     <Reference Include="Tao.Platform.Windows, Version=1.0.0.5, Culture=neutral, PublicKeyToken=701104b2da67a104" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Entidades\Circulo.cs" />
-    <Compile Include="Entidades\ComparadorPuntosCirculo.cs" />
-    <Compile Include="Entidades\ViewPort.cs" />
-    <Compile Include="Entidades\Vista.cs" />
-    <Compile Include="Entidades\Poligono.cs" />
-    <Compile Include="Entidades\Linea.cs" />
-    <Compile Include="Entidades\Punto.cs" />
-    <Compile Include="Entidades\PuntoEntero.cs" />
-    <Compile Include="Entidades\PuntoFlotante.cs" />
+    <Compile Include="EntidadesVista\Circulo.cs" />
+    <Compile Include="EntidadesVista\ComparadorPuntosCirculo.cs" />
+    <Compile Include="EntidadesVista\Linea.cs" />
+    <Compile Include="EntidadesVista\Poligono.cs" />
+    <Compile Include="EntidadesVista\Punto.cs" />
+    <Compile Include="EntidadesVista\PuntoEntero.cs" />
+    <Compile Include="EntidadesVista\PuntoFlotante.cs" />
+    <Compile Include="EntidadesVista\ViewPort.cs" />
+    <Compile Include="EntidadesVista\Vista.cs" />
     <Compile Include="EstrategiasDibujo\Bresenham.cs" />
     <Compile Include="EstrategiasDibujo\Clipping.cs" />
     <Compile Include="EstrategiasDibujo\Pintar.cs" />
@@ -104,6 +104,9 @@
       <Project>{D83D0D21-8DA9-4C3D-8647-2373EFB6BEFC}</Project>
       <Name>Modelo</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Entidades\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

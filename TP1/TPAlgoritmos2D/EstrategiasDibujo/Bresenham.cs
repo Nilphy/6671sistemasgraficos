@@ -135,13 +135,13 @@ namespace SistemasGraficos.EstrategiasDibujo
 
             int x0 = circulo.Centro.GetXEntero();
             int y0 = circulo.Centro.GetYEntero();
-            float radius = circulo.Radio;
+            double radius = circulo.Radio;
 
-            float f = 1 - radius;
+            double f = 1 - radius;
             int ddF_x = 1;
-            float ddF_y = -2 * radius;
+            double ddF_y = -2 * radius;
             int x = 0;
-            float y = radius;
+            double y = radius;
             
             puntos.Add(new PuntoFlotante(x0, y0 + radius, circulo.Centro));
             puntos.Add(new PuntoFlotante(x0, y0 - radius, circulo.Centro));

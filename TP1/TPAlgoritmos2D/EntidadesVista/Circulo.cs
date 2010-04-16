@@ -8,12 +8,12 @@ namespace SistemasGraficos.Entidades
     public class Circulo
     {
         private Punto centro;
-        private float radio;
+        private double radio;
 
         public Punto Centro { set { this.centro = value; } get { return this.centro; } }
-        public float Radio { set { this.radio = value; } get { return this.radio; } }
+        public double Radio { set { this.radio = value; } get { return this.radio; } }
 
-        public Circulo(Punto centro, float radio)
+        public Circulo(Punto centro, double radio)
         {
             this.Centro = centro;
             this.Radio = radio;
