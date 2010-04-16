@@ -32,17 +32,21 @@ namespace SistemasGraficos.Entidades
             CrearPoligonosTerreno(escena.Terreno);
             CrearPoligonosRueda(escena.Rueda);
 
+            Gl.glPushMatrix();
+
             this.EscalarEscenaToViewSceneWindow();
 
             DibujarTerreno(escena.Terreno);
             DibujarRueda(escena.Rueda);
+
+            Gl.glPopMatrix();
         }
 
         private void DibujarTerreno(Terreno terreno)
         {
             foreach (Poligono poligono in PoligonosTerreno)
             {
-                Gl.glPushMatrix();
+                //Gl.glPushMatrix();
 
                 // Se rellena el polígono
                 Pintar.RellenarPoligonoScanLine(poligono.Puntos, poligono.ColorRelleno);
@@ -59,7 +63,7 @@ namespace SistemasGraficos.Entidades
 
                 Gl.glEnd();
 
-                Gl.glPopMatrix();
+                //Gl.glPopMatrix();
             }
         }
 
@@ -72,6 +76,8 @@ namespace SistemasGraficos.Entidades
 
                 foreach (Vertice vertice in terreno.Vertices)
                 {
+                    Gl.glPushMatrix();
+
                     if (verticeAnterior != null)
                     {
                         Poligono poligono = new Poligono();
@@ -88,6 +94,8 @@ namespace SistemasGraficos.Entidades
                     }
 
                     verticeAnterior = vertice;
+
+                    Gl.glPopMatrix();
                 }
             }
         }

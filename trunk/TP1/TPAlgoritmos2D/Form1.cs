@@ -252,22 +252,22 @@ namespace TPAlgoritmos2D
 
             Gl.glBegin(Gl.GL_LINE_STRIP);
             // X
-            Gl.glColor3f(0, 0, 0);
-            Gl.glVertex3f(-10, 0, 0);
-            Gl.glColor3f(0, 0, 0);
-            Gl.glVertex3f(0, 0, 0);
-            Gl.glColor3f(0, 0, 0);
-            Gl.glVertex3f(10, 0, 0);
+            Gl.glColor3d(0, 0, 0);
+            Gl.glVertex3d(vista.X_MIN, 0, 0);
+            Gl.glColor3d(0, 0, 0);
+            Gl.glVertex3d(0, 0, 0);
+            Gl.glColor3d(0, 0, 0);
+            Gl.glVertex3d(vista.X_MAX, 0, 0);
             Gl.glEnd();
 
             Gl.glBegin(Gl.GL_LINE_STRIP);
             // Y
-            Gl.glColor3f(0, 0, 0);
-            Gl.glVertex3f(0, -8, 0);
-            Gl.glColor3f(0, 0, 0);
-            Gl.glVertex3f(0, 0, 0);
-            Gl.glColor3f(0, 0, 0);
-            Gl.glVertex3f(0, 8, 0);
+            Gl.glColor3d(0, 0, 0);
+            Gl.glVertex3d(0, vista.Y_MIN, 0);
+            Gl.glColor3d(0, 0, 0);
+            Gl.glVertex3d(0, 0, 0);
+            Gl.glColor3d(0, 0, 0);
+            Gl.glVertex3d(0, vista.Y_MAX, 0);
             Gl.glEnd();
 
             Gl.glEnable(Gl.GL_LIGHTING);
@@ -277,11 +277,11 @@ namespace TPAlgoritmos2D
         {
             Gl.glDisable(Gl.GL_LIGHTING);
             Gl.glBegin(Gl.GL_LINE_LOOP);
-            Gl.glColor3f(1, 1, 0);
-            Gl.glVertex3f(0, 0, 0);
-            Gl.glVertex3f(1, 0, 0);
-            Gl.glVertex3f(1, 1, 0);
-            Gl.glVertex3f(0, 1, 0);
+            Gl.glColor3d(1, 1, 0);
+            Gl.glVertex3d(0, 0, 0);
+            Gl.glVertex3d(1, 0, 0);
+            Gl.glVertex3d(1, 1, 0);
+            Gl.glVertex3d(0, 1, 0);
             Gl.glEnd();
             Gl.glEnable(Gl.GL_LIGHTING);
         }
@@ -290,14 +290,14 @@ namespace TPAlgoritmos2D
         {
             int i;
             Gl.glDisable(Gl.GL_LIGHTING);
-            Gl.glColor3f(0.15f, 0.1f, 0.1f);
+            Gl.glColor3d(0.15d, 0.1d, 0.1d);
             Gl.glBegin(Gl.GL_LINES);
             for (i = -20; i < 21; i++)
             {
-                Gl.glVertex3f(i, -20, 0);
-                Gl.glVertex3f(i, 20, 0);
-                Gl.glVertex3f(-20, i, 0);
-                Gl.glVertex3f(20, i, 0);
+                Gl.glVertex3d(i, -20, 0);
+                Gl.glVertex3d(i, 20, 0);
+                Gl.glVertex3d(-20, i, 0);
+                Gl.glVertex3d(20, i, 0);
             }
             Gl.glEnd();
             Gl.glEnable(Gl.GL_LIGHTING);
