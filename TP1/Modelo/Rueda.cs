@@ -9,11 +9,13 @@ namespace Modelo
     {
         public static Vertice verticeInicial = new Vertice(-7, 3);
         public static double radio = 2d;
-        public static double radioInterno = 1.9d;
         public static double masa = 300d;
 
         public double RadioExterno { get; set; }
-        public double RadioInterno { get; set; }
+        public double RadioInterno
+        {
+            get { return this.RadioExterno * 0.9; }
+        }
         public Vertice Centro { get; set; }
         public double VelocidadX { get; set; } // m / s
         public double VelocidadY { get; set; } // m / s
@@ -22,26 +24,17 @@ namespace Modelo
         
         public int SentidoX
         {
-            get
-            {
-                return (VelocidadX > 0) ? 1 : -1;
-            }
+            get { return (VelocidadX > 0) ? 1 : -1; }
         }
 
         public double VelocidadTraslacion
         {
-            get
-            {
-                return Math.Sqrt(Math.Pow(VelocidadX, 2) + Math.Pow(VelocidadY, 2));
-            }
+            get { return Math.Sqrt(Math.Pow(VelocidadX, 2) + Math.Pow(VelocidadY, 2)); }
         }
 
         public double VelocidadAngular
         {
-            get
-            {
-                return VelocidadTraslacion / RadioExterno;
-            }
+            get { return VelocidadTraslacion / RadioExterno; }
         }
 
         public double MomentoInercia
@@ -53,7 +46,6 @@ namespace Modelo
         {
             this.Centro = verticeInicial;
             this.RadioExterno = radio;
-            this.RadioInterno = RadioInterno;
             this.VelocidadX = 0;
             this.VelocidadY = 0;
             this.Masa = masa;

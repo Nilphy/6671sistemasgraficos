@@ -20,15 +20,14 @@ namespace Modelo
 
         public void AddVertice(double x, double y)
         {
-            Vertice nuevoVertice = new Vertice(x, y);
+            Vertice verticeNuevo = new Vertice(x, y);
+            Vertice verticeAnterior = (this.Vertices.Count > 1) ? this.Vertices.Last<Vertice>() : null;
 
-            this.Vertices.Add(nuevoVertice);
+            this.Vertices.Add(verticeNuevo);
 
             // Si tengo mas de un vertice, puedo empezar a formar los planos.
-            if (this.Vertices.Count > 1)
-            {
-                this.Planos.Add(new Plano(this.Vertices.Last<Vertice>(), nuevoVertice));
-            }
+            if (verticeAnterior != null)
+                this.Planos.Add(new Plano(verticeAnterior, verticeNuevo));
         }
 
         public double GetAltura(double x)
