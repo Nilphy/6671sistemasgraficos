@@ -34,6 +34,7 @@ namespace SistemasGraficos.Entidades
 
         public void DibujarEscena(Escena escena)
         {
+            Gl.glDisable(Gl.GL_LIGHTING);
             CrearPoligonosTerreno(escena.Terreno);
             CrearPoligonosRueda(escena.Rueda);
 
@@ -45,6 +46,7 @@ namespace SistemasGraficos.Entidades
             DibujarRueda(escena.Rueda);
 
             Gl.glPopMatrix();
+            Gl.glEnable(Gl.GL_LIGHTING);
         }
 
         private void DibujarTerreno(Terreno terreno, Boolean aplicarClipping, ViewPort viewPort)
@@ -88,8 +90,8 @@ namespace SistemasGraficos.Entidades
                     {
                         Poligono poligono = new Poligono();
 
-                        poligono.ColorLinea = new ColorRGB(1, 0, 0);
-                        poligono.ColorRelleno = new ColorRGB(1, 0, 0);
+                        poligono.ColorLinea = new ColorRGB(0.4f, 0.4f, 0.4f);
+                        poligono.ColorRelleno = new ColorRGB(0.4f, 0.4f, 0.4f);
 
                         poligono.Puntos.Add(new PuntoFlotante(verticeAnterior.X, 0));
                         poligono.Puntos.Add(new PuntoFlotante(verticeAnterior.X, verticeAnterior.Y));
@@ -113,7 +115,7 @@ namespace SistemasGraficos.Entidades
                 Gl.glPushMatrix();
 
                 Gl.glTranslated(rueda.Centro.X, rueda.Centro.Y, 0);
-                Gl.glRotated(rueda.AnguloRotacion, 0, 0, 1);
+                Gl.glRotated(rueda.AnguloRotacion * 180 / Math.PI, 0, 0, 1);
                 Gl.glTranslated(-rueda.Centro.X, -rueda.Centro.Y, 0);
 
                 Gl.glColor3f(poligono.ColorLinea.Red, poligono.ColorLinea.Green, poligono.ColorLinea.Blue);
@@ -202,6 +204,7 @@ namespace SistemasGraficos.Entidades
 
         internal void DibujarZoomEscena(Escena escena)
         {
+            Gl.glDisable(Gl.GL_LIGHTING);
             CrearPoligonosTerreno(escena.Terreno);
             CrearPoligonosRueda(escena.Rueda);
 
@@ -215,6 +218,7 @@ namespace SistemasGraficos.Entidades
             DibujarRueda(escena.Rueda);
 
             Gl.glPopMatrix();
+            Gl.glEnable(Gl.GL_LIGHTING);
         }
 
         private void EscalarEscenaToViewCameraWindow(ViewPort viewPort)
