@@ -64,30 +64,30 @@ namespace SistemasGraficos.EstrategiasDibujo
 
         private static bool EsInterior(Punto p, Punto vertice1, Punto vertice2)
         {
-            if (vertice2.GetXEntero() > vertice1.GetXEntero())	//inferior
+            if (vertice2.GetXFlotante() > vertice1.GetXFlotante())	//inferior
             {
-                if (p.GetYEntero() >= vertice1.GetYEntero())
+                if (p.GetYFlotante() >= vertice1.GetYFlotante())
                 {
                     return true;
                 }
             }
-            if (vertice2.GetXEntero() < vertice1.GetXEntero())  //superior
+            if (vertice2.GetXFlotante() < vertice1.GetXFlotante())  //superior
             {
-                if (p.GetYEntero() <= vertice1.GetYEntero())
+                if (p.GetYFlotante() <= vertice1.GetYFlotante())
                 {
                     return true;
                 }
             }
-            if (vertice2.GetYEntero() > vertice1.GetYEntero()) //derecha
+            if (vertice2.GetYFlotante() > vertice1.GetYFlotante()) //derecha
             {
-                if (p.GetXEntero() <= vertice2.GetXEntero())
+                if (p.GetXFlotante() <= vertice2.GetXFlotante())
                 {
                     return true;
                 }
             }
-            if (vertice2.GetYEntero() < vertice1.GetYEntero()) //izquierda
+            if (vertice2.GetYFlotante() < vertice1.GetYFlotante()) //izquierda
             {
-                if (p.GetXEntero() >= vertice2.GetXEntero())
+                if (p.GetXFlotante() >= vertice2.GetXFlotante())
                 {
                     return true;
                 }

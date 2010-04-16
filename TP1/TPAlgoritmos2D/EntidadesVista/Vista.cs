@@ -18,6 +18,11 @@ namespace SistemasGraficos.Entidades
         public double Y_MIN = -5;
         public double Y_MAX = 5;
 
+        public double X_MIN_ZOOM = 0;
+        public double X_MAX_ZOOM = 1;
+        public double Y_MIN_ZOOM = 0;
+        public double Y_MAX_ZOOM = 1;
+
         public IList PoligonosTerreno { set; get; }
         public IList PoligonosRueda { set; get; }
 
@@ -36,25 +41,30 @@ namespace SistemasGraficos.Entidades
 
             this.EscalarEscenaToViewSceneWindow();
 
-            DibujarTerreno(escena.Terreno);
+            DibujarTerreno(escena.Terreno, false, null);
             DibujarRueda(escena.Rueda);
 
             Gl.glPopMatrix();
         }
 
-        private void DibujarTerreno(Terreno terreno)
+        private void DibujarTerreno(Terreno terreno, Boolean aplicarClipping, ViewPort viewPort)
         {
             foreach (Poligono poligono in PoligonosTerreno)
             {
+                IList puntosDibujo;
+
+                if (aplicarClipping) puntosDibujo = Clipping.RecortarPoligono(poligono.Puntos, viewPort);
+                else puntosDibujo = poligono.Puntos;
+
                 // Se rellena el polígono
-                Pintar.RellenarPoligonoScanLine(poligono.Puntos, poligono.ColorRelleno);
+                Pintar.RellenarPoligonoScanLine(puntosDibujo, poligono.ColorRelleno);
 
                 Gl.glColor3f(poligono.ColorLinea.Red, poligono.ColorLinea.Green, poligono.ColorLinea.Blue);
 
                 // Todos los puntos van a ser unidos por segmentos y el último se une al primero
                 Gl.glBegin(Gl.GL_LINE_LOOP);
 
-                foreach (Punto punto in poligono.Puntos)
+                foreach (Punto punto in puntosDibujo)
                 {
                     Gl.glVertex2d(punto.GetXFlotante(), punto.GetYFlotante());
                 }
@@ -189,5 +199,29 @@ namespace SistemasGraficos.Entidades
             }
         }
 
+
+        internal void DibujarZoomEscena(Escena escena)
+        {
+            CrearPoligonosTerreno(escena.Terreno);
+            CrearPoligonosRueda(escena.Rueda);
+
+            Gl.glPushMatrix();
+
+            ViewPort vp = new ViewPort(escena.Rueda);
+
+            this.EscalarEscenaToViewCameraWindow(vp);
+
+            DibujarTerreno(escena.Terreno, true, vp);
+            DibujarRueda(escena.Rueda);
+
+            Gl.glPopMatrix();
+        }
+
+        private void EscalarEscenaToViewCameraWindow(ViewPort viewPort)
+        {
+            Gl.glTranslated(X_MIN_ZOOM, Y_MIN_ZOOM, 0);
+            Gl.glScaled((X_MAX_ZOOM - X_MIN_ZOOM) / (viewPort.XDer - viewPort.XIzq), (Y_MAX_ZOOM - Y_MIN_ZOOM) / (viewPort.YArriba - viewPort.YAbajo), 1);
+            Gl.glTranslated(-viewPort.XIzq, -viewPort.YAbajo, 0);
+        }
     }
 }
