@@ -105,15 +105,13 @@ namespace TPAlgoritmos2D
             // Escena 3D
             this.SetSceneWindow();
 
-            this.vista.DibujarEscena(this.escena);
-
             if (view_axis)
                 Gl.glCallList(DL_AXIS);
 
             if (view_grid)
                 Gl.glCallList(DL_GRID);
 
-            
+            this.vista.DibujarEscena(this.escena);
             //this.DibujarPoligonos(false);
           
             ///////////////////////////////////////////////////
@@ -163,7 +161,7 @@ namespace TPAlgoritmos2D
             this.escena.Terreno.AddVertice(800, 600);
 
             // Creo la rueda
-            this.escena.Rueda.RadioExterno = 5;
+            this.escena.Rueda.RadioExterno = 10;
 
             this.escena.Rueda.Centro.X = 20;
             this.escena.Rueda.Centro.Y = escena.Terreno.GetAltura(20) + this.escena.Rueda.RadioExterno;

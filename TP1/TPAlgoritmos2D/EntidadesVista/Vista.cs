@@ -46,8 +46,6 @@ namespace SistemasGraficos.Entidades
         {
             foreach (Poligono poligono in PoligonosTerreno)
             {
-                //Gl.glPushMatrix();
-
                 // Se rellena el polígono
                 Pintar.RellenarPoligonoScanLine(poligono.Puntos, poligono.ColorRelleno);
 
@@ -62,8 +60,6 @@ namespace SistemasGraficos.Entidades
                 }
 
                 Gl.glEnd();
-
-                //Gl.glPopMatrix();
             }
         }
 
