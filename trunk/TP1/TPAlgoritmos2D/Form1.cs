@@ -111,7 +111,8 @@ namespace TPAlgoritmos2D
             if (view_grid)
                 Gl.glCallList(DL_GRID);
 
-            this.DibujarPoligonos(false);
+            this.vista.DibujarEscena(this.escena);
+            //this.DibujarPoligonos(false);
           
             ///////////////////////////////////////////////////
             // Panel 2D para la vista de la camara
@@ -153,16 +154,17 @@ namespace TPAlgoritmos2D
             this.escena = new Escena();
 
             // Creo el terreno
-            this.escena.Terreno.AddVertice(-10, 8);
-            this.escena.Terreno.AddVertice(-5, 0);
-            this.escena.Terreno.AddVertice(-3, 0);
-            this.escena.Terreno.AddVertice(1, 2);
-            this.escena.Terreno.AddVertice(5, 6);
-            this.escena.Terreno.AddVertice(10, 8);
+            this.escena.Terreno.AddVertice(0, 500);
+            this.escena.Terreno.AddVertice(100, 100);
+            this.escena.Terreno.AddVertice(400, 250);
+            this.escena.Terreno.AddVertice(600, 200);
+            this.escena.Terreno.AddVertice(800, 600);
 
             // Creo la rueda
-            this.escena.Rueda.Centro.X = 6;
-            this.escena.Rueda.Centro.Y = escena.Terreno.GetAltura(6) + this.escena.Rueda.RadioExterno;
+            this.escena.Rueda.RadioExterno = 5;
+
+            this.escena.Rueda.Centro.X = 20;
+            this.escena.Rueda.Centro.Y = escena.Terreno.GetAltura(20) + this.escena.Rueda.RadioExterno;
         }
 
         /// <summary>
@@ -173,7 +175,7 @@ namespace TPAlgoritmos2D
         /// <param name="aplicarClipping"></param>
         private void DibujarPoligonos(bool aplicarClipping)
         {
-            if (vista.PoligonosTerreno.Count == 0) this.GenerarPoligonosTerreno();
+            //if (vista.PoligonosTerreno.Count == 0) this.GenerarPoligonosTerreno();
             // this.GenerarPoligonosRueda(); // siempre se generan porque cambian
 
             if (aplicarClipping) this.AplicarClipping();
@@ -227,79 +229,6 @@ namespace TPAlgoritmos2D
 
                 Gl.glPopMatrix();
             }*/
-        }
-
-        private void GenerarPoligonosTerreno()
-        {
-            Vertice verticeAnterior = null;
-
-            foreach (Vertice vertice in escena.Terreno.Vertices)
-            {
-                if (verticeAnterior != null)
-                {
-                    Poligono poligono = new Poligono();
-
-                    poligono.ColorLinea = new ColorRGB(255, 0, 0);
-                    poligono.ColorRelleno = new ColorRGB(255, 0, 0);
-                    
-                    poligono.Puntos.Add(new PuntoFlotante(verticeAnterior.X, -5));
-                    poligono.Puntos.Add(new PuntoFlotante(vertice.X, -5));
-                    poligono.Puntos.Add(new PuntoFlotante(vertice.X, vertice.Y));
-                    poligono.Puntos.Add(new PuntoFlotante(verticeAnterior.X, verticeAnterior.Y));
-
-                    vista.PoligonosTerreno.Add(poligono);
-                }
-
-                verticeAnterior = vertice;
-            }
-        }
-
-        private void GenerarPoligonosRueda()
-        {
-            // primero agrego la rueda externa
-            Poligono ruedaExterna = new Poligono();
-            ruedaExterna.ColorLinea = new ColorRGB(255, 0, 0);
-            ruedaExterna.ColorRelleno = new ColorRGB(255, 0, 0);
-            ruedaExterna.Puntos = Bresenham.ObtenerPuntosEquidistantesCirculo(
-                new Circulo(
-                    new PuntoFlotante(escena.Rueda.Centro.X, escena.Rueda.Centro.Y), 
-                    escena.Rueda.RadioExterno),
-                8);
-
-            vista.PoligonosRueda.Add(ruedaExterna);
-
-            // agrego a rueda interna
-            Poligono ruedaInterna = new Poligono();
-            ruedaInterna.ColorLinea = new ColorRGB(255, 255, 255);
-            ruedaInterna.ColorRelleno = new ColorRGB(255, 255, 255);
-            ruedaInterna.Puntos = Bresenham.ObtenerPuntosEquidistantesCirculo(
-                new Circulo(
-                    new PuntoFlotante(escena.Rueda.Centro.X, escena.Rueda.Centro.Y),
-                    escena.Rueda.RadioInterno),
-                8);
-
-            vista.PoligonosRueda.Add(ruedaInterna);
-
-            // agrego los triangulos
-            Poligono triangulo1 = new Poligono();
-            triangulo1.ColorLinea = new ColorRGB(0, 0, 0);
-            triangulo1.ColorRelleno = new ColorRGB(0, 0, 0);
-            triangulo1.Puntos.Add(new PuntoFlotante(escena.Rueda.Centro.X, escena.Rueda.Centro.Y));
-            triangulo1.Puntos.Add(ruedaInterna.Puntos[0]);
-            triangulo1.Puntos.Add(ruedaInterna.Puntos[1]);
-            triangulo1.Puntos.Add(ruedaInterna.Puntos[2]);
-
-            vista.PoligonosRueda.Add(triangulo1);
-
-            Poligono triangulo2 = new Poligono();
-            triangulo2.ColorLinea = new ColorRGB(0, 0, 0);
-            triangulo2.ColorRelleno = new ColorRGB(0, 0, 0);
-            triangulo2.Puntos.Add(new PuntoFlotante(escena.Rueda.Centro.X, escena.Rueda.Centro.Y));
-            triangulo2.Puntos.Add(ruedaInterna.Puntos[4]);
-            triangulo2.Puntos.Add(ruedaInterna.Puntos[5]);
-            triangulo2.Puntos.Add(ruedaInterna.Puntos[6]);
-
-            vista.PoligonosRueda.Add(triangulo2);
         }
 
         private void AplicarClipping()

@@ -7,27 +7,27 @@ namespace Modelo
 {
     public class ColorRGB
     {
-        private int red;
-        private int green;
-        private int blue;
+        private float red;
+        private float green;
+        private float blue;
 
-        public int Red
+        public float Red
         {
             set { this.red = value; }
             get { return this.red; }
         }
-        public int Green
+        public float Green
         {
             set { this.green = value; }
             get { return this.green; }
         }
-        public int Blue
+        public float Blue
         {
             set { this.blue = value; }
             get { return this.blue; }
         }
 
-        public ColorRGB(int r, int g, int b)
+        public ColorRGB(float r, float g, float b)
         {
             this.Red = r;
             this.Blue = b;
