@@ -10,6 +10,11 @@ namespace Modelo
 
         private float GRAVEDAD = 9.81f;
 
+        public const double X_MIN = 0;
+        public const double Y_MIN = 0;
+        public const double X_MAX = 800;
+        public const double Y_MAX = 600;
+
         // Flag para indicar si cambia la inclinación del terreno para realizar 
         // las correcciones para la simulación del movimiento físico.
         private bool cambioInclinacion = false;

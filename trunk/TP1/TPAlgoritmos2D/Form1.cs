@@ -105,13 +105,15 @@ namespace TPAlgoritmos2D
             // Escena 3D
             this.SetSceneWindow();
 
+            this.vista.DibujarEscena(this.escena);
+
             if (view_axis)
                 Gl.glCallList(DL_AXIS);
 
             if (view_grid)
                 Gl.glCallList(DL_GRID);
 
-            this.vista.DibujarEscena(this.escena);
+            
             //this.DibujarPoligonos(false);
           
             ///////////////////////////////////////////////////
