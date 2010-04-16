@@ -8,8 +8,6 @@ namespace Modelo
     public class Terreno
     {
 
-        public ColorRGB Color { get; set; }
-
         public IList<Vertice> Vertices { get; set; }
 
         private IList<Plano> Planos { get; set; }

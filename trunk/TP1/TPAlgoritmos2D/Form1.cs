@@ -19,15 +19,12 @@ namespace TPAlgoritmos2D
 {
     public partial class Form1 : Form
     {
-        public static Escena escena = new Escena();
-        public static Vista vista = new Vista();
 
-        public Form1()
-        {
-            InitializeComponent();
-            glControl.InitializeContexts();
-            Init();
-        }
+        private const int DELTA_TIEMPO = 50;
+        
+        public Escena escena = new Escena();
+        public Vista vista = new Vista();
+        private Timer timer;
 
         #region Propiedades
 
@@ -86,6 +83,21 @@ namespace TPAlgoritmos2D
 
         #endregion
 
+        public Form1()
+        {
+            InitializeComponent();
+            glControl.InitializeContexts();
+            Init();
+
+            CrearEscenaInicial();
+
+            // Configuramos el Timer para la simulación.
+            this.timer = new Timer();
+            timer.Tick += new EventHandler(TimerEventProcessor);
+            timer.Interval = DELTA_TIEMPO;
+            timer.Start();
+        }
+
         private void glControl_Paint(object sender, PaintEventArgs e)
         {
             Gl.glClear(Gl.GL_COLOR_BUFFER_BIT | Gl.GL_DEPTH_BUFFER_BIT);
@@ -129,14 +141,28 @@ namespace TPAlgoritmos2D
             //Glut.glutTimerFunc(200, actualizarModelo, 0);
         }
 
-        public static void actualizarModelo(int extra)
+        private void TimerEventProcessor(Object myObject, EventArgs myEventArgs)
         {
-            Glut.glutTimerFunc(200, actualizarModelo, 0);
+            escena.Simular(DELTA_TIEMPO);
 
-            escena.Rueda.Centro.X = (float)((escena.Rueda.Centro.X + 0.1 > 0) ? escena.Rueda.Centro.X + 0.1 % 10 : escena.Rueda.Centro.X + 0.1);
-            escena.Rueda.Omega = escena.Rueda.Omega + 5 % 360;
-            
-            Glut.glutPostRedisplay();
+            glControl.Invalidate();
+        }
+
+        private void CrearEscenaInicial()
+        {
+            this.escena = new Escena();
+
+            // Creo el terreno
+            this.escena.Terreno.AddVertice(-10, 8);
+            this.escena.Terreno.AddVertice(-5, 0);
+            this.escena.Terreno.AddVertice(-3, 0);
+            this.escena.Terreno.AddVertice(1, 2);
+            this.escena.Terreno.AddVertice(5, 6);
+            this.escena.Terreno.AddVertice(10, 8);
+
+            // Creo la rueda
+            this.escena.Rueda.Centro.X = 6;
+            this.escena.Rueda.Centro.Y = escena.Terreno.GetAltura(6) + this.escena.Rueda.RadioExterno;
         }
 
         /// <summary>
@@ -158,7 +184,7 @@ namespace TPAlgoritmos2D
 
                 // Se rellena el polígono
                 Pintar.RellenarPoligonoScanLine(poligono.Puntos, poligono.ColorRelleno);
-
+                
                 Gl.glColor3f(poligono.ColorLinea.Red, poligono.ColorLinea.Green, poligono.ColorLinea.Blue);
 
                 // Todos los puntos van a ser unidos por segmentos y el último se une al primero
@@ -213,8 +239,8 @@ namespace TPAlgoritmos2D
                 {
                     Poligono poligono = new Poligono();
 
-                    poligono.ColorLinea = escena.Terreno.Color;
-                    poligono.ColorRelleno = escena.Terreno.Color;
+                    poligono.ColorLinea = new ColorRGB(255, 0, 0);
+                    poligono.ColorRelleno = new ColorRGB(255, 0, 0);
                     
                     poligono.Puntos.Add(new PuntoFlotante(verticeAnterior.X, -5));
                     poligono.Puntos.Add(new PuntoFlotante(vertice.X, -5));
