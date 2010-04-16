@@ -117,10 +117,11 @@ namespace TPAlgoritmos2D
             ///////////////////////////////////////////////////
             // Panel 2D para la vista de la camara
             SetCamera();
-            
+
             // Acá se dibuja solo la parte de la pelota... etonces tomamos centro pelota como centro de la ventana
             // y dos radios para todos lados y movemos eso por matriz de transformación a la cámara... 
-
+            this.vista.DibujarZoomEscena(this.escena);
+            
             // Matriz de transformación!!!
             // 
             // poner en 0,0 -> (centox - 2radiox, centroy - 2 radio y)
