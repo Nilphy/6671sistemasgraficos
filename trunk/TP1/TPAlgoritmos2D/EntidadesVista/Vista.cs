@@ -15,8 +15,8 @@ namespace SistemasGraficos.Entidades
     {
         public double X_MIN = -10;
         public double X_MAX = 10;
-        public double Y_MIN = -8;
-        public double Y_MAX = 8;
+        public double Y_MIN = -5;
+        public double Y_MAX = 5;
 
         public IList PoligonosTerreno { set; get; }
         public IList PoligonosRueda { set; get; }
@@ -177,7 +177,7 @@ namespace SistemasGraficos.Entidades
         {
             Gl.glTranslated(X_MIN, Y_MIN, 0);
             Gl.glScaled((X_MAX - X_MIN) / (Escena.X_MAX - Escena.X_MIN), (Y_MAX - Y_MIN) / (Escena.Y_MAX - Escena.Y_MIN), 1);
-            Gl.glTranslated(-Escena.X_MIN, Escena.Y_MIN, 0);
+            Gl.glTranslated(-Escena.X_MIN, -Escena.Y_MIN, 0);
         }
 
         private void AplicarClipping(Rueda rueda)
