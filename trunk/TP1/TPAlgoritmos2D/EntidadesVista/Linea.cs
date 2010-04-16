@@ -33,7 +33,7 @@ namespace SistemasGraficos.Entidades
             else return false;
         }
 
-        public float GetPendiente()
+        public double GetPendiente()
         {
             return ( (this.Fin.GetYFlotante() - this.Inicio.GetYFlotante()) / 
                 (this.Fin.GetXFlotante() - this.Inicio.GetXFlotante()) );

@@ -97,7 +97,7 @@ namespace SistemasGraficos.EstrategiasDibujo
 
         private static Punto Interseccion(Punto s, Punto p, Punto vertice1, Punto vertice2)
         {
-            float x, y;
+            double x, y;
             if (vertice1.GetYFlotante() == vertice2.GetYFlotante()) //Limite vertical
             {
                 y = vertice1.GetYFlotante();

@@ -26,7 +26,6 @@ namespace TPAlgoritmos2D
         {
             InitializeComponent();
             glControl.InitializeContexts();
-            //Initialize2DConfiguration(); //
             Init();
         }
 
@@ -86,13 +85,6 @@ namespace TPAlgoritmos2D
         }
 
         #endregion
-
-        private void Initialize2DConfiguration()
-        {
-            Gl.glMatrixMode(Gl.GL_PROJECTION);
-            Gl.glLoadIdentity();
-            Gl.glOrtho(0, W_WIDTH, 0, W_HEIGHT, -1, 1);
-        }
 
         private void glControl_Paint(object sender, PaintEventArgs e)
         {
@@ -174,7 +166,7 @@ namespace TPAlgoritmos2D
 
                 foreach (Punto punto in poligono.Puntos) 
                 {
-                    Gl.glVertex2f(punto.GetXFlotante(), punto.GetYFlotante());
+                    Gl.glVertex2d(punto.GetXFlotante(), punto.GetYFlotante());
                 }
                 
                 Gl.glEnd();

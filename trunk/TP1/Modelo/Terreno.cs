@@ -2,34 +2,93 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Collections;
 
 namespace Modelo
 {
     public class Terreno
     {
-        public IList Vertices { get; set; }
+
         public ColorRGB Color { get; set; }
+
+        public IList<Vertice> Vertices { get; set; }
+
+        private IList<Plano> Planos { get; set; }
 
         public Terreno()
         {
-            Vertices = new ArrayList();
-
-            Vertices.Add(new Vertice(-10,1));
-            Vertices.Add(new Vertice(-8,0.5f));
-            Vertices.Add(new Vertice(-5,-1));
-            Vertices.Add(new Vertice(-3.5f,-2));
-            Vertices.Add(new Vertice(-2.3f,-2.5f));
-            Vertices.Add(new Vertice(-1.8f, -1.8f));
-            Vertices.Add(new Vertice(-1, -1.8f));
-            Vertices.Add(new Vertice(1, -3));
-            Vertices.Add(new Vertice(2, -3.2f));
-            Vertices.Add(new Vertice(4, -2.8f));
-            Vertices.Add(new Vertice(5, -1.8f));
-            Vertices.Add(new Vertice(7, -1));
-            Vertices.Add(new Vertice(10, 1));
-
-            Color = new ColorRGB(200, 0, 50);
+            this.Vertices = new List<Vertice>();
+            this.Planos = new List<Plano>();
         }
+
+        public void AddVertice(double x, double y)
+        {
+            Vertice nuevoVertice = new Vertice(x, y);
+
+            this.Vertices.Add(nuevoVertice);
+
+            // Si tengo mas de un vertice, puedo empezar a formar los planos.
+            if (this.Vertices.Count > 1)
+            {
+                this.Planos.Add(new Plano(this.Vertices.Last<Vertice>(), nuevoVertice));
+            }
+        }
+
+        public double GetAltura(double x)
+        {
+            return GetPlanoForX(x).GetAltura(x);
+        }
+
+        public double GetAnguloInclinacion(double x)
+        {
+            return GetPlanoForX(x).GetAnguloInclinacion();
+        }
+
+        private Plano GetPlanoForX(double x)
+        {
+            foreach (Plano plano in Planos)
+            {
+                if (plano.ContainsX(x))
+                    return plano;
+            }
+
+            throw new Exception("No existe un plano que contenga el valor para X = " + x + ". No se puede realizar la operacion.");
+        }
+
+    }
+
+    class Plano
+    {
+
+        public Vertice VerticeInicial { get; set; }
+
+        public Vertice VerticeFinal { get; set; }
+
+        public Plano(Vertice verticeInicial, Vertice verticeFinal)
+        {
+            this.VerticeInicial = verticeInicial;
+            this.VerticeFinal = verticeFinal;
+        }
+
+        public double GetPendiente()
+        {
+            return (VerticeFinal.Y - VerticeInicial.Y) / (VerticeFinal.X - VerticeInicial.X);
+        }
+
+        public double GetAnguloInclinacion()
+        {
+            return Math.Atan(GetPendiente());
+        }
+
+        public bool ContainsX(double x)
+        {
+            return VerticeInicial.X > x && x < VerticeFinal.X;
+        }
+
+        public double GetAltura(double x)
+        {
+            double b = VerticeInicial.Y - (VerticeInicial.X * GetPendiente());
+            return (GetPendiente() * x) + b;
+        }
+
     }
 }

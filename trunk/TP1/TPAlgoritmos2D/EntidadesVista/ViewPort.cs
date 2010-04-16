@@ -8,10 +8,10 @@ namespace SistemasGraficos.Entidades
 {
     public class ViewPort
     {
-        public float XIzq { set; get; }
-        public float XDer { set; get; }
-        public float YArriba { set; get; }
-        public float YAbajo { set; get; }
+        public double XIzq { set; get; }
+        public double XDer { set; get; }
+        public double YArriba { set; get; }
+        public double YAbajo { set; get; }
 
         public ViewPort(Rueda rueda)
         {

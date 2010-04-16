@@ -17,8 +17,8 @@ namespace SistemasGraficos.Entidades
             }
         }
 
-        public abstract float GetXFlotante();
-        public abstract float GetYFlotante();
+        public abstract double GetXFlotante();
+        public abstract double GetYFlotante();
         public abstract int GetXEntero();
         public abstract int GetYEntero();
         

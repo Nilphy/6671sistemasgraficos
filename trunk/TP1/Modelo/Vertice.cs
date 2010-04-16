@@ -7,10 +7,10 @@ namespace Modelo
 {
     public class Vertice
     {
-        public float X { get; set; }
-        public float Y { get; set; }
+        public double X { get; set; }
+        public double Y { get; set; }
 
-        public Vertice(float x, float y)
+        public Vertice(double x, double y)
         {
             this.X = x;
             this.Y = y;
