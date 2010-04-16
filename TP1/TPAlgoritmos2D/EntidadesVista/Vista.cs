@@ -13,6 +13,11 @@ namespace SistemasGraficos.Entidades
 {
     public class Vista
     {
+        public double X_MIN = -10;
+        public double X_MAX = 10;
+        public double Y_MIN = -8;
+        public double Y_MAX = 8;
+
         public IList PoligonosTerreno { set; get; }
         public IList PoligonosRueda { set; get; }
 
@@ -25,7 +30,7 @@ namespace SistemasGraficos.Entidades
         public void DibujarEscena(Escena escena)
         {
             DibujarTerreno(escena.Terreno);
-            DibujarRueda(escena.Rueda);
+            //DibujarRueda(escena.Rueda);
         }
 
         private void DibujarTerreno(Terreno terreno)
@@ -33,6 +38,8 @@ namespace SistemasGraficos.Entidades
             // Solo tengo que crear los poligonos del terreno una única vez.
             if (PoligonosTerreno.Count == 0)
                 this.CrearPoligonosTerreno(terreno);
+
+            this.EscalarEscenaToViewSceneWindow();
 
             foreach (Poligono poligono in PoligonosTerreno)
             {
@@ -129,6 +136,13 @@ namespace SistemasGraficos.Entidades
             triangulo2.Puntos.Add(ruedaInterna.Puntos[6]);
 
             PoligonosRueda.Add(triangulo2);
+        }
+
+        private void EscalarEscenaToViewSceneWindow()
+        {
+            Gl.glTranslated(X_MIN, Y_MIN, 0);
+            Gl.glScaled((X_MAX - X_MIN) / (Escena.X_MAX - Escena.X_MIN), (Y_MAX - Y_MIN) / (Escena.Y_MAX - Escena.Y_MIN), 1);
+            Gl.glTranslated(-Escena.X_MIN, Escena.Y_MIN, 0);
         }
 
         private void AplicarClipping(Rueda rueda)
