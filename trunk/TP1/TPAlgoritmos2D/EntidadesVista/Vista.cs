@@ -29,18 +29,17 @@ namespace SistemasGraficos.Entidades
 
         public void DibujarEscena(Escena escena)
         {
+            CrearPoligonosTerreno(escena.Terreno);
+            CrearPoligonosRueda(escena.Rueda);
+
+            this.EscalarEscenaToViewSceneWindow();
+
             DibujarTerreno(escena.Terreno);
-            //DibujarRueda(escena.Rueda);
+            DibujarRueda(escena.Rueda);
         }
 
         private void DibujarTerreno(Terreno terreno)
         {
-            // Solo tengo que crear los poligonos del terreno una única vez.
-            if (PoligonosTerreno.Count == 0)
-                this.CrearPoligonosTerreno(terreno);
-
-            this.EscalarEscenaToViewSceneWindow();
-
             foreach (Poligono poligono in PoligonosTerreno)
             {
                 Gl.glPushMatrix();
@@ -66,32 +65,60 @@ namespace SistemasGraficos.Entidades
 
         private void CrearPoligonosTerreno(Terreno terreno)
         {
-            Vertice verticeAnterior = null;
-
-            foreach (Vertice vertice in terreno.Vertices)
+            // Creo los poligonos del terreno una única vez.
+            if (PoligonosTerreno.Count == 0)
             {
-                if (verticeAnterior != null)
+                Vertice verticeAnterior = null;
+
+                foreach (Vertice vertice in terreno.Vertices)
                 {
-                    Poligono poligono = new Poligono();
+                    if (verticeAnterior != null)
+                    {
+                        Poligono poligono = new Poligono();
 
-                    poligono.ColorLinea = new ColorRGB(1, 0, 0);
-                    poligono.ColorRelleno = new ColorRGB(1, 0, 0);
+                        poligono.ColorLinea = new ColorRGB(1, 0, 0);
+                        poligono.ColorRelleno = new ColorRGB(1, 0, 0);
 
-                    poligono.Puntos.Add(new PuntoFlotante(verticeAnterior.X, 0));
-                    poligono.Puntos.Add(new PuntoFlotante(verticeAnterior.X, verticeAnterior.Y));
-                    poligono.Puntos.Add(new PuntoFlotante(vertice.X, vertice.Y));
-                    poligono.Puntos.Add(new PuntoFlotante(vertice.X, 0));
+                        poligono.Puntos.Add(new PuntoFlotante(verticeAnterior.X, 0));
+                        poligono.Puntos.Add(new PuntoFlotante(verticeAnterior.X, verticeAnterior.Y));
+                        poligono.Puntos.Add(new PuntoFlotante(vertice.X, vertice.Y));
+                        poligono.Puntos.Add(new PuntoFlotante(vertice.X, 0));
 
-                    this.PoligonosTerreno.Add(poligono);
+                        this.PoligonosTerreno.Add(poligono);
+                    }
+
+                    verticeAnterior = vertice;
                 }
-
-                verticeAnterior = vertice;
             }
         }
 
         private void DibujarRueda(Rueda rueda)
         {
-            CrearPoligonosRueda(rueda);
+            foreach (Poligono poligono in PoligonosRueda)
+            {
+                Gl.glPushMatrix();
+
+                Gl.glTranslated(rueda.Centro.X, rueda.Centro.Y, 0);
+                Gl.glRotated(rueda.AnguloRotacion, 0, 0, 1);
+                Gl.glTranslated(-rueda.Centro.X, -rueda.Centro.Y, 0);
+
+                Gl.glColor3f(poligono.ColorLinea.Red, poligono.ColorLinea.Green, poligono.ColorLinea.Blue);
+
+                // Todos los puntos van a ser unidos por segmentos y el último se une al primero
+                Gl.glBegin(Gl.GL_LINE_LOOP);
+
+                foreach (Punto punto in poligono.Puntos)
+                {
+                    Gl.glVertex2d(punto.GetXFlotante(), punto.GetYFlotante());
+                }
+
+                Gl.glEnd();
+
+                // Se rellena el polígono
+                Pintar.RellenarPoligonoScanLine(poligono.Puntos, poligono.ColorRelleno);
+
+                Gl.glPopMatrix();
+            }
         }
 
         private void CrearPoligonosRueda(Rueda rueda)
