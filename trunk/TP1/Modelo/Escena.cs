@@ -68,7 +68,7 @@ namespace Modelo
 
         private double GetAceleracion(double anguloTerreno)
         {
-            return (Math.Sin(-anguloTerreno) * GRAVEDAD) / 2d;
+            return (Math.Sin(-anguloTerreno) * GRAVEDAD) / (1 + (Math.Pow(Rueda.RadioExterno, 2) / 4d));
         }
 
         private void ActualizarDatosCuerpo(double tiempo, double anguloTerreno)

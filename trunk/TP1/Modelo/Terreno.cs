@@ -21,7 +21,7 @@ namespace Modelo
         public void AddVertice(double x, double y)
         {
             Vertice verticeNuevo = new Vertice(x, y);
-            Vertice verticeAnterior = (this.Vertices.Count > 1) ? this.Vertices.Last<Vertice>() : null;
+            Vertice verticeAnterior = (this.Vertices.Count > 0) ? this.Vertices.Last<Vertice>() : null;
 
             this.Vertices.Add(verticeNuevo);
 
@@ -78,7 +78,7 @@ namespace Modelo
 
         public bool ContainsX(double x)
         {
-            return VerticeInicial.X > x && x < VerticeFinal.X;
+            return VerticeInicial.X < x && x < VerticeFinal.X;
         }
 
         public double GetAltura(double x)
