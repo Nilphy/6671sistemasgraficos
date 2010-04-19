@@ -60,7 +60,7 @@ namespace Modelo
             ActualizarDatosCuerpo(tiempo, this.Terreno.GetAnguloInclinacion(this.Rueda.Centro.X));
 
             // TODO: Probar esto!!! No guarda el signo del angulo en caso de ser negativo!!!
-            this.Rueda.AnguloRotacion += this.Rueda.SentidoX * this.Rueda.VelocidadAngular * tiempo;
+            this.Rueda.AnguloRotacion += (-this.Rueda.SentidoX) * this.Rueda.VelocidadAngular * tiempo;
             this.Rueda.AnguloRotacion %= (2 * Math.PI);
         }
 
@@ -85,7 +85,12 @@ namespace Modelo
                 this.Rueda.VelocidadY = velocidad * Math.Sin(sentido * anguloTerreno);
 
                 // Ubico a la rueda a la altura correcta.
-                this.Rueda.Centro.Y = this.Terreno.GetAltura(this.Rueda.Centro.X) + this.Rueda.RadioExterno;
+                double dx = this.Rueda.RadioExterno * Math.Sin(anguloTerreno);
+                double nuevoX = this.Rueda.Centro.X + dx;
+
+                double otroY = this.Terreno.GetAlturaForOtherX(this.Rueda.Centro.X, nuevoX);
+                double dy = otroY - this.Rueda.Centro.Y;
+                this.Rueda.Centro.Y = this.Terreno.GetAltura(nuevoX) + this.Rueda.RadioExterno * Math.Cos(anguloTerreno);
             }
         }
 

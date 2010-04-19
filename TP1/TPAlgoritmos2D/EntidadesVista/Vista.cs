@@ -59,12 +59,12 @@ namespace SistemasGraficos.Entidades
                 else puntosDibujo = poligono.Puntos;
 
                 // Se rellena el polígono
-                Pintar.RellenarPoligonoScanLine(puntosDibujo, poligono.ColorRelleno);
+                //Pintar.RellenarPoligonoScanLine(puntosDibujo, poligono.ColorRelleno);
 
                 Gl.glColor3f(poligono.ColorLinea.Red, poligono.ColorLinea.Green, poligono.ColorLinea.Blue);
 
                 // Todos los puntos van a ser unidos por segmentos y el último se une al primero
-                Gl.glBegin(Gl.GL_LINE_LOOP);
+                Gl.glBegin(Gl.GL_POLYGON);
 
                 foreach (Punto punto in puntosDibujo)
                 {
@@ -121,7 +121,7 @@ namespace SistemasGraficos.Entidades
                 Gl.glColor3f(poligono.ColorLinea.Red, poligono.ColorLinea.Green, poligono.ColorLinea.Blue);
 
                 // Todos los puntos van a ser unidos por segmentos y el último se une al primero
-                Gl.glBegin(Gl.GL_LINE_LOOP);
+                Gl.glBegin(Gl.GL_POLYGON);
 
                 foreach (Punto punto in poligono.Puntos)
                 {
@@ -131,7 +131,7 @@ namespace SistemasGraficos.Entidades
                 Gl.glEnd();
 
                 // Se rellena el polígono
-                Pintar.RellenarPoligonoScanLine(poligono.Puntos, poligono.ColorRelleno);
+                //Pintar.RellenarPoligonoScanLine(poligono.Puntos, poligono.ColorRelleno);
 
                 Gl.glPopMatrix();
             }
@@ -146,39 +146,38 @@ namespace SistemasGraficos.Entidades
             ruedaExterna.ColorLinea = new ColorRGB(1, 0, 0);
             ruedaExterna.ColorRelleno = new ColorRGB(1, 0, 0);
             ruedaExterna.Puntos = Bresenham.ObtenerPuntosEquidistantesCirculo(
-                new Circulo(new PuntoFlotante(rueda.Centro.X, rueda.Centro.Y), rueda.RadioExterno), 8);
-
-            PoligonosRueda.Add(ruedaExterna);
+                new Circulo(new PuntoFlotante(rueda.Centro.X, rueda.Centro.Y), rueda.RadioExterno), 12);
 
             // agrego a rueda interna
             Poligono ruedaInterna = new Poligono();
             ruedaInterna.ColorLinea = new ColorRGB(1, 1, 1);
             ruedaInterna.ColorRelleno = new ColorRGB(1, 1, 1);
             ruedaInterna.Puntos = Bresenham.ObtenerPuntosEquidistantesCirculo(
-                new Circulo(new PuntoFlotante(rueda.Centro.X, rueda.Centro.Y), rueda.RadioInterno), 8);
-
-            PoligonosRueda.Add(ruedaInterna);
+                new Circulo(new PuntoFlotante(rueda.Centro.X, rueda.Centro.Y), rueda.RadioInterno), 12);
 
             // agrego los triangulos
             Poligono triangulo1 = new Poligono();
-            triangulo1.ColorLinea = new ColorRGB(0, 0, 0);
-            triangulo1.ColorRelleno = new ColorRGB(0, 0, 0);
+            triangulo1.ColorLinea = new ColorRGB(0, 1, 1);
+            triangulo1.ColorRelleno = new ColorRGB(1, 0, 0);
             triangulo1.Puntos.Add(new PuntoFlotante(rueda.Centro.X, rueda.Centro.Y));
             triangulo1.Puntos.Add(ruedaInterna.Puntos[0]);
             triangulo1.Puntos.Add(ruedaInterna.Puntos[1]);
             triangulo1.Puntos.Add(ruedaInterna.Puntos[2]);
-
-            PoligonosRueda.Add(triangulo1);
+            triangulo1.Puntos.Add(ruedaInterna.Puntos[3]);
 
             Poligono triangulo2 = new Poligono();
-            triangulo2.ColorLinea = new ColorRGB(0, 0, 0);
-            triangulo2.ColorRelleno = new ColorRGB(0, 0, 0);
+            triangulo2.ColorLinea = new ColorRGB(0, 1, 1);
+            triangulo2.ColorRelleno = new ColorRGB(1, 0, 0);
             triangulo2.Puntos.Add(new PuntoFlotante(rueda.Centro.X, rueda.Centro.Y));
-            triangulo2.Puntos.Add(ruedaInterna.Puntos[4]);
-            triangulo2.Puntos.Add(ruedaInterna.Puntos[5]);
-            triangulo2.Puntos.Add(ruedaInterna.Puntos[6]);
+            triangulo2.Puntos.Add(ruedaInterna.Puntos[8]);
+            triangulo2.Puntos.Add(ruedaInterna.Puntos[9]);
+            triangulo2.Puntos.Add(ruedaInterna.Puntos[10]);
+            triangulo2.Puntos.Add(ruedaInterna.Puntos[11]);
 
+            PoligonosRueda.Add(triangulo1);
             PoligonosRueda.Add(triangulo2);
+            PoligonosRueda.Add(ruedaInterna);
+            PoligonosRueda.Add(ruedaExterna);
         }
 
         private void EscalarEscenaToViewSceneWindow()

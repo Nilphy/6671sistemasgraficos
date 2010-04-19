@@ -14,7 +14,7 @@ namespace Modelo
         public double RadioExterno { get; set; }
         public double RadioInterno
         {
-            get { return this.RadioExterno * 0.9; }
+            get { return this.RadioExterno * 0.5; }
         }
         public Vertice Centro { get; set; }
         public double VelocidadX { get; set; } // m / s

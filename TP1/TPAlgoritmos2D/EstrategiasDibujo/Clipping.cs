@@ -15,10 +15,10 @@ namespace SistemasGraficos.EstrategiasDibujo
         {
             IList puntosClippeados;
 
-            Punto pia = new PuntoFlotante(viewport.XIzq, viewport.YArriba);
-            Punto pda = new PuntoFlotante(viewport.XDer, viewport.YArriba);
-            Punto pdb = new PuntoFlotante(viewport.XDer, viewport.YAbajo);
-            Punto pib = new PuntoFlotante(viewport.XIzq, viewport.YAbajo);
+            Punto pia = new PuntoFlotante(viewport.XIzq, viewport.YAbajo);
+            Punto pda = new PuntoFlotante(viewport.XDer, viewport.YAbajo);
+            Punto pdb = new PuntoFlotante(viewport.XDer, viewport.YArriba);
+            Punto pib = new PuntoFlotante(viewport.XIzq, viewport.YArriba);
 
             puntosClippeados = Recortar(puntos, pia, pda);
             puntosClippeados = Recortar(puntosClippeados, pda, pdb);

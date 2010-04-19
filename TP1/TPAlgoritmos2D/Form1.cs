@@ -112,7 +112,6 @@ namespace TPAlgoritmos2D
                 Gl.glCallList(DL_GRID);
 
             this.vista.DibujarEscena(this.escena);
-            //this.DibujarPoligonos(false);
           
             ///////////////////////////////////////////////////
             // Panel 2D para la vista de la camara
@@ -121,26 +120,6 @@ namespace TPAlgoritmos2D
             // Acá se dibuja solo la parte de la pelota... etonces tomamos centro pelota como centro de la ventana
             // y dos radios para todos lados y movemos eso por matriz de transformación a la cámara... 
             this.vista.DibujarZoomEscena(this.escena);
-            
-            // Matriz de transformación!!!
-            // 
-            // poner en 0,0 -> (centox - 2radiox, centroy - 2 radio y)
-            // escalar para que entre en 0 1 0 1
-            
-            // clipping
-            //this.DibujarPoligonos(true);
-            // Se obtienen todos los polígonos que forman parte del dibujo
-            // (dibujarlos teniendo en cuenta que tienen que estar entre -10 10 -5 5)
-            // Se dibujan, se pintan y listo 
-            // La posición de la rueda tiene que depender de una variable global
-
-
-            //
-            ///////////////////////////////////////////////////
-
-            // Se setea el temporizador para actualizar los datos del modelo 30 frames por segundo
-            // osea cada 6000/30 milisegundos = 200 milisegundos
-            //Glut.glutTimerFunc(200, actualizarModelo, 0);
         }
 
         private void TimerEventProcessor(Object myObject, EventArgs myEventArgs)
@@ -163,86 +142,13 @@ namespace TPAlgoritmos2D
 
             // Creo la rueda
             this.escena.Rueda.RadioExterno = 10;
-
             this.escena.Rueda.Centro.X = 20;
-            this.escena.Rueda.Centro.Y = escena.Terreno.GetAltura(20) + this.escena.Rueda.RadioExterno;
-        }
+            double anguloTerreno = this.escena.Terreno.GetAnguloInclinacion(this.escena.Rueda.Centro.X);
+            double dx = this.escena.Rueda.RadioExterno * Math.Sin(anguloTerreno);
+            double nuevoX = this.escena.Rueda.Centro.X + dx;
 
-        /// <summary>
-        /// convierte en polígonos todos los cuerpos del modelo
-        /// si aplicar clipping es true aplica clipping a todos los polígonos
-        /// dibuja todos los polígonos resultantes y los pinta del color que corresponda
-        /// </summary>
-        /// <param name="aplicarClipping"></param>
-        private void DibujarPoligonos(bool aplicarClipping)
-        {
-            //if (vista.PoligonosTerreno.Count == 0) this.GenerarPoligonosTerreno();
-            // this.GenerarPoligonosRueda(); // siempre se generan porque cambian
-
-            if (aplicarClipping) this.AplicarClipping();
-
-            foreach (Poligono poligono in vista.PoligonosTerreno)
-            {
-                Gl.glPushMatrix();
-
-                // Se rellena el polígono
-                Pintar.RellenarPoligonoScanLine(poligono.Puntos, poligono.ColorRelleno);
-                
-                Gl.glColor3f(poligono.ColorLinea.Red, poligono.ColorLinea.Green, poligono.ColorLinea.Blue);
-
-                // Todos los puntos van a ser unidos por segmentos y el último se une al primero
-                Gl.glBegin(Gl.GL_LINE_LOOP);
-
-                foreach (Punto punto in poligono.Puntos) 
-                {
-                    Gl.glVertex2d(punto.GetXFlotante(), punto.GetYFlotante());
-                }
-                
-                Gl.glEnd();
-
-                Gl.glPopMatrix();
-            }
-
-            // Estos se van a dibujar -> mover al origen -> rotar -> mover adonde estaban
-            /*
-            foreach (Poligono poligono in vista.PoligonosRueda)
-            {
-                Gl.glPushMatrix();
-
-                Gl.glTranslatef(escena.Rueda.Centro.X, escena.Rueda.Centro.Y, 0);
-                Gl.glRotatef(escena.Rueda.Omega, 0, 0, 1);
-                Gl.glTranslatef(-escena.Rueda.Centro.X, -escena.Rueda.Centro.Y, 0);
-
-                Gl.glColor3f(poligono.ColorLinea.Red, poligono.ColorLinea.Green, poligono.ColorLinea.Blue);
-
-                // Todos los puntos van a ser unidos por segmentos y el último se une al primero
-                Gl.glBegin(Gl.GL_LINE_LOOP);
-
-                foreach (Punto punto in poligono.Puntos)
-                {
-                    Gl.glVertex2f(punto.GetXFlotante(), punto.GetYFlotante());
-                }
-
-                Gl.glEnd();
-
-                // Se rellena el polígono
-                Pintar.RellenarPoligonoScanLine(poligono.Puntos, poligono.ColorRelleno);
-
-                Gl.glPopMatrix();
-            }*/
-        }
-
-        private void AplicarClipping()
-        {
-            foreach (Poligono poligono in vista.PoligonosTerreno)
-            {
-                poligono.Puntos = Clipping.RecortarPoligono(poligono.Puntos, new ViewPort(escena.Rueda));
-            }
-
-            foreach (Poligono poligono in vista.PoligonosRueda)
-            {
-                poligono.Puntos = Clipping.RecortarPoligono(poligono.Puntos, new ViewPort(escena.Rueda));
-            }
+            
+            this.escena.Rueda.Centro.Y = this.escena.Terreno.GetAltura(nuevoX) + this.escena.Rueda.RadioExterno * Math.Cos(anguloTerreno);
         }
 
         private void DrawAxis()
@@ -365,6 +271,12 @@ namespace TPAlgoritmos2D
                     break;
                 case 'a':
                     view_axis = !view_axis;
+                    glControl.Refresh();
+                    break;
+                case 'r':
+                    escena = new Escena();
+                    vista = new Vista();
+                    this.CrearEscenaInicial();
                     glControl.Refresh();
                     break;
                 default:
