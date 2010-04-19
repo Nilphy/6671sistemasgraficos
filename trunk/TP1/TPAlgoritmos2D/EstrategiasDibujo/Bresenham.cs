@@ -180,7 +180,8 @@ namespace SistemasGraficos.EstrategiasDibujo
             int indice;
             IList retorno = new ArrayList();
 
-            for (int i = 0; i < cantidadPuntos; i++)
+            int i;
+            for (i = 0; i <= cantidadPuntos; i++)
             {
                 indice = (i == 0) ? 0 : (i*cantidadSaltoPuntos) - 1;
                 retorno.Add(puntos[indice]);

@@ -40,6 +40,11 @@ namespace Modelo
             return GetPlanoForX(x).GetAnguloInclinacion();
         }
 
+        public double GetAlturaForOtherX(double xOriginal, double xDeseable)
+        {
+            return GetPlanoForX(xOriginal).GetAltura(xDeseable);
+        }
+
         private Plano GetPlanoForX(double x)
         {
             foreach (Plano plano in Planos)
