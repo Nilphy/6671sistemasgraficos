@@ -5,8 +5,11 @@ using System.Text;
 
 namespace SistemasGraficos.Entidades
 {
-    public class CurvaBzier
+    public class CurvaBzierSegmentosCubicos
     {
+        // Esto no se puede cambiar si el tipo de curva sigue siendo de segmentos cúbicos
+        public static int CANTIDAD_PUNTOS_SEGMENTO = 4;
+
         // Tienen que venir ordenados!!
         private IList<PuntoFlotante> puntosControl;
 
@@ -14,7 +17,8 @@ namespace SistemasGraficos.Entidades
         {
             set
             {
-                if (value.Count % 4 != 0) throw new InvalidOperationException("Esto es para curvas de segmentos de cuatro puntos");
+                // TODO completar la curva con el punto final
+                if (value.Count % CANTIDAD_PUNTOS_SEGMENTO != 0) throw new InvalidOperationException("Esto es para curvas de segmentos de cuatro puntos");
 
                 this.puntosControl = value;
             }
@@ -24,14 +28,9 @@ namespace SistemasGraficos.Entidades
             }
         }
         
-        public CurvaBzier(IList<PuntoFlotante> puntosControl)
+        public CurvaBzierSegmentosCubicos(IList<PuntoFlotante> puntosControl)
         {
             this.PuntosControl = puntosControl;
-        }
-
-        public double GetAlturaAtU(double u)
-        {
-            throw new NotImplementedException();
         }
 
         public IList<PuntoFlotante> GetPuntosDiscretos(double deltaU)
@@ -42,11 +41,10 @@ namespace SistemasGraficos.Entidades
             while (numeroSegmento <= this.GetCantidadSegmentos())
             {
                 IList<PuntoFlotante> puntosParteCurva = new List<PuntoFlotante>();
-
-                // TODO: Desharcodear el cuatro de acá
-                for (int i = 0; i < 4; i++)
+               
+                for (int i = 0; i < CANTIDAD_PUNTOS_SEGMENTO; i++)
                 {
-                    puntosParteCurva.Add(this.PuntosControl[numeroSegmento - 1 + i]);
+                    puntosParteCurva.Add(this.PuntosControl[(numeroSegmento - 1) * CANTIDAD_PUNTOS_SEGMENTO + i]);
                 }
 
                 for (double u = 0; u <= 1; u += deltaU)
@@ -70,7 +68,7 @@ namespace SistemasGraficos.Entidades
         /// </summary>       
         private PuntoFlotante GetValorEnSegmento(IList<PuntoFlotante> puntosParteCurva, double u)
         {
-            if (puntosParteCurva.Count != 4) throw new InvalidOperationException("es una Bziel de 3 puntos de control");
+            if (puntosParteCurva.Count != CANTIDAD_PUNTOS_SEGMENTO) throw new InvalidOperationException("es una Bziel de " + CANTIDAD_PUNTOS_SEGMENTO + " puntos de control");
 
             PuntoFlotante primerSumando = puntosParteCurva[0].MultiplicarEscalar(Math.Pow(1-u, 3));
             PuntoFlotante segundoSumando = puntosParteCurva[1].MultiplicarEscalar(3).MultiplicarEscalar(u).MultiplicarEscalar(Math.Pow(1 - u, 2));
@@ -82,7 +80,7 @@ namespace SistemasGraficos.Entidades
 
         private int GetCantidadSegmentos()
         {
-            return this.PuntosControl.Count / 4;
+            return this.PuntosControl.Count / CANTIDAD_PUNTOS_SEGMENTO;
         }
     }
 }
