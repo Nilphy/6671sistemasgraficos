@@ -7,32 +7,39 @@ namespace SistemasGraficos.Entidades
 {
     public class PuntoFlotante : Punto
     {
-        private float x;
-        private float y;
+        private double x;
+        private double y;
         
-        public float X
+        public double X
         {
             set { this.x = value; }
             get { return this.x; }
         }
-        public float Y
+        public double Y
         {
             set { this.y = value; }
             get { return this.y; }
         }
 
-        public PuntoFlotante(float x, float y)
+        public PuntoFlotante(double x, double y, Punto origenCoordenadas)
+        {
+            this.X = x;
+            this.Y = y;
+            this.OrigenCoordenadas = origenCoordenadas;
+        }
+
+        public PuntoFlotante(double x, double y)
         {
             this.X = x;
             this.Y = y;
         }
 
-        public override float GetXFlotante()
+        public override double GetXFlotante()
         {
             return this.X;
         }
 
-        public override float GetYFlotante()
+        public override double GetYFlotante()
         {
             return this.Y;
         }
@@ -54,7 +61,7 @@ namespace SistemasGraficos.Entidades
         /// <returns></returns> 
         public PuntoFlotante MultiplicarEscalar(double p)
         {
-            return new PuntoFlotante((float)(this.GetXFlotante() * p), (float)(this.GetYFlotante() *p));
+            return new PuntoFlotante((double)(this.GetXFlotante() * p), (double)(this.GetYFlotante() *p));
         }
         
         /// <summary>
