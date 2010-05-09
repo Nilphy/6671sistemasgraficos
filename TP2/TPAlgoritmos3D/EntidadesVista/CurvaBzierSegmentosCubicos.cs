@@ -17,17 +17,61 @@ namespace SistemasGraficos.Entidades
         {
             set
             {
-                // TODO completar la curva con el punto final
-                if (value.Count % CANTIDAD_PUNTOS_SEGMENTO != 0) throw new InvalidOperationException("Esto es para curvas de segmentos de cuatro puntos");
-
-                this.puntosControl = value;
+                this.puntosControl = this.CompletarPuntos(value);
             }
             get
             {
                 return this.puntosControl;
             }
         }
-        
+
+        /// <summary>
+        /// Si vienen PO P1 P2 P3 P4 P5 se completa así:
+        /// 
+        ///     P0 P1 P2 P3
+        ///     P3 P4 P5 P5
+        /// 
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        private IList<PuntoFlotante> CompletarPuntos(IList<PuntoFlotante> puntos)
+        {
+            IList<PuntoFlotante> retorno = new List<PuntoFlotante>();
+            
+            int numeroSegmento = 1;
+            int cantidadSegmentos = puntos.Count / 4;
+            while (numeroSegmento <= cantidadSegmentos)
+            {
+                int indiceInicioSegmento = ((numeroSegmento - 1) * CANTIDAD_PUNTOS_SEGMENTO - 1) > 0 ? (numeroSegmento - 1) * CANTIDAD_PUNTOS_SEGMENTO - 1 : 0;
+
+                for (int i = indiceInicioSegmento; i < CANTIDAD_PUNTOS_SEGMENTO + indiceInicioSegmento; i++)
+                {
+                    retorno.Add(puntos[i]);
+                }
+
+                numeroSegmento++;
+            }
+
+            if (puntos.Count % CANTIDAD_PUNTOS_SEGMENTO != 0)
+            {
+                int cantidadPuntos = puntos.Count;
+                int cantidadTramosCuatroPuntos = cantidadPuntos / CANTIDAD_PUNTOS_SEGMENTO;
+                int cantidadPuntosAgregar = (cantidadTramosCuatroPuntos + 1) * 4 - cantidadPuntos;
+
+                for (int i = cantidadTramosCuatroPuntos * 4 -1; i < cantidadPuntos; i++)
+                {
+                    retorno.Add(puntos[i]);
+                }
+
+                for (int i = 0; i < cantidadPuntosAgregar -1; i++)
+                {
+                    retorno.Add(retorno[retorno.Count - 1]);
+                }
+            }
+
+            return retorno;
+        }
+
         public CurvaBzierSegmentosCubicos(IList<PuntoFlotante> puntosControl)
         {
             this.PuntosControl = puntosControl;

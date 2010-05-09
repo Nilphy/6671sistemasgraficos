@@ -53,6 +53,8 @@
   <ItemGroup>
     <Compile Include="EntidadesVista\Circulo.cs" />
     <Compile Include="EntidadesVista\ComparadorPuntosCirculo.cs" />
+    <Compile Include="EntidadesVista\CurvaBsplineSegmentosCubicos.cs" />
+    <Compile Include="EntidadesVista\CurvaBzierSegmentosCubicos.cs" />
     <Compile Include="EntidadesVista\Linea.cs" />
     <Compile Include="EntidadesVista\Poligono.cs" />
     <Compile Include="EntidadesVista\Punto.cs" />
