@@ -73,5 +73,15 @@ namespace SistemasGraficos.Entidades
         {
             return new PuntoFlotante(this.GetXFlotante() + punto.GetXFlotante(), this.GetYFlotante() + punto.GetYFlotante());
         }
+
+        internal void SetXFlotante(double p)
+        {
+            this.x = p;
+        }
+
+        internal void SetYFlotante(double p)
+        {
+            this.y = p;
+        }
     }
 }

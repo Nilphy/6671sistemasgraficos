@@ -28,12 +28,7 @@ namespace TPAlgoritmos3D
 
         #region Propiedades
 
-        private const int CURVE_POINTS = 36;
-
         private int dl_handle;
-
-        private int W_WIDTH = 1024;
-        private int W_HEIGHT = 768;
 
         private bool view_grid = true;
         private bool view_axis = true;
@@ -51,75 +46,31 @@ namespace TPAlgoritmos3D
         // Color de la esfera en movimiento dentro de la escena
         private float[] color_esfera = new float[4] { 0.5f, 0.5f, 0.2f, 1.0f };
 
-        private float[] default_curve = new float[CURVE_POINTS * 2];
+        private float[] default_curve = new float[Vista.CURVE_POINTS * 2];
 
         private float[] surface_buffer = null;
         private float[] normals_buffer = null;
 
-        // Variable asociada al movimiento de rotación de la esfera alrededor del eje Z
-        private float rotate_sphere = 0;
-
         private int curve_points = 0;
-
-        private int TOP_VIEW_POSX
-        {
-            get { return ((int)((float)W_WIDTH * 0.70f)); }
-        }
-
-        private int TOP_VIEW_POSY
-        {
-            get { return ((int)((float)W_HEIGHT * 0.70f)); }
-        }
-
-        private int TOP_VIEW_W
-        {
-            get { return ((int)((float)W_WIDTH * 0.30f)); }
-        }
-
-        private int TOP_VIEW_H
-        {
-            get { return ((int)((float)W_HEIGHT * 0.30f)); }
-        }
-
+                
         private int DL_AXIS
         {
             get { return (dl_handle + 0); }
         }
-
         private int DL_GRID
         {
             get { return (dl_handle + 1); }
         }
-
         private int DL_AXIS2D_TOP
         {
             get { return (dl_handle + 2); }
         }
-
         private int DL_AXIS2D_HEIGHT
         {
             get { return (dl_handle + 3); }
         }
 
-        private int HEIGHT_VIEW_POSX
-        {
-            get { return (int)((float)W_WIDTH * 0.00f); }
-        }
 
-        private int HEIGHT_VIEW_W
-        {
-            get { return (int)((float)W_WIDTH * 0.30f); }
-        }
-
-        private int HEIGHT_VIEW_POSY
-        {
-            get { return (int)((float)W_HEIGHT * 0.70f); }
-        }
-
-        private int HEIGHT_VIEW_H
-        {
-            get { return (int)((float)W_HEIGHT * 0.30f); }
-        }
 
         #endregion
 
@@ -192,6 +143,7 @@ namespace TPAlgoritmos3D
             if (view_grid)
                 Gl.glCallList(DL_GRID);
 
+            // TODO Acá se dibuja el cilindro
             //this.vista.DibujarEscena(this.escena);
 
             //
@@ -211,6 +163,7 @@ namespace TPAlgoritmos3D
             //
             ///////////////////////////////////////////////////
 
+            // TODO Dibujar acá la curva Bsiel
 
             ///////////////////////////////////////////////////
             // Panel 2D para la vista del perfil de altura
@@ -220,11 +173,9 @@ namespace TPAlgoritmos3D
             Glu.gluLookAt(0, 0, 0.5, 0, 0, 0, 0, 1, 0);
             Gl.glCallList(DL_AXIS2D_HEIGHT);
             //
-            ///////////////////////////////////////////////////
+            ///////////////////////////////////////////////////   
 
-            // Acá se dibuja solo la parte de la pelota... etonces tomamos centro pelota como centro de la ventana
-            // y dos radios para todos lados y movemos eso por matriz de transformación a la cámara... 
-            //this.vista.DibujarZoomEscena(this.escena);
+            // TODO Dibujar acá la curva del perfil
         }
 
         private void TimerEventProcessor(Object myObject, EventArgs myEventArgs)
@@ -330,15 +281,15 @@ namespace TPAlgoritmos3D
 
         private void Set3DEnv()
         {
-            Gl.glViewport(0, 0, W_WIDTH, W_HEIGHT);
+            Gl.glViewport(0, 0, Vista.W_WIDTH, Vista.W_HEIGHT);
             Gl.glMatrixMode(Gl.GL_PROJECTION);
             Gl.glLoadIdentity();
-            Glu.gluPerspective(60.0, (float)W_WIDTH / (float)W_HEIGHT, 0.10, 100.0);
+            Glu.gluPerspective(60.0, (float)Vista.W_WIDTH / (float)Vista.W_HEIGHT, 0.10, 100.0);
         }
 
         private void SetPanelTopEnv()
         {
-            Gl.glViewport(TOP_VIEW_POSX, TOP_VIEW_POSY, TOP_VIEW_W, TOP_VIEW_H);
+            Gl.glViewport(Vista.TOP_VIEW_POSX, Vista.TOP_VIEW_POSY, Vista.TOP_VIEW_W, Vista.TOP_VIEW_H);
             Gl.glMatrixMode(Gl.GL_PROJECTION);
             Gl.glLoadIdentity();
             Glu.gluOrtho2D(-0.10, 1.05, -0.10, 1.05);
@@ -346,7 +297,7 @@ namespace TPAlgoritmos3D
 
         private void SetPanelHeightEnv()
         {
-            Gl.glViewport(HEIGHT_VIEW_POSX, HEIGHT_VIEW_POSY, HEIGHT_VIEW_W, HEIGHT_VIEW_H);
+            Gl.glViewport(Vista.HEIGHT_VIEW_POSX, Vista.HEIGHT_VIEW_POSY, Vista.HEIGHT_VIEW_W, Vista.HEIGHT_VIEW_H);
             Gl.glMatrixMode(Gl.GL_PROJECTION);
             Gl.glLoadIdentity();
             Glu.gluOrtho2D(-0.10, 1.05, -0.10, 1.05);
@@ -358,9 +309,10 @@ namespace TPAlgoritmos3D
             {
                 Gl.glEnable(Gl.GL_LIGHT0);
                 Gl.glPushMatrix();
-                Gl.glScaled(10.0, 20.0, 1.0);
-                Gl.glTranslated(0.0, -0.5, 0.0);
-                Gl.glScaled(1.0, 1 / (double)curve_points, 1.0);
+                //Gl.glScaled(10.0, 20.0, 1.0);
+                //Gl.glTranslated(0.0, -0.5, 0.0);
+                //Gl.glScaled(1.0, 1 / (double)curve_points, 1.0);
+                vista.EscalarMundoToEscena3D();
                 Gl.glBegin(Gl.GL_QUAD_STRIP);
                 for (int i = 0; i < curve_points; i++)
                 {
@@ -375,7 +327,7 @@ namespace TPAlgoritmos3D
 
         private void SetSceneWindow()
         {
-            Gl.glViewport(0, 0, W_WIDTH, W_WIDTH / 2);
+            Gl.glViewport(0, 0, Vista.W_WIDTH, Vista.W_WIDTH / 2);
             Gl.glMatrixMode(Gl.GL_PROJECTION);
             Gl.glLoadIdentity();
             Glu.gluOrtho2D(-10, 10, -5.0, 5.0);
@@ -387,7 +339,7 @@ namespace TPAlgoritmos3D
 
         private void SetCamera()
         {
-            Gl.glViewport(TOP_VIEW_POSX, TOP_VIEW_POSY, TOP_VIEW_W, TOP_VIEW_H);
+            Gl.glViewport(Vista.TOP_VIEW_POSX, Vista.TOP_VIEW_POSY, Vista.TOP_VIEW_W, Vista.TOP_VIEW_H);
             Gl.glMatrixMode(Gl.GL_PROJECTION);
             Gl.glLoadIdentity();
             Glu.gluOrtho2D(-0.0, 1.0, -0.0, 1.0);
@@ -399,17 +351,23 @@ namespace TPAlgoritmos3D
 
         private void Init()
         {
-            // Incialización de la curva por default
-            int i;
-            float dx,dy,dz;
-            for (i = 0; i < CURVE_POINTS; i++)
-            {
-                default_curve[i * 2 + 0] = i;
-                default_curve[i * 2 + 1] = (float) Math.Sin((double)i * 6.28 / (double)CURVE_POINTS);
-            }
+            // Se obtienen los puntos seleccionados por el usuario
+            IList<PuntoFlotante> puntosPoligonoControlBzier = this.vista.GetPuntosBzier();
+
+            // Se escalan los puntos a las coordenadas de mundo, para poder controlar el paso de discretisación
+            this.vista.EscalarPuntosBzier(puntosPoligonoControlBzier);
+
+            // Se crea la curva
+            CurvaBzierSegmentosCubicos curva = new CurvaBzierSegmentosCubicos(puntosPoligonoControlBzier);
+            
+            // Se obtienen los puntos discretos de la curva
+            IList puntosBzier = (IList)curva.GetPuntosDiscretos(0.1);
+            
+            // Se pasan al formato que pide el fwk
+            default_curve = this.vista.ConvertirPuntos(puntosBzier);
 
             // Construccion de la Superficie
-            BuildSurface(default_curve, CURVE_POINTS);
+            BuildSurface(default_curve, puntosBzier.Count);
 
             dl_handle = Gl.glGenLists(3);
 

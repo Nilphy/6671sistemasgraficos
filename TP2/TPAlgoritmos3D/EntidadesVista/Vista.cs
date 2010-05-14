@@ -13,15 +13,32 @@ namespace SistemasGraficos.Entidades
 {
     public class Vista
     {
-        public double X_MIN = -10;
-        public double X_MAX = 10;
-        public double Y_MIN = -5;
-        public double Y_MAX = 5;
+        // Para los calculos y los límites de las cosas
+        public double X_MIN_MUNDO = 0;
+        public double X_MAX_MUNDO = 100;
+        public double Y_MIN_MUNDO = 0;
+        public double Y_MAX_MUNDO = 100;
 
-        public double X_MIN_ZOOM = 0;
-        public double X_MAX_ZOOM = 1;
-        public double Y_MIN_ZOOM = 0;
-        public double Y_MAX_ZOOM = 1;
+        // Creo que es 20 pero con 15 seguro queda mejor :S
+        public double X_MIN_VIEWPORT_ESCENA3D = -20;
+        public double X_MAX_VIEWPORT_ESCENA3D = 20;
+        public double Y_MIN_VIEWPORT_ESCENA3D = -20;
+        public double Y_MAX_VIEWPORT_ESCENA3D = 20;
+
+        public static int W_WIDTH = 1024;
+        public static int W_HEIGHT = 768;
+
+        public static int TOP_VIEW_POSX = (int)((float)W_WIDTH * 0.70f);
+        public static int TOP_VIEW_POSY = (int)((float)W_HEIGHT * 0.70f);
+        public static int TOP_VIEW_W = (int)((float)W_WIDTH * 0.30f);
+        public static int TOP_VIEW_H = (int)((float)W_HEIGHT * 0.30f);
+
+        public static int HEIGHT_VIEW_POSX = (int)((float)W_WIDTH * 0.00f);
+        public static int HEIGHT_VIEW_POSY = (int)((float)W_HEIGHT * 0.70f);
+        public static int HEIGHT_VIEW_W = (int)((float)W_WIDTH * 0.30f);
+        public static int HEIGHT_VIEW_H = (int)((float)W_HEIGHT * 0.30f);
+
+        public static int CURVE_POINTS = 36;
 
         public IList PoligonosTerreno { set; get; }
         public IList PoligonosRueda { set; get; }
@@ -32,60 +49,14 @@ namespace SistemasGraficos.Entidades
             this.PoligonosRueda = new ArrayList();
         }
 
-        public void DibujarEscena(Escena escena)
-        {
-            Gl.glDisable(Gl.GL_LIGHTING);
-            CrearPoligonosTerreno(escena.Terreno);
-            CrearPoligonosRueda(escena.Rueda);
-
-            Gl.glPushMatrix();
-
-            this.EscalarEscenaToViewSceneWindow();
-
-            DibujarTerreno(escena.Terreno, false, null);
-            DibujarRueda(escena.Rueda);
-
-            Gl.glPopMatrix();
-            Gl.glEnable(Gl.GL_LIGHTING);
-        }
-
-        private void DibujarTerreno(Terreno terreno, Boolean aplicarClipping, ViewPort viewPort)
-        {
-            foreach (Poligono poligono in PoligonosTerreno)
-            {
-                IList puntosDibujo;
-
-                if (aplicarClipping) puntosDibujo = Clipping.RecortarPoligono(poligono.Puntos, viewPort);
-                else puntosDibujo = poligono.Puntos;
-
-                // Se rellena el polígono
-                //Pintar.RellenarPoligonoScanLine(puntosDibujo, poligono.ColorRelleno);
-
-                Gl.glColor3f(poligono.ColorLinea.Red, poligono.ColorLinea.Green, poligono.ColorLinea.Blue);
-
-                // Todos los puntos van a ser unidos por segmentos y el último se une al primero
-                Gl.glBegin(Gl.GL_POLYGON);
-
-                foreach (Punto punto in puntosDibujo)
-                {
-                    Gl.glVertex2d(punto.GetXFlotante(), punto.GetYFlotante());
-                }
-
-                Gl.glEnd();
-            }
-        }
-
         private void CrearPoligonosTerreno(Terreno terreno)
         {
-            // Creo los poligonos del terreno una única vez.
             if (PoligonosTerreno.Count == 0)
             {
                 Vertice verticeAnterior = null;
 
                 foreach (Vertice vertice in terreno.Vertices)
                 {
-                    Gl.glPushMatrix();
-
                     if (verticeAnterior != null)
                     {
                         Poligono poligono = new Poligono();
@@ -102,129 +73,138 @@ namespace SistemasGraficos.Entidades
                     }
 
                     verticeAnterior = vertice;
-
-                    Gl.glPopMatrix();
                 }
             }
         }
 
-        private void DibujarRueda(Rueda rueda)
+        public void EscalarMundoToEscena3D()
         {
-            foreach (Poligono poligono in PoligonosRueda)
+            Gl.glTranslated(X_MIN_VIEWPORT_ESCENA3D, Y_MIN_VIEWPORT_ESCENA3D, 0);
+            Gl.glScaled((X_MAX_VIEWPORT_ESCENA3D - X_MIN_VIEWPORT_ESCENA3D) / (X_MAX_MUNDO - X_MIN_MUNDO), (Y_MAX_VIEWPORT_ESCENA3D - Y_MIN_VIEWPORT_ESCENA3D) / (Y_MAX_MUNDO - Y_MIN_MUNDO), 1);
+            Gl.glTranslated(-X_MIN_MUNDO, -Y_MIN_MUNDO, 0);
+        }
+
+        public void EscalarPuntosBzier(IList<PuntoFlotante> puntosBzier)
+        {
+            // Obtengo los límites de los puntos y los escalo a los límites del mundo
+
+            float maxX = this.GetMaxX(puntosBzier);
+            float maxY = this.getMaxY(puntosBzier);
+            float minX = this.GetMinX(puntosBzier);
+            float minY = this.GetMinY(puntosBzier);
+
+            this.TrasladarPuntosAlOrigen(puntosBzier, minX, minY);
+            this.EscalarPuntos(puntosBzier, maxX, maxY, minX, minY);
+            this.TrasladarPuntosAlComienzoDelMundo(puntosBzier);
+        }
+
+        private void TrasladarPuntosAlComienzoDelMundo(IList<PuntoFlotante> puntosBzier)
+        {
+            foreach (PuntoFlotante punto in puntosBzier)
             {
-                Gl.glPushMatrix();
-
-                Gl.glTranslated(rueda.Centro.X, rueda.Centro.Y, 0);
-                Gl.glRotated(rueda.AnguloRotacion * 180 / Math.PI, 0, 0, 1);
-                Gl.glTranslated(-rueda.Centro.X, -rueda.Centro.Y, 0);
-
-                Gl.glColor3f(poligono.ColorLinea.Red, poligono.ColorLinea.Green, poligono.ColorLinea.Blue);
-
-                // Todos los puntos van a ser unidos por segmentos y el último se une al primero
-                Gl.glBegin(Gl.GL_POLYGON);
-
-                foreach (Punto punto in poligono.Puntos)
-                {
-                    Gl.glVertex2d(punto.GetXFlotante(), punto.GetYFlotante());
-                }
-
-                Gl.glEnd();
-
-                // Se rellena el polígono
-                //Pintar.RellenarPoligonoScanLine(poligono.Puntos, poligono.ColorRelleno);
-
-                Gl.glPopMatrix();
+                punto.SetXFlotante(punto.GetXFlotante() + X_MIN_MUNDO);
+                punto.SetYFlotante(punto.GetYFlotante() + Y_MIN_MUNDO);
             }
         }
 
-        private void CrearPoligonosRueda(Rueda rueda)
+        private void EscalarPuntos(IList<PuntoFlotante> puntosBzier, float maxX, float maxY, float minX, float minY)
         {
-            PoligonosRueda.Clear();
-
-            // primero agrego la rueda externa
-            Poligono ruedaExterna = new Poligono();
-            ruedaExterna.ColorLinea = new ColorRGB(1, 0, 0);
-            ruedaExterna.ColorRelleno = new ColorRGB(1, 0, 0);
-            ruedaExterna.Puntos = Bresenham.ObtenerPuntosEquidistantesCirculo(
-                new Circulo(new PuntoFlotante(rueda.Centro.X, rueda.Centro.Y), rueda.RadioExterno), 12);
-
-            // agrego a rueda interna
-            Poligono ruedaInterna = new Poligono();
-            ruedaInterna.ColorLinea = new ColorRGB(1, 1, 1);
-            ruedaInterna.ColorRelleno = new ColorRGB(1, 1, 1);
-            ruedaInterna.Puntos = Bresenham.ObtenerPuntosEquidistantesCirculo(
-                new Circulo(new PuntoFlotante(rueda.Centro.X, rueda.Centro.Y), rueda.RadioInterno), 12);
-
-            // agrego los triangulos
-            Poligono triangulo1 = new Poligono();
-            triangulo1.ColorLinea = new ColorRGB(0, 1, 1);
-            triangulo1.ColorRelleno = new ColorRGB(1, 0, 0);
-            triangulo1.Puntos.Add(new PuntoFlotante(rueda.Centro.X, rueda.Centro.Y));
-            triangulo1.Puntos.Add(ruedaInterna.Puntos[0]);
-            triangulo1.Puntos.Add(ruedaInterna.Puntos[1]);
-            triangulo1.Puntos.Add(ruedaInterna.Puntos[2]);
-            triangulo1.Puntos.Add(ruedaInterna.Puntos[3]);
-
-            Poligono triangulo2 = new Poligono();
-            triangulo2.ColorLinea = new ColorRGB(0, 1, 1);
-            triangulo2.ColorRelleno = new ColorRGB(1, 0, 0);
-            triangulo2.Puntos.Add(new PuntoFlotante(rueda.Centro.X, rueda.Centro.Y));
-            triangulo2.Puntos.Add(ruedaInterna.Puntos[8]);
-            triangulo2.Puntos.Add(ruedaInterna.Puntos[9]);
-            triangulo2.Puntos.Add(ruedaInterna.Puntos[10]);
-            triangulo2.Puntos.Add(ruedaInterna.Puntos[11]);
-
-            PoligonosRueda.Add(triangulo1);
-            PoligonosRueda.Add(triangulo2);
-            PoligonosRueda.Add(ruedaInterna);
-            PoligonosRueda.Add(ruedaExterna);
-        }
-
-        private void EscalarEscenaToViewSceneWindow()
-        {
-            Gl.glTranslated(X_MIN, Y_MIN, 0);
-            Gl.glScaled((X_MAX - X_MIN) / (Escena.X_MAX - Escena.X_MIN), (Y_MAX - Y_MIN) / (Escena.Y_MAX - Escena.Y_MIN), 1);
-            Gl.glTranslated(-Escena.X_MIN, -Escena.Y_MIN, 0);
-        }
-
-        private void AplicarClipping(Rueda rueda)
-        {
-            foreach (Poligono poligono in PoligonosTerreno)
+            foreach (PuntoFlotante punto in puntosBzier)
             {
-                poligono.Puntos = Clipping.RecortarPoligono(poligono.Puntos, new ViewPort(rueda));
-            }
-
-            foreach (Poligono poligono in PoligonosRueda)
-            {
-                poligono.Puntos = Clipping.RecortarPoligono(poligono.Puntos, new ViewPort(rueda));
+                punto.SetXFlotante(punto.GetXFlotante() * ((X_MAX_MUNDO - X_MIN_MUNDO) / (maxX - minX)));
+                punto.SetYFlotante(punto.GetYFlotante() * ((Y_MAX_MUNDO - Y_MIN_MUNDO) / (maxY - minY)));
             }
         }
 
-
-        internal void DibujarZoomEscena(Escena escena)
+        private float GetMinY(IList<PuntoFlotante> puntosBzier)
         {
-            Gl.glDisable(Gl.GL_LIGHTING);
-            CrearPoligonosTerreno(escena.Terreno);
-            CrearPoligonosRueda(escena.Rueda);
+            float minY = float.MaxValue;
 
-            Gl.glPushMatrix();
+            foreach (PuntoFlotante punto in puntosBzier)
+            {
+                if (punto.GetYFlotante() < minY) minY = (float)punto.GetYFlotante();
+            }
 
-            ViewPort vp = new ViewPort(escena.Rueda);
-
-            this.EscalarEscenaToViewCameraWindow(vp);
-
-            DibujarTerreno(escena.Terreno, true, vp);
-            DibujarRueda(escena.Rueda);
-
-            Gl.glPopMatrix();
-            Gl.glEnable(Gl.GL_LIGHTING);
+            return minY;
         }
 
-        private void EscalarEscenaToViewCameraWindow(ViewPort viewPort)
+        private float GetMinX(IList<PuntoFlotante> puntosBzier)
         {
-            Gl.glTranslated(X_MIN_ZOOM, Y_MIN_ZOOM, 0);
-            Gl.glScaled((X_MAX_ZOOM - X_MIN_ZOOM) / (viewPort.XDer - viewPort.XIzq), (Y_MAX_ZOOM - Y_MIN_ZOOM) / (viewPort.YArriba - viewPort.YAbajo), 1);
-            Gl.glTranslated(-viewPort.XIzq, -viewPort.YAbajo, 0);
+            float minX = float.MaxValue;
+
+            foreach (PuntoFlotante punto in puntosBzier)
+            {
+                if (punto.GetXFlotante() < minX) minX = (float)punto.GetXFlotante();
+            }
+
+            return minX;
+        }
+
+        private float getMaxY(IList<PuntoFlotante> puntosBzier)
+        {
+            float maxY = float.MinValue;
+
+            foreach (PuntoFlotante punto in puntosBzier)
+            {
+                if (punto.GetYFlotante() > maxY) maxY = (float)punto.GetYFlotante();
+            }
+
+            return maxY;
+        }
+
+        private float GetMaxX(IList<PuntoFlotante> puntosBzier)
+        {
+            float maxX = 0;
+
+            foreach (PuntoFlotante punto in puntosBzier)
+            {
+                if (punto.GetXFlotante() > maxX) maxX = (float)punto.GetXFlotante();
+            }
+
+            return maxX;
+        }
+
+        private void TrasladarPuntosAlOrigen(IList<PuntoFlotante> puntosBzier, float minX, float minY)
+        {
+            foreach (PuntoFlotante punto in puntosBzier)
+            {
+                punto.SetXFlotante(punto.GetXFlotante() - minX);
+                punto.SetYFlotante(punto.GetYFlotante() - minY);
+            }
+        }
+
+        // TODO: obtener de acá los puntos que hernan sacó de la pantallita de la derecha
+        internal IList<PuntoFlotante> GetPuntosBzier()
+        {
+            IList<PuntoFlotante> puntos = new List<PuntoFlotante>();
+
+            // Pueden estar en cualquier sistema de coordenadas
+            puntos.Add(new PuntoFlotante(200, 300));
+            puntos.Add(new PuntoFlotante(300, 100));
+            puntos.Add(new PuntoFlotante(350, 100));
+            puntos.Add(new PuntoFlotante(400, 300));
+            puntos.Add(new PuntoFlotante(425, 560));
+            puntos.Add(new PuntoFlotante(437, 300));
+            puntos.Add(new PuntoFlotante(443, 100));
+
+            return puntos;
+        }
+
+        internal float[] ConvertirPuntos(IList puntosBzierEscalados)
+        {
+            // algo así para pasar de la lista al vector
+
+            int i;
+            int cantidadPuntos = puntosBzierEscalados.Count;
+            float[] default_curve = new float[cantidadPuntos * 2];
+
+            for (i = 0; i < cantidadPuntos; i++)
+            {
+                default_curve[i * 2 + 0] = (float)((PuntoFlotante)puntosBzierEscalados[i]).GetXFlotante();
+                default_curve[i * 2 + 1] = (float)((PuntoFlotante)puntosBzierEscalados[i]).GetYFlotante();
+            }
+
+            return default_curve;            
         }
     }
 }
