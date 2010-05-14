@@ -20,10 +20,10 @@ namespace SistemasGraficos.Entidades
         public double Y_MAX_MUNDO = 100;
 
         // Creo que es 20 pero con 15 seguro queda mejor :S
-        public double X_MIN_VIEWPORT_ESCENA3D = -20;
-        public double X_MAX_VIEWPORT_ESCENA3D = 20;
-        public double Y_MIN_VIEWPORT_ESCENA3D = -20;
-        public double Y_MAX_VIEWPORT_ESCENA3D = 20;
+        public double X_MIN_VIEWPORT_ESCENA3D = -10;
+        public double X_MAX_VIEWPORT_ESCENA3D = 10;
+        public double Y_MIN_VIEWPORT_ESCENA3D = -5;
+        public double Y_MAX_VIEWPORT_ESCENA3D = 5;
 
         public static int W_WIDTH = 1024;
         public static int W_HEIGHT = 768;
@@ -79,9 +79,9 @@ namespace SistemasGraficos.Entidades
 
         public void EscalarMundoToEscena3D()
         {
-            Gl.glTranslated(X_MIN_VIEWPORT_ESCENA3D, Y_MIN_VIEWPORT_ESCENA3D, 0);
-            Gl.glScaled((X_MAX_VIEWPORT_ESCENA3D - X_MIN_VIEWPORT_ESCENA3D) / (X_MAX_MUNDO - X_MIN_MUNDO), (Y_MAX_VIEWPORT_ESCENA3D - Y_MIN_VIEWPORT_ESCENA3D) / (Y_MAX_MUNDO - Y_MIN_MUNDO), 1);
-            Gl.glTranslated(-X_MIN_MUNDO, -Y_MIN_MUNDO, 0);
+            Gl.glTranslated(0,X_MIN_VIEWPORT_ESCENA3D, Y_MIN_VIEWPORT_ESCENA3D);
+            Gl.glScaled(1,(X_MAX_VIEWPORT_ESCENA3D - X_MIN_VIEWPORT_ESCENA3D) / (X_MAX_MUNDO - X_MIN_MUNDO), (Y_MAX_VIEWPORT_ESCENA3D - Y_MIN_VIEWPORT_ESCENA3D) / (Y_MAX_MUNDO - Y_MIN_MUNDO));
+            Gl.glTranslated(0,-X_MIN_MUNDO, -Y_MIN_MUNDO);
         }
 
         public void EscalarPuntosBzier(IList<PuntoFlotante> puntosBzier)
@@ -179,12 +179,12 @@ namespace SistemasGraficos.Entidades
             IList<PuntoFlotante> puntos = new List<PuntoFlotante>();
 
             // Pueden estar en cualquier sistema de coordenadas
-            puntos.Add(new PuntoFlotante(200, 300));
+            puntos.Add(new PuntoFlotante(200, 150));
             puntos.Add(new PuntoFlotante(300, 100));
-            puntos.Add(new PuntoFlotante(350, 100));
-            puntos.Add(new PuntoFlotante(400, 300));
-            puntos.Add(new PuntoFlotante(450, 500));
-            puntos.Add(new PuntoFlotante(500, 300));
+            puntos.Add(new PuntoFlotante(350, 150));
+            puntos.Add(new PuntoFlotante(400, 200));
+            puntos.Add(new PuntoFlotante(450, 300));
+            puntos.Add(new PuntoFlotante(500, 250));
             puntos.Add(new PuntoFlotante(550, 100));
             puntos.Add(new PuntoFlotante(600, 200));
 
