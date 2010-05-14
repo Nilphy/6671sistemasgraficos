@@ -17,18 +17,21 @@ using SistemasGraficos.EstrategiasDibujo;
 
 namespace TPAlgoritmos3D
 {
-    public partial class Form1 : Form
+    public partial class Form1 : Form, IWindowParameterProvider
     {
 
         private const int DELTA_TIEMPO = 50;
         
         public Escena escena = new Escena();
-        public Vista vista = new Vista();
+        public Vista vista;
         private Timer timer;
 
         #region Propiedades
 
         private int dl_handle;
+
+        //private int W_WIDTH = 1024;
+        //private int W_HEIGHT = 768;
 
         private bool view_grid = true;
         private bool view_axis = true;
@@ -52,30 +55,93 @@ namespace TPAlgoritmos3D
         private float[] normals_buffer = null;
 
         private int curve_points = 0;
-                
-        private int DL_AXIS
+
+        public int TOP_VIEW_POSX
+        {
+            get { return (int)((float)W_WIDTH * 0.70f); }
+            set { this.TOP_VIEW_POSX = value; }
+        }
+
+        public int TOP_VIEW_POSY
+        {
+            get { return (int)((float)W_HEIGHT * 0.70f); }
+            set { this.TOP_VIEW_POSY = value; }
+        }
+
+        public int TOP_VIEW_W
+        {
+            get { return (int)((float)W_WIDTH * 0.30f); }
+            set { this.TOP_VIEW_W = value; }
+        }
+
+        public int TOP_VIEW_H
+        {
+            get { return (int)((float)W_HEIGHT * 0.30f); }
+            set { this.TOP_VIEW_H = value; }
+        }
+
+        public int HEIGHT_VIEW_POSX
+        {
+            get { return (int)((float)W_WIDTH * 0.00f); }
+            set { this.HEIGHT_VIEW_POSX = value; }
+        }
+
+        public int HEIGHT_VIEW_POSY
+        {
+            get { return (int)((float)W_HEIGHT * 0.70f); }
+            set { this.HEIGHT_VIEW_POSY = value; }
+        }
+
+        public int HEIGHT_VIEW_W
+        {
+            get { return (int)((float)W_WIDTH * 0.30f); }
+            set { this.HEIGHT_VIEW_W = value; }
+        }
+
+        public int HEIGHT_VIEW_H
+        {
+            get { return (int)((float)W_HEIGHT * 0.30f); }
+            set { this.HEIGHT_VIEW_H = value; }
+        }
+
+        public int DL_AXIS
         {
             get { return (dl_handle + 0); }
+            set { this.DL_AXIS = value; }
         }
-        private int DL_GRID
+        public int DL_GRID
         {
             get { return (dl_handle + 1); }
+            set { this.DL_GRID = value; }
         }
-        private int DL_AXIS2D_TOP
+        public int DL_AXIS2D_TOP
         {
             get { return (dl_handle + 2); }
+            set { this.DL_AXIS2D_TOP = value; }
         }
-        private int DL_AXIS2D_HEIGHT
+        public int DL_AXIS2D_HEIGHT
         {
             get { return (dl_handle + 3); }
+            set { this.DL_AXIS2D_HEIGHT = value; }
         }
 
+        public int W_WIDTH
+        {
+            get { return this.Width; }
+            set { this.W_WIDTH = value; }
+        }
 
+        public int W_HEIGHT
+        {
+            get { return this.Height; }
+            set { this.W_HEIGHT = value; }
+        }
 
         #endregion
 
         public Form1()
         {
+            this.vista = new Vista(this);
             InitializeComponent();
             glControl.InitializeContexts();
             Init();
@@ -121,9 +187,9 @@ namespace TPAlgoritmos3D
 	            normals_buffer[i*3 + 1] = -dz;
 	            normals_buffer[i*3 + 2] = dy;
             }
-            normals_buffer[(nr_points-1)*3 + 0] = normals_buffer[(nr_points-2)*3 + 0];
-            normals_buffer[(nr_points-1)*3 + 1] = normals_buffer[(nr_points-2)*3 + 1];
-            normals_buffer[(nr_points-1)*3 + 2] = normals_buffer[(nr_points-2)*3 + 2];
+            normals_buffer[(nr_points - 1) * 3 + 0] = normals_buffer[(nr_points - 2) * 3 + 0];
+            normals_buffer[(nr_points - 1) * 3 + 1] = normals_buffer[(nr_points - 2) * 3 + 1];
+            normals_buffer[(nr_points - 1) * 3 + 2] = normals_buffer[(nr_points - 2) * 3 + 2];
         }
 
         private void glControl_Paint(object sender, PaintEventArgs e)
@@ -143,19 +209,18 @@ namespace TPAlgoritmos3D
             if (view_grid)
                 Gl.glCallList(DL_GRID);
 
-            // TODO Acá se dibuja el cilindro
             //this.vista.DibujarEscena(this.escena);
-            Gl.glPushMatrix();
+            this.vista.DibujarRueda();
 
             //
             ///////////////////////////////////////////////////
 
             // Dibujar la superficie generada a partir de la curva
-            DrawSurface();
+            //DrawSurface();
 
             Gl.glPopMatrix();
             ///////////////////////////////////////////////////
-            // Panel 2D para la vista superior
+            // Panel 2D para la vista superior derecha
             this.SetPanelTopEnv();
             Gl.glMatrixMode(Gl.GL_MODELVIEW);
             Gl.glLoadIdentity();
@@ -283,23 +348,29 @@ namespace TPAlgoritmos3D
 
         private void Set3DEnv()
         {
-            Gl.glViewport(0, 0, Vista.W_WIDTH, Vista.W_HEIGHT);
+            Gl.glViewport(0, 0, W_WIDTH, W_HEIGHT);
             Gl.glMatrixMode(Gl.GL_PROJECTION);
             Gl.glLoadIdentity();
-            Glu.gluPerspective(60.0, (float)Vista.W_WIDTH / (float)Vista.W_HEIGHT, 0.10, 100.0);
+            Glu.gluPerspective(60.0, (float)W_WIDTH / (float)W_HEIGHT, 0.10, 100.0);
         }
 
+        /// <summary>
+        /// Panel 2D para la vista superior derecha
+        /// </summary>
         private void SetPanelTopEnv()
         {
-            Gl.glViewport(Vista.TOP_VIEW_POSX, Vista.TOP_VIEW_POSY, Vista.TOP_VIEW_W, Vista.TOP_VIEW_H);
+            Gl.glViewport(TOP_VIEW_POSX, TOP_VIEW_POSY, TOP_VIEW_W, TOP_VIEW_H);
             Gl.glMatrixMode(Gl.GL_PROJECTION);
             Gl.glLoadIdentity();
             Glu.gluOrtho2D(-0.10, 1.05, -0.10, 1.05);
         }
 
+        /// <summary>
+        /// Panel 2D para la vista superior izquierda
+        /// </summary>
         private void SetPanelHeightEnv()
         {
-            Gl.glViewport(Vista.HEIGHT_VIEW_POSX, Vista.HEIGHT_VIEW_POSY, Vista.HEIGHT_VIEW_W, Vista.HEIGHT_VIEW_H);
+            Gl.glViewport(HEIGHT_VIEW_POSX, HEIGHT_VIEW_POSY, HEIGHT_VIEW_W, HEIGHT_VIEW_H);
             Gl.glMatrixMode(Gl.GL_PROJECTION);
             Gl.glLoadIdentity();
             Glu.gluOrtho2D(-0.10, 1.05, -0.10, 1.05);
@@ -329,7 +400,7 @@ namespace TPAlgoritmos3D
 
         private void SetSceneWindow()
         {
-            Gl.glViewport(0, 0, Vista.W_WIDTH, Vista.W_WIDTH / 2);
+            Gl.glViewport(0, 0, W_WIDTH, W_WIDTH / 2);
             Gl.glMatrixMode(Gl.GL_PROJECTION);
             Gl.glLoadIdentity();
             Glu.gluOrtho2D(-10, 10, -5.0, 5.0);
@@ -341,7 +412,7 @@ namespace TPAlgoritmos3D
 
         private void SetCamera()
         {
-            Gl.glViewport(Vista.TOP_VIEW_POSX, Vista.TOP_VIEW_POSY, Vista.TOP_VIEW_W, Vista.TOP_VIEW_H);
+            Gl.glViewport(TOP_VIEW_POSX, TOP_VIEW_POSY, TOP_VIEW_W, TOP_VIEW_H);
             Gl.glMatrixMode(Gl.GL_PROJECTION);
             Gl.glLoadIdentity();
             Glu.gluOrtho2D(-0.0, 1.0, -0.0, 1.0);
@@ -414,13 +485,37 @@ namespace TPAlgoritmos3D
                     break;
                 case 'r':
                     escena = new Escena();
-                    vista = new Vista();
+                    vista = new Vista(this);
                     this.CrearEscenaInicial();
                     glControl.Refresh();
                     break;
                 default:
                     break;
             }
+        }
+
+        private void glControl_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (IsZona2(e.X, e.Y))
+            {
+                System.Console.Out.WriteLine("En la Zona 2.");
+            }
+            else if (IsZona3(e.X, e.Y))
+            {
+                System.Console.Out.WriteLine("En la Zona 3.");
+            }
+        }
+
+        private bool IsZona2(int x, int y)
+        {
+            return (HEIGHT_VIEW_POSX <= x && x <= (HEIGHT_VIEW_POSX + HEIGHT_VIEW_W)) &&
+                (0 <= y && y <= HEIGHT_VIEW_H);
+        }
+
+        private bool IsZona3(int x, int y)
+        {
+            return (TOP_VIEW_POSX <= x && x <= (TOP_VIEW_POSX + TOP_VIEW_W)) &&
+                (0 <= y && y <= TOP_VIEW_H);
         }
 
     }
