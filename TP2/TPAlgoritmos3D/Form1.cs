@@ -25,6 +25,7 @@ namespace TPAlgoritmos3D
         public Escena escena = new Escena();
         public Vista vista;
         private Timer timer;
+        
 
         #region Propiedades
 
@@ -37,8 +38,8 @@ namespace TPAlgoritmos3D
         private bool view_axis = true;
 
         // Variables que controlan la ubicación de la cámara en la Escena 3D
-        private float[] eye = new float[3] { 15.0f, 15.0f, 5.0f };
-        private float[] at = new float[3] { 0.0f, 0.0f, 0.0f };
+        //private float[] eye = new float[3] { 15.0f, 15.0f, 5.0f };
+        //private float[] at = new float[3] { 0.0f, 0.0f, 0.0f };
         private float[] up = new float[3] { 0.0f, 0.0f, 1.0f };
 
         // Variables asociadas a única fuente de luz de la escena
@@ -141,7 +142,7 @@ namespace TPAlgoritmos3D
 
         public Form1()
         {
-            this.vista = new Vista(this);
+            this.vista = new Vista(this, escena);
             InitializeComponent();
             glControl.InitializeContexts();
             Init();
@@ -152,6 +153,7 @@ namespace TPAlgoritmos3D
             this.timer = new Timer();
             timer.Tick += new EventHandler(TimerEventProcessor);
             timer.Interval = DELTA_TIEMPO;
+            
             timer.Start();
         }
 
@@ -201,7 +203,19 @@ namespace TPAlgoritmos3D
 
             Gl.glMatrixMode(Gl.GL_MODELVIEW);
             Gl.glLoadIdentity();
-            Glu.gluLookAt(eye[0], eye[1], eye[2], at[0], at[1], at[2], up[0], up[1], up[2]);
+
+            IList<PuntoFlotante> puntosCamara = vista.GetPuntosBspline();
+
+            // Se escalan los puntos a las coordenadas máximas de la cámara
+            this.vista.EscalarPuntosVentanitas(puntosCamara, false);
+
+            // Se crea la curva
+            CurvaBsplineSegmentosCubicos curva = new CurvaBsplineSegmentosCubicos(puntosCamara);
+
+            // Se obtienen los puntos discretos de la curva
+            IList<PuntoFlotante> puntosBspline = curva.GetPuntosDiscretos(0.001);
+
+            Glu.gluLookAt(puntosBspline[escena.iteradorCurva % puntosBspline.Count].GetXFlotante(), puntosBspline[escena.iteradorCurva % puntosBspline.Count].GetYFlotante(), 10, 0, 0, 0, up[0], up[1], up[2]);
 
             if (view_axis)
                 Gl.glCallList(DL_AXIS);
@@ -209,15 +223,19 @@ namespace TPAlgoritmos3D
             if (view_grid)
                 Gl.glCallList(DL_GRID);
 
-            //this.vista.DibujarEscena(this.escena);
+            vista.EscalarMundoToEscena3D();
+
+            
+            
+            
             this.vista.DibujarRueda();
-
-            //
-            ///////////////////////////////////////////////////
-
+            
             // Dibujar la superficie generada a partir de la curva
-            //DrawSurface();
+            DrawSurface();
 
+
+
+            
             Gl.glPopMatrix();
             ///////////////////////////////////////////////////
             // Panel 2D para la vista superior derecha
@@ -257,20 +275,16 @@ namespace TPAlgoritmos3D
             this.escena = new Escena();
 
             // Creo el terreno
-            this.escena.Terreno.AddVertice(0, 500);
-            this.escena.Terreno.AddVertice(100, 100);
-            this.escena.Terreno.AddVertice(400, 250);
-            this.escena.Terreno.AddVertice(600, 200);
-            this.escena.Terreno.AddVertice(800, 600);
+            foreach (PuntoFlotante punto in vista.GetPuntosCurvaBzier())
+            {
+                this.escena.Terreno.AddVertice(punto.GetXFlotante(), punto.GetYFlotante());
+            }
 
-            // Creo la rueda
-            this.escena.Rueda.RadioExterno = 10;
-            this.escena.Rueda.Centro.X = 20;
+            // Creo la rueda            
+            this.escena.Rueda.Centro.X = this.escena.Terreno.Vertices[10].X;
             double anguloTerreno = this.escena.Terreno.GetAnguloInclinacion(this.escena.Rueda.Centro.X);
             double dx = this.escena.Rueda.RadioExterno * Math.Sin(anguloTerreno);
             double nuevoX = this.escena.Rueda.Centro.X + dx;
-
-            
             this.escena.Rueda.Centro.Y = this.escena.Terreno.GetAltura(nuevoX) + this.escena.Rueda.RadioExterno * Math.Cos(anguloTerreno);
         }
 
@@ -382,10 +396,6 @@ namespace TPAlgoritmos3D
             {
                 Gl.glEnable(Gl.GL_LIGHT0);
                 Gl.glPushMatrix();
-                //Gl.glScaled(10.0, 20.0, 0.01);
-                //Gl.glTranslated(4.5, 2.5, -10);
-                //Gl.glScaled(1.0, 1 / (float)curve_points, 1.0);
-                vista.EscalarMundoToEscena3D();
                 Gl.glBegin(Gl.GL_QUAD_STRIP);
                 for (int i = 0; i < curve_points; i++)
                 {
@@ -407,7 +417,6 @@ namespace TPAlgoritmos3D
             Gl.glMatrixMode(Gl.GL_MODELVIEW);
             Gl.glLoadIdentity();
             Glu.gluLookAt(0, 0, 0.5, 0, 0, 0, 0, 1, 0);
-
         }
 
         private void SetCamera()
@@ -424,18 +433,8 @@ namespace TPAlgoritmos3D
 
         private void Init()
         {
-            // Se obtienen los puntos seleccionados por el usuario
-            IList<PuntoFlotante> puntosPoligonoControlBzier = this.vista.GetPuntosBzier();
+            IList puntosBzier = (IList)vista.GetPuntosCurvaBzier();
 
-            // Se escalan los puntos a las coordenadas de mundo, para poder controlar el paso de discretisación
-            this.vista.EscalarPuntosBzier(puntosPoligonoControlBzier);
-
-            // Se crea la curva
-            CurvaBzierSegmentosCubicos curva = new CurvaBzierSegmentosCubicos(puntosPoligonoControlBzier);
-            
-            // Se obtienen los puntos discretos de la curva
-            IList puntosBzier = (IList)curva.GetPuntosDiscretos(0.01);
-            
             // Se pasan al formato que pide el fwk
             default_curve = this.vista.ConvertirPuntos(puntosBzier);
 
@@ -483,9 +482,17 @@ namespace TPAlgoritmos3D
                     view_axis = !view_axis;
                     glControl.Refresh();
                     break;
+                case 'h':
+                    escena.velocidadIteracionCurva*=2;
+                    glControl.Refresh();
+                    break;
+                case 'l':
+                    escena.velocidadIteracionCurva/=2;
+                    glControl.Refresh();
+                    break;
                 case 'r':
                     escena = new Escena();
-                    vista = new Vista(this);
+                    vista = new Vista(this, escena);
                     this.CrearEscenaInicial();
                     glControl.Refresh();
                     break;
