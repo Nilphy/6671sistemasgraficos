@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Collections;
+using System.Windows.Forms;
 
 using Tao.OpenGl;
 
 using Modelo;
 using SistemasGraficos.EstrategiasDibujo;
+using TPAlgoritmos3D;
 
 namespace SistemasGraficos.Entidades
 {
@@ -25,28 +27,17 @@ namespace SistemasGraficos.Entidades
         public double Y_MIN_VIEWPORT_ESCENA3D = -5;
         public double Y_MAX_VIEWPORT_ESCENA3D = 5;
 
-        public static int W_WIDTH = 1024;
-        public static int W_HEIGHT = 768;
-
-        public static int TOP_VIEW_POSX = (int)((float)W_WIDTH * 0.70f);
-        public static int TOP_VIEW_POSY = (int)((float)W_HEIGHT * 0.70f);
-        public static int TOP_VIEW_W = (int)((float)W_WIDTH * 0.30f);
-        public static int TOP_VIEW_H = (int)((float)W_HEIGHT * 0.30f);
-
-        public static int HEIGHT_VIEW_POSX = (int)((float)W_WIDTH * 0.00f);
-        public static int HEIGHT_VIEW_POSY = (int)((float)W_HEIGHT * 0.70f);
-        public static int HEIGHT_VIEW_W = (int)((float)W_WIDTH * 0.30f);
-        public static int HEIGHT_VIEW_H = (int)((float)W_HEIGHT * 0.30f);
-
         //public static int CURVE_POINTS = 36;
 
         public IList PoligonosTerreno { set; get; }
         public IList PoligonosRueda { set; get; }
+        private IWindowParameterProvider windowParameterProvider;
 
-        public Vista()
+        public Vista(IWindowParameterProvider windowParameterProvider)
         {
             this.PoligonosTerreno = new ArrayList();
             this.PoligonosRueda = new ArrayList();
+            this.windowParameterProvider = windowParameterProvider;
         }
 
         private void CrearPoligonosTerreno(Terreno terreno)
@@ -206,6 +197,28 @@ namespace SistemasGraficos.Entidades
             }
 
             return default_curve;            
+        }
+
+        public void DibujarRueda()
+        {
+            Glu.GLUquadric quad = Glu.gluNewQuadric();
+
+            Gl.glPushMatrix();
+
+            Gl.glRotated(90, 0, 1, 0);
+
+            Glu.gluDisk(quad, 0.6, 1, 20, 20);
+
+            Glu.gluCylinder(quad, 1, 1, 1, 20, 20);
+            Glu.gluCylinder(quad, 0.6, 0.6, 1, 20, 20);
+
+            Gl.glTranslated(0, 0, 1);
+
+            Glu.gluDisk(quad, 0.6, 1, 20, 20);
+
+            Gl.glPopMatrix();
+
+            Glu.gluDeleteQuadric(quad);
         }
     }
 }
