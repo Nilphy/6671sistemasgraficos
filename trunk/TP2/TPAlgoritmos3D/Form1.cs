@@ -46,7 +46,7 @@ namespace TPAlgoritmos3D
         // Color de la esfera en movimiento dentro de la escena
         private float[] color_esfera = new float[4] { 0.5f, 0.5f, 0.2f, 1.0f };
 
-        private float[] default_curve = new float[Vista.CURVE_POINTS * 2];
+        private float[] default_curve;
 
         private float[] surface_buffer = null;
         private float[] normals_buffer = null;
@@ -145,13 +145,15 @@ namespace TPAlgoritmos3D
 
             // TODO Acá se dibuja el cilindro
             //this.vista.DibujarEscena(this.escena);
-
+            Gl.glPushMatrix();
+            vista.EscalarMundoToEscena3D();
             //
             ///////////////////////////////////////////////////
 
             // Dibujar la superficie generada a partir de la curva
             DrawSurface();
-          
+
+            Gl.glPopMatrix();
             ///////////////////////////////////////////////////
             // Panel 2D para la vista superior
             this.SetPanelTopEnv();
@@ -309,10 +311,10 @@ namespace TPAlgoritmos3D
             {
                 Gl.glEnable(Gl.GL_LIGHT0);
                 Gl.glPushMatrix();
-                //Gl.glScaled(10.0, 20.0, 1.0);
-                //Gl.glTranslated(0.0, -0.5, 0.0);
-                //Gl.glScaled(1.0, 1 / (double)curve_points, 1.0);
-                vista.EscalarMundoToEscena3D();
+                Gl.glScaled(10.0, 20.0, 0.1);
+                Gl.glTranslated(4, 2.5, -10);
+                Gl.glScaled(1.0, 1 / (double)curve_points, 1.0);
+                //vista.EscalarMundoToEscena3D();
                 Gl.glBegin(Gl.GL_QUAD_STRIP);
                 for (int i = 0; i < curve_points; i++)
                 {
@@ -361,7 +363,7 @@ namespace TPAlgoritmos3D
             CurvaBzierSegmentosCubicos curva = new CurvaBzierSegmentosCubicos(puntosPoligonoControlBzier);
             
             // Se obtienen los puntos discretos de la curva
-            IList puntosBzier = (IList)curva.GetPuntosDiscretos(0.1);
+            IList puntosBzier = (IList)curva.GetPuntosDiscretos(0.01);
             
             // Se pasan al formato que pide el fwk
             default_curve = this.vista.ConvertirPuntos(puntosBzier);
