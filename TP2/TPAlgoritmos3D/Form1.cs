@@ -146,7 +146,7 @@ namespace TPAlgoritmos3D
             // TODO Acá se dibuja el cilindro
             //this.vista.DibujarEscena(this.escena);
             Gl.glPushMatrix();
-            vista.EscalarMundoToEscena3D();
+
             //
             ///////////////////////////////////////////////////
 
@@ -311,10 +311,10 @@ namespace TPAlgoritmos3D
             {
                 Gl.glEnable(Gl.GL_LIGHT0);
                 Gl.glPushMatrix();
-                Gl.glScaled(10.0, 20.0, 0.1);
-                Gl.glTranslated(4, 2.5, -10);
-                Gl.glScaled(1.0, 1 / (double)curve_points, 1.0);
-                //vista.EscalarMundoToEscena3D();
+                //Gl.glScaled(10.0, 20.0, 0.01);
+                //Gl.glTranslated(4.5, 2.5, -10);
+                //Gl.glScaled(1.0, 1 / (float)curve_points, 1.0);
+                vista.EscalarMundoToEscena3D();
                 Gl.glBegin(Gl.GL_QUAD_STRIP);
                 for (int i = 0; i < curve_points; i++)
                 {
