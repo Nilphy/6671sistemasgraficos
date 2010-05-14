@@ -38,7 +38,7 @@ namespace SistemasGraficos.Entidades
         public static int HEIGHT_VIEW_W = (int)((float)W_WIDTH * 0.30f);
         public static int HEIGHT_VIEW_H = (int)((float)W_HEIGHT * 0.30f);
 
-        public static int CURVE_POINTS = 36;
+        //public static int CURVE_POINTS = 36;
 
         public IList PoligonosTerreno { set; get; }
         public IList PoligonosRueda { set; get; }
@@ -183,9 +183,10 @@ namespace SistemasGraficos.Entidades
             puntos.Add(new PuntoFlotante(300, 100));
             puntos.Add(new PuntoFlotante(350, 100));
             puntos.Add(new PuntoFlotante(400, 300));
-            puntos.Add(new PuntoFlotante(425, 560));
-            puntos.Add(new PuntoFlotante(437, 300));
-            puntos.Add(new PuntoFlotante(443, 100));
+            puntos.Add(new PuntoFlotante(450, 500));
+            puntos.Add(new PuntoFlotante(500, 300));
+            puntos.Add(new PuntoFlotante(550, 100));
+            puntos.Add(new PuntoFlotante(600, 200));
 
             return puntos;
         }
