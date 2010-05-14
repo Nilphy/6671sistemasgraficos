@@ -57,6 +57,8 @@ namespace TPAlgoritmos3D
 
         private int curve_points = 0;
 
+        private bool simularEscenea = false;
+
         public int TOP_VIEW_POSX
         {
             get { return (int)((float)W_WIDTH * 0.70f); }
@@ -147,14 +149,14 @@ namespace TPAlgoritmos3D
             glControl.InitializeContexts();
             Init();
 
-            CrearEscenaInicial();
+            //CrearEscena();
 
             // Configuramos el Timer para la simulación.
             this.timer = new Timer();
             timer.Tick += new EventHandler(TimerEventProcessor);
             timer.Interval = DELTA_TIEMPO;
             
-            timer.Start();
+            //timer.Start();
         }
 
         private void BuildSurface(float[] vertex_buffers, int nr_points)
@@ -189,6 +191,7 @@ namespace TPAlgoritmos3D
 	            normals_buffer[i*3 + 1] = -dz;
 	            normals_buffer[i*3 + 2] = dy;
             }
+
             normals_buffer[(nr_points - 1) * 3 + 0] = normals_buffer[(nr_points - 2) * 3 + 0];
             normals_buffer[(nr_points - 1) * 3 + 1] = normals_buffer[(nr_points - 2) * 3 + 1];
             normals_buffer[(nr_points - 1) * 3 + 2] = normals_buffer[(nr_points - 2) * 3 + 2];
@@ -201,42 +204,40 @@ namespace TPAlgoritmos3D
             // Escena 3D
             this.Set3DEnv();
 
-            Gl.glMatrixMode(Gl.GL_MODELVIEW);
-            Gl.glLoadIdentity();
+            if (this.simularEscenea)
+            {
+                Gl.glMatrixMode(Gl.GL_MODELVIEW);
+                Gl.glLoadIdentity();
 
-            IList<PuntoFlotante> puntosCamara = vista.GetPuntosBspline();
+                IList<PuntoFlotante> puntosCamara = vista.GetPuntosBspline();
 
-            // Se escalan los puntos a las coordenadas máximas de la cámara
-            this.vista.EscalarPuntosVentanitas(puntosCamara, false);
+                // Se escalan los puntos a las coordenadas máximas de la cámara
+                this.vista.EscalarPuntosVentanitas(puntosCamara, false);
 
-            // Se crea la curva
-            CurvaBsplineSegmentosCubicos curva = new CurvaBsplineSegmentosCubicos(puntosCamara);
+                // Se crea la curva
+                CurvaBsplineSegmentosCubicos curva = new CurvaBsplineSegmentosCubicos(puntosCamara);
 
-            // Se obtienen los puntos discretos de la curva
-            IList<PuntoFlotante> puntosBspline = curva.GetPuntosDiscretos(0.001);
+                // Se obtienen los puntos discretos de la curva
+                IList<PuntoFlotante> puntosBspline = curva.GetPuntosDiscretos(0.001);
 
-            Glu.gluLookAt(puntosBspline[escena.iteradorCurva % puntosBspline.Count].GetXFlotante(), puntosBspline[escena.iteradorCurva % puntosBspline.Count].GetYFlotante(), 10, 0, 0, 0, up[0], up[1], up[2]);
+                Glu.gluLookAt(puntosBspline[escena.iteradorCurva % puntosBspline.Count].GetXFlotante(), puntosBspline[escena.iteradorCurva % puntosBspline.Count].GetYFlotante(), 10, 0, 0, 0, up[0], up[1], up[2]);
 
-            if (view_axis)
-                Gl.glCallList(DL_AXIS);
+                if (view_axis)
+                    Gl.glCallList(DL_AXIS);
 
-            if (view_grid)
-                Gl.glCallList(DL_GRID);
+                if (view_grid)
+                    Gl.glCallList(DL_GRID);
 
-            vista.EscalarMundoToEscena3D();
+                vista.EscalarMundoToEscena3D();
 
-            
-            
-            
-            this.vista.DibujarRueda();
-            
-            // Dibujar la superficie generada a partir de la curva
-            DrawSurface();
+                this.vista.DibujarRueda();
 
+                // Dibujar la superficie generada a partir de la curva
+                DrawSurface();
 
+                Gl.glPopMatrix();
+            }
 
-            
-            Gl.glPopMatrix();
             ///////////////////////////////////////////////////
             // Panel 2D para la vista superior derecha
             this.SetPanelTopEnv();
@@ -248,7 +249,25 @@ namespace TPAlgoritmos3D
             //
             ///////////////////////////////////////////////////
 
-            // TODO Dibujar acá la curva Bsiel
+            // TODO: pasarme en limpio y a VISTA!!!
+            Gl.glEnable(Gl.GL_LINE_STIPPLE);
+            Gl.glDisable(Gl.GL_LIGHTING);
+            Gl.glLineStipple(4, 0xAAAA);
+            Gl.glBegin(Gl.GL_LINE_STRIP);
+            Gl.glPushMatrix();
+            foreach (PuntoFlotante punto in this.vista.GetPuntosBspline())
+            {
+                Gl.glVertex2d(punto.X, punto.Y);
+            }
+            Gl.glPopMatrix();
+            Gl.glEnd();
+            Gl.glDisable(Gl.GL_LINE_STIPPLE);
+            Gl.glEnable(Gl.GL_LIGHTING);
+
+            foreach (PuntoFlotante punto in this.vista.GetPuntosBspline())
+            {
+                DibujarPunto(punto.X, punto.Y);
+            }
 
             ///////////////////////////////////////////////////
             // Panel 2D para la vista del perfil de altura
@@ -260,7 +279,26 @@ namespace TPAlgoritmos3D
             //
             ///////////////////////////////////////////////////   
 
-            // TODO Dibujar acá la curva del perfil
+            // TODO: pasarme en limpio y a VISTA!!!
+            Gl.glEnable(Gl.GL_LINE_STIPPLE);
+            Gl.glDisable(Gl.GL_LIGHTING);
+            Gl.glLineStipple(4, 0xAAAA);
+            Gl.glColor3d(0, 0, 1);
+            Gl.glBegin(Gl.GL_LINE_STRIP);
+            Gl.glPushMatrix();
+            foreach (PuntoFlotante punto in this.vista.GetPuntosBzier())
+            {
+                Gl.glVertex2d(punto.X, punto.Y);
+            }
+            Gl.glPopMatrix();
+            Gl.glEnd();
+            Gl.glDisable(Gl.GL_LINE_STIPPLE);
+            Gl.glEnable(Gl.GL_LIGHTING);
+
+            foreach (PuntoFlotante punto in this.vista.GetPuntosBzier())
+            {
+                DibujarPunto(punto.X, punto.Y);
+            }
         }
 
         private void TimerEventProcessor(Object myObject, EventArgs myEventArgs)
@@ -270,7 +308,7 @@ namespace TPAlgoritmos3D
             glControl.Invalidate();
         }
 
-        private void CrearEscenaInicial()
+        private void CrearEscena()
         {
             this.escena = new Escena();
 
@@ -321,7 +359,7 @@ namespace TPAlgoritmos3D
         {
             Gl.glDisable(Gl.GL_LIGHTING);
             Gl.glBegin(Gl.GL_LINE_LOOP);
-            Gl.glColor3d(1, 1, 0);
+            Gl.glColor3d(1, 0.6, 0);
             Gl.glVertex3d(0, 0, 0);
             Gl.glVertex3d(1, 0, 0);
             Gl.glVertex3d(1, 1, 0);
@@ -433,13 +471,16 @@ namespace TPAlgoritmos3D
 
         private void Init()
         {
-            IList puntosBzier = (IList)vista.GetPuntosCurvaBzier();
+            if (this.simularEscenea)
+            {
+                IList puntosBzier = (IList)vista.GetPuntosCurvaBzier();
 
-            // Se pasan al formato que pide el fwk
-            default_curve = this.vista.ConvertirPuntos(puntosBzier);
+                // Se pasan al formato que pide el fwk
+                default_curve = this.vista.ConvertirPuntos(puntosBzier);
 
-            // Construccion de la Superficie
-            BuildSurface(default_curve, puntosBzier.Count);
+                // Construccion de la Superficie
+                BuildSurface(default_curve, puntosBzier.Count);
+            }
 
             dl_handle = Gl.glGenLists(3);
 
@@ -493,7 +534,7 @@ namespace TPAlgoritmos3D
                 case 'r':
                     escena = new Escena();
                     vista = new Vista(this, escena);
-                    this.CrearEscenaInicial();
+                    this.CrearEscena();
                     glControl.Refresh();
                     break;
                 default:
@@ -505,11 +546,25 @@ namespace TPAlgoritmos3D
         {
             if (IsZona2(e.X, e.Y))
             {
-                System.Console.Out.WriteLine("En la Zona 2.");
+                double offsetX = e.X - HEIGHT_VIEW_POSX;
+                double offsetY = e.Y + 40; // TODO: VER COMO CUERNO HACER PARA ARREGLAR EL CORRIMIENTO
+
+                offsetX = (offsetX / (HEIGHT_VIEW_POSX + HEIGHT_VIEW_W));
+                offsetY = ((HEIGHT_VIEW_H - offsetY) / HEIGHT_VIEW_H);
+
+                this.vista.AddPuntosBzier(offsetX, offsetY);
+                glControl.Invalidate();
             }
             else if (IsZona3(e.X, e.Y))
             {
-                System.Console.Out.WriteLine("En la Zona 3.");
+                double offsetX = e.X - TOP_VIEW_POSX;
+                double offsetY = e.Y + 40; // TODO: VER COMO CUERNO HACER PARA ARREGLAR EL CORRIMIENTO
+
+                offsetX = (offsetX / TOP_VIEW_W);
+                offsetY = ((TOP_VIEW_H - offsetY) / TOP_VIEW_H);
+
+                this.vista.AddPuntosBspline(offsetX, offsetY);
+                glControl.Invalidate();
             }
         }
 
@@ -523,6 +578,24 @@ namespace TPAlgoritmos3D
         {
             return (TOP_VIEW_POSX <= x && x <= (TOP_VIEW_POSX + TOP_VIEW_W)) &&
                 (0 <= y && y <= TOP_VIEW_H);
+        }
+
+        // TODO: pasarme a VISTA!
+        private void DibujarPunto(double x, double y)
+        {
+            double DELTA = 0.01;
+            Gl.glPushMatrix();
+
+            Gl.glDisable(Gl.GL_LIGHTING);
+            Glu.GLUquadric quad = Glu.gluNewQuadric();
+            Gl.glPushMatrix();
+            Gl.glColor3d(1, 0, 0);
+            Gl.glTranslated(x, y, 0);
+            Glu.gluDisk(quad, 0, DELTA, 20, 20);
+            Gl.glPopMatrix();
+            Gl.glEnable(Gl.GL_LIGHTING);
+            Gl.glColor3d(1, 1, 1);
+            Glu.gluDeleteQuadric(quad);
         }
 
     }
