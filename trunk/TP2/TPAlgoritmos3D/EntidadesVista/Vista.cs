@@ -35,6 +35,9 @@ namespace SistemasGraficos.Entidades
         public Escena escena { get; set; }
         private IWindowParameterProvider windowParameterProvider;
 
+        private IList<PuntoFlotante> puntosBzier = new List<PuntoFlotante>();
+        private IList<PuntoFlotante> puntosBspline = new List<PuntoFlotante>();
+
         public Vista(IWindowParameterProvider windowParameterProvider, Escena escena)
         {
             this.windowParameterProvider = windowParameterProvider;
@@ -194,6 +197,11 @@ namespace SistemasGraficos.Entidades
 
         #endregion
 
+        public void AddPuntosBzier(double x, double y)
+        {
+            puntosBzier.Add(new PuntoFlotante(x, y));
+        }
+        
         // TODO: obtener de acá los puntos que hernan sacó de la pantallita de la derecha
         internal IList<PuntoFlotante> GetPuntosBzier()
         {
@@ -209,7 +217,12 @@ namespace SistemasGraficos.Entidades
             //puntos.Add(new PuntoFlotante(550, 100));
             //puntos.Add(new PuntoFlotante(600, 200));
 
-            return puntos;
+            return puntosBzier;
+        }
+
+        public void AddPuntosBspline(double x, double y)
+        {
+            this.puntosBspline.Add(new PuntoFlotante(x, y));
         }
 
         // TODO: obtener de acá los puntos que hernán sacó de la pantallita de la izquierda
@@ -224,7 +237,7 @@ namespace SistemasGraficos.Entidades
             puntos.Add(new PuntoFlotante(4, 4));
             puntos.Add(new PuntoFlotante(4, 1));
 
-            return puntos;
+            return puntosBspline;
         }
 
         public void DibujarRueda()
