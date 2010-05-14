@@ -18,6 +18,8 @@ namespace Modelo
         // Flag para indicar si cambia la inclinación del terreno para realizar 
         // las correcciones para la simulación del movimiento físico.
         private bool cambioInclinacion = false;
+        public int iteradorCurva = 0;
+        public int velocidadIteracionCurva = 10;
 
         #region Propiedades
 
@@ -62,6 +64,8 @@ namespace Modelo
             // TODO: Probar esto!!! No guarda el signo del angulo en caso de ser negativo!!!
             this.Rueda.AnguloRotacion += (-this.Rueda.SentidoX) * this.Rueda.VelocidadAngular * tiempo;
             this.Rueda.AnguloRotacion %= (2 * Math.PI);
+
+            iteradorCurva += velocidadIteracionCurva;
         }
 
         #region Métodos Privados

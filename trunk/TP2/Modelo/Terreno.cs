@@ -83,7 +83,7 @@ namespace Modelo
 
         public bool ContainsX(double x)
         {
-            return VerticeInicial.X < x && x < VerticeFinal.X;
+            return VerticeInicial.X <= x && x <= VerticeFinal.X;
         }
 
         public double GetAltura(double x)
