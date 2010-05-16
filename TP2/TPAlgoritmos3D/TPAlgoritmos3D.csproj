@@ -51,15 +51,18 @@
     <Reference Include="Tao.Platform.Windows, Version=1.0.0.5, Culture=neutral, PublicKeyToken=701104b2da67a104" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EntidadesVista\CamaraPathPlotter.cs" />
     <Compile Include="EntidadesVista\Circulo.cs" />
     <Compile Include="EntidadesVista\ComparadorPuntosCirculo.cs" />
     <Compile Include="EntidadesVista\CurvaBsplineSegmentosCubicos.cs" />
     <Compile Include="EntidadesVista\CurvaBzierSegmentosCubicos.cs" />
     <Compile Include="EntidadesVista\Linea.cs" />
+    <Compile Include="EntidadesVista\PlotHelper.cs" />
     <Compile Include="EntidadesVista\Poligono.cs" />
     <Compile Include="EntidadesVista\Punto.cs" />
     <Compile Include="EntidadesVista\PuntoEntero.cs" />
     <Compile Include="EntidadesVista\PuntoFlotante.cs" />
+    <Compile Include="EntidadesVista\Terreno2DPlotter.cs" />
     <Compile Include="EntidadesVista\ViewPort.cs" />
     <Compile Include="EntidadesVista\Vista.cs" />
     <Compile Include="EstrategiasDibujo\Bresenham.cs" />
