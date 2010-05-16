@@ -21,10 +21,10 @@ namespace SistemasGraficos.Entidades
         public double Y_MIN_MUNDO = 0;
         public double Y_MAX_MUNDO = 100;
 
-        public double X_MIN_CAMARA = -15;
-        public double X_MAX_CAMARA = 15;
-        public double Y_MIN_CAMARA = -15;
-        public double Y_MAX_CAMARA = 15;
+        public double X_MIN_CAMARA = -10;
+        public double X_MAX_CAMARA = 10;
+        public double Y_MIN_CAMARA = -10;
+        public double Y_MAX_CAMARA = 10;
 
         // Creo que es 20 pero con 15 seguro queda mejor :S
         public double X_MIN_VIEWPORT_ESCENA3D = -10;
@@ -55,7 +55,7 @@ namespace SistemasGraficos.Entidades
             Gl.glTranslated(0,-X_MIN_MUNDO, -Y_MIN_MUNDO);
         }
 
-        public void EscalarPuntosVentanitas(IList<PuntoFlotante> puntosBzier, Boolean mundoOcamara)
+        public IList<PuntoFlotante> EscalarPuntosVentanitas(IList<PuntoFlotante> puntosBzier, Boolean mundoOcamara)
         {
             // Obtengo los límites de los puntos y los escalo a los límites del mundo
 
@@ -63,10 +63,13 @@ namespace SistemasGraficos.Entidades
             float maxY = this.getMaxY(puntosBzier);
             float minX = this.GetMinX(puntosBzier);
             float minY = this.GetMinY(puntosBzier);
+            
 
-            this.TrasladarPuntosAlOrigen(puntosBzier, minX, minY);
-            this.EscalarPuntos(puntosBzier, maxX, maxY, minX, minY, mundoOcamara);
-            this.TrasladarPuntosAlComienzoDelMundo(puntosBzier, mundoOcamara);
+            IList<PuntoFlotante>result = this.TrasladarPuntosAlOrigen(puntosBzier, minX, minY);
+            result = this.EscalarPuntos(result, maxX, maxY, minX, minY, mundoOcamara);
+            this.TrasladarPuntosAlComienzoDelMundo(result, mundoOcamara);
+
+            return result;
         }
 
         private void TrasladarPuntosAlComienzoDelMundo(IList<PuntoFlotante> puntosBzier, Boolean isMundoOCamara)
@@ -92,7 +95,7 @@ namespace SistemasGraficos.Entidades
             }
         }
 
-        private void EscalarPuntos(IList<PuntoFlotante> puntosBzier, float maxX, float maxY, float minX, float minY, Boolean isMundoOcamara)
+        private IList<PuntoFlotante> EscalarPuntos(IList<PuntoFlotante> puntosBzier, float maxX, float maxY, float minX, float minY, Boolean isMundoOcamara)
         {
             double xMin; double xMax; double yMin; double yMax;
 
@@ -117,6 +120,8 @@ namespace SistemasGraficos.Entidades
                 punto.SetXFlotante(punto.GetXFlotante() * ((xMax - xMin) / (maxX - minX)));
                 punto.SetYFlotante(punto.GetYFlotante() * ((yMax - yMin) / (maxY - minY)));
             }
+
+            return puntosBzier;
         }
 
         private float GetMinY(IList<PuntoFlotante> puntosBzier)
@@ -167,13 +172,16 @@ namespace SistemasGraficos.Entidades
             return maxX;
         }
 
-        private void TrasladarPuntosAlOrigen(IList<PuntoFlotante> puntosBzier, float minX, float minY)
+        private IList<PuntoFlotante> TrasladarPuntosAlOrigen(IList<PuntoFlotante> puntosBzier, float minX, float minY)
         {
+            IList<PuntoFlotante> result = new List<PuntoFlotante>();
+
             foreach (PuntoFlotante punto in puntosBzier)
             {
-                punto.SetXFlotante(punto.GetXFlotante() - minX);
-                punto.SetYFlotante(punto.GetYFlotante() - minY);
+                result.Add(punto.SumarPunto(new PuntoFlotante(-minX, -minY)));
             }
+
+            return result;
         }
 
         internal float[] ConvertirPuntos(IList puntosBzierEscalados)
@@ -216,7 +224,7 @@ namespace SistemasGraficos.Entidades
             puntos.Add(new PuntoFlotante(500, 250));
             //puntos.Add(new PuntoFlotante(550, 100));
             //puntos.Add(new PuntoFlotante(600, 200));
-
+                
             return puntosBzier;
         }
 
@@ -238,6 +246,7 @@ namespace SistemasGraficos.Entidades
             puntos.Add(new PuntoFlotante(4, 1));
 
             return puntosBspline;
+            //return puntos;
         }
 
         public void DibujarRueda()
@@ -271,7 +280,7 @@ namespace SistemasGraficos.Entidades
             IList<PuntoFlotante> puntosPoligonoControlBzier = this.GetPuntosBzier();
 
             // Se escalan los puntos a las coordenadas de mundo, para poder controlar el paso de discretisación
-            this.EscalarPuntosVentanitas(puntosPoligonoControlBzier, true);
+            puntosPoligonoControlBzier = this.EscalarPuntosVentanitas(puntosPoligonoControlBzier, true);
 
             // Se crea la curva
             CurvaBzierSegmentosCubicos curva = new CurvaBzierSegmentosCubicos(puntosPoligonoControlBzier);
