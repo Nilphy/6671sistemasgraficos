@@ -155,8 +155,6 @@ namespace TPAlgoritmos3D
             this.timer = new Timer();
             timer.Tick += new EventHandler(TimerEventProcessor);
             timer.Interval = DELTA_TIEMPO;
-            
-            //timer.Start();
         }
 
         private void BuildSurface(float[] vertex_buffers, int nr_points)
@@ -212,13 +210,13 @@ namespace TPAlgoritmos3D
                 IList<PuntoFlotante> puntosCamara = vista.GetPuntosBspline();
 
                 // Se escalan los puntos a las coordenadas máximas de la cámara
-                this.vista.EscalarPuntosVentanitas(puntosCamara, false);
+                puntosCamara = this.vista.EscalarPuntosVentanitas(puntosCamara, false);
 
                 // Se crea la curva
                 CurvaBsplineSegmentosCubicos curva = new CurvaBsplineSegmentosCubicos(puntosCamara);
 
                 // Se obtienen los puntos discretos de la curva
-                IList<PuntoFlotante> puntosBspline = curva.GetPuntosDiscretos(0.001);
+                IList<PuntoFlotante> puntosBspline = curva.GetPuntosDiscretos(0.01);
 
                 Glu.gluLookAt(puntosBspline[escena.iteradorCurva % puntosBspline.Count].GetXFlotante(), puntosBspline[escena.iteradorCurva % puntosBspline.Count].GetYFlotante(), 10, 0, 0, 0, up[0], up[1], up[2]);
 
@@ -240,6 +238,7 @@ namespace TPAlgoritmos3D
 
             ///////////////////////////////////////////////////
             // Panel 2D para la vista superior derecha
+            Gl.glLoadIdentity();
             this.SetPanelTopEnv();
             Gl.glMatrixMode(Gl.GL_MODELVIEW);
             Gl.glLoadIdentity();
@@ -267,6 +266,25 @@ namespace TPAlgoritmos3D
             foreach (PuntoFlotante punto in this.vista.GetPuntosBspline())
             {
                 DibujarPunto(punto.X, punto.Y);
+            }
+
+            if (this.vista.GetPuntosBspline().Count > 4)
+            {
+                // Dibujo la curvita
+                CurvaBsplineSegmentosCubicos curvaCamino = new CurvaBsplineSegmentosCubicos(this.vista.GetPuntosBspline());
+
+                Gl.glDisable(Gl.GL_LIGHTING);
+                Gl.glBegin(Gl.GL_LINE_STRIP);
+                Gl.glPushMatrix();
+                Gl.glColor3d(0.5, 0.5, 0);
+                foreach (PuntoFlotante punto in curvaCamino.GetPuntosDiscretos(0.001))
+                {
+                    Gl.glVertex2d(punto.X, punto.Y);
+                }
+                Gl.glPopMatrix();
+                Gl.glEnd();
+                Gl.glEnable(Gl.GL_LIGHTING);
+                Gl.glColor3d(1, 1, 1);
             }
 
             ///////////////////////////////////////////////////
@@ -324,6 +342,19 @@ namespace TPAlgoritmos3D
             double dx = this.escena.Rueda.RadioExterno * Math.Sin(anguloTerreno);
             double nuevoX = this.escena.Rueda.Centro.X + dx;
             this.escena.Rueda.Centro.Y = this.escena.Terreno.GetAltura(nuevoX) + this.escena.Rueda.RadioExterno * Math.Cos(anguloTerreno);
+
+            if (this.simularEscenea)
+            {
+                IList puntosBzier = (IList)vista.GetPuntosCurvaBzier();
+
+                // Se pasan al formato que pide el fwk
+                default_curve = this.vista.ConvertirPuntos(puntosBzier);
+
+                // Construccion de la Superficie
+                BuildSurface(default_curve, puntosBzier.Count);
+            }
+
+            this.timer.Start();
         }
 
         private void DrawAxis()
@@ -471,16 +502,7 @@ namespace TPAlgoritmos3D
 
         private void Init()
         {
-            if (this.simularEscenea)
-            {
-                IList puntosBzier = (IList)vista.GetPuntosCurvaBzier();
-
-                // Se pasan al formato que pide el fwk
-                default_curve = this.vista.ConvertirPuntos(puntosBzier);
-
-                // Construccion de la Superficie
-                BuildSurface(default_curve, puntosBzier.Count);
-            }
+            
 
             dl_handle = Gl.glGenLists(3);
 
@@ -532,8 +554,13 @@ namespace TPAlgoritmos3D
                     glControl.Refresh();
                     break;
                 case 'r':
-                    escena = new Escena();
-                    vista = new Vista(this, escena);
+                    //vista = new Vista(this, escena);
+                    this.CrearEscena();
+                    glControl.Refresh();
+                    break;
+                case 's':
+                    //vista = new Vista(this, escena);
+                    this.simularEscenea = true;
                     this.CrearEscena();
                     glControl.Refresh();
                     break;
