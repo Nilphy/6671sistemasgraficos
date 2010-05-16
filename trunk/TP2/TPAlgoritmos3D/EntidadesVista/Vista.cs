@@ -10,6 +10,7 @@ using Tao.OpenGl;
 using Modelo;
 using SistemasGraficos.EstrategiasDibujo;
 using TPAlgoritmos3D;
+using TPAlgoritmos3D.EntidadesVista;
 
 namespace SistemasGraficos.Entidades
 {
@@ -33,20 +34,16 @@ namespace SistemasGraficos.Entidades
         public double Y_MAX_VIEWPORT_ESCENA3D = 5;
 
         public Escena escena { get; set; }
-        private IWindowParameterProvider windowParameterProvider;
 
         private IList<PuntoFlotante> puntosBzier = new List<PuntoFlotante>();
         private IList<PuntoFlotante> puntosBspline = new List<PuntoFlotante>();
 
-        public Vista(IWindowParameterProvider windowParameterProvider, Escena escena)
+        public Vista(Escena escena)
         {
-            this.windowParameterProvider = windowParameterProvider;
             this.escena = escena;
         }
 
         #region Funciones de escalado que están acá por no tener un mejor lugar
-
-
 
         public void EscalarMundoToEscena3D()
         {
@@ -210,21 +207,8 @@ namespace SistemasGraficos.Entidades
             puntosBzier.Add(new PuntoFlotante(x, y));
         }
         
-        // TODO: obtener de acá los puntos que hernan sacó de la pantallita de la derecha
         internal IList<PuntoFlotante> GetPuntosBzier()
         {
-            IList<PuntoFlotante> puntos = new List<PuntoFlotante>();
-
-            // Pueden estar en cualquier sistema de coordenadas
-            puntos.Add(new PuntoFlotante(200, 300));
-            puntos.Add(new PuntoFlotante(300, 100));
-            puntos.Add(new PuntoFlotante(350, 150));
-            puntos.Add(new PuntoFlotante(400, 200));
-            puntos.Add(new PuntoFlotante(450, 300));
-            puntos.Add(new PuntoFlotante(500, 250));
-            //puntos.Add(new PuntoFlotante(550, 100));
-            //puntos.Add(new PuntoFlotante(600, 200));
-                
             return puntosBzier;
         }
 
@@ -233,20 +217,19 @@ namespace SistemasGraficos.Entidades
             this.puntosBspline.Add(new PuntoFlotante(x, y));
         }
 
-        // TODO: obtener de acá los puntos que hernán sacó de la pantallita de la izquierda
         internal IList<PuntoFlotante> GetPuntosBspline()
         {
-            IList<PuntoFlotante> puntos = new List<PuntoFlotante>();
-
-            // Pueden estar en cualquier sistema de coordenadas
-            puntos.Add(new PuntoFlotante(1, 1));
-            puntos.Add(new PuntoFlotante(1.5, 2));
-            puntos.Add(new PuntoFlotante(1, 4));
-            puntos.Add(new PuntoFlotante(4, 4));
-            puntos.Add(new PuntoFlotante(4, 1));
-
             return puntosBspline;
-            //return puntos;
+        }
+
+        public void DibujarTerreno2D()
+        {
+            Terreno2DPlotter.DibujarTerreno2D(this.GetPuntosBzier());
+        }
+
+        public void DibujarCamaraPath()
+        {
+            CamaraPathPlotter.DibujarCamaraPath(this.GetPuntosBspline());
         }
 
         public void DibujarRueda()

@@ -17,7 +17,7 @@ using SistemasGraficos.EstrategiasDibujo;
 
 namespace TPAlgoritmos3D
 {
-    public partial class Form1 : Form, IWindowParameterProvider
+    public partial class Form1 : Form
     {
 
         private const int DELTA_TIEMPO = 50;
@@ -62,138 +62,168 @@ namespace TPAlgoritmos3D
         public int TOP_VIEW_POSX
         {
             get { return (int)((float)W_WIDTH * 0.70f); }
-            set { this.TOP_VIEW_POSX = value; }
         }
 
         public int TOP_VIEW_POSY
         {
             get { return (int)((float)W_HEIGHT * 0.70f); }
-            set { this.TOP_VIEW_POSY = value; }
         }
 
         public int TOP_VIEW_W
         {
             get { return (int)((float)W_WIDTH * 0.30f); }
-            set { this.TOP_VIEW_W = value; }
         }
 
         public int TOP_VIEW_H
         {
             get { return (int)((float)W_HEIGHT * 0.30f); }
-            set { this.TOP_VIEW_H = value; }
         }
 
         public int HEIGHT_VIEW_POSX
         {
             get { return (int)((float)W_WIDTH * 0.00f); }
-            set { this.HEIGHT_VIEW_POSX = value; }
         }
 
         public int HEIGHT_VIEW_POSY
         {
             get { return (int)((float)W_HEIGHT * 0.70f); }
-            set { this.HEIGHT_VIEW_POSY = value; }
         }
 
         public int HEIGHT_VIEW_W
         {
             get { return (int)((float)W_WIDTH * 0.30f); }
-            set { this.HEIGHT_VIEW_W = value; }
         }
 
         public int HEIGHT_VIEW_H
         {
             get { return (int)((float)W_HEIGHT * 0.30f); }
-            set { this.HEIGHT_VIEW_H = value; }
         }
 
         public int DL_AXIS
         {
             get { return (dl_handle + 0); }
-            set { this.DL_AXIS = value; }
         }
+
         public int DL_GRID
         {
             get { return (dl_handle + 1); }
-            set { this.DL_GRID = value; }
         }
+
         public int DL_AXIS2D_TOP
         {
             get { return (dl_handle + 2); }
-            set { this.DL_AXIS2D_TOP = value; }
         }
+
         public int DL_AXIS2D_HEIGHT
         {
             get { return (dl_handle + 3); }
-            set { this.DL_AXIS2D_HEIGHT = value; }
         }
 
         public int W_WIDTH
         {
             get { return this.Width; }
-            set { this.W_WIDTH = value; }
         }
 
         public int W_HEIGHT
         {
             get { return this.Height; }
-            set { this.W_HEIGHT = value; }
         }
 
         #endregion
 
         public Form1()
         {
-            this.vista = new Vista(this, escena);
+            // Creamos la vista.
+            this.vista = new Vista(escena);
+
+            // Inicializamos los controles de la ventana.
             InitializeComponent();
             glControl.InitializeContexts();
+
+            // Inicializamos los componentes de la escena en OpenGL.
             Init();
 
-            //CrearEscena();
-
             // Configuramos el Timer para la simulación.
+            InitTimerSimulacion();
+        }
+
+        #region Inicialización
+
+        /// <summary>
+        /// Inicializa los controles básicos de la escena a generar en OpenGL.
+        /// </summary>
+        private void Init()
+        {
+            dl_handle = Gl.glGenLists(3);
+
+            Gl.glClearColor(0.02f, 0.02f, 0.04f, 0.0f);
+            Gl.glShadeModel(Gl.GL_SMOOTH);
+            Gl.glEnable(Gl.GL_DEPTH_TEST);
+            Gl.glLightfv(Gl.GL_LIGHT0, Gl.GL_DIFFUSE, light_color);
+            Gl.glLightfv(Gl.GL_LIGHT0, Gl.GL_AMBIENT, light_ambient);
+            Gl.glLightfv(Gl.GL_LIGHT0, Gl.GL_POSITION, light_position);
+            Gl.glEnable(Gl.GL_LIGHT0);
+            Gl.glEnable(Gl.GL_LIGHTING);
+
+            // Generación de las Display Lists
+            Gl.glNewList(DL_AXIS, Gl.GL_COMPILE);
+            DrawAxis();
+            Gl.glEndList();
+            Gl.glNewList(DL_GRID, Gl.GL_COMPILE);
+            DrawXYGrid();
+            Gl.glEndList();
+            Gl.glNewList(DL_AXIS2D_TOP, Gl.GL_COMPILE);
+            DrawAxis2DTopView();
+            Gl.glEndList();
+            Gl.glNewList(DL_AXIS2D_HEIGHT, Gl.GL_COMPILE);
+            DrawAxis2DHeightView();
+            Gl.glEndList();
+        }
+
+        /// <summary>
+        /// Crea el Timer para realizar la simulación física del modelo.
+        /// </summary>
+        private void InitTimerSimulacion()
+        {
             this.timer = new Timer();
             timer.Tick += new EventHandler(TimerEventProcessor);
             timer.Interval = DELTA_TIEMPO;
         }
 
-        private void BuildSurface(float[] vertex_buffers, int nr_points)
+        #endregion
+
+        private void CrearEscena()
         {
-            float dx,dy,dz;
-            curve_points = nr_points;
+            this.escena = new Escena();
 
-            if (surface_buffer != null)
-	            surface_buffer = null;
-            surface_buffer = new float[nr_points * 6];
-            if (normals_buffer != null)
-	            normals_buffer = null;
-            normals_buffer = new float[nr_points * 3];
-
-            for (int i=0; i < nr_points; i++)
+            // Creo el terreno
+            foreach (PuntoFlotante punto in vista.GetPuntosCurvaBzier())
             {
-	            surface_buffer[i*3 + 0] = 1.0f;
-	            surface_buffer[i*3 + 1] = vertex_buffers[i*2 + 0];
-	            surface_buffer[i*3 + 2] = vertex_buffers[i*2 + 1];
-
-	            surface_buffer[nr_points*3 + i*3 + 0] = -1.0f;
-	            surface_buffer[nr_points*3 + i*3 + 1] = vertex_buffers[i*2 + 0];
-	            surface_buffer[nr_points*3 + i*3 + 2] = vertex_buffers[i*2 + 1];
+                this.escena.Terreno.AddVertice(punto.GetXFlotante(), punto.GetYFlotante());
             }
 
-            for (int i=0; i < (nr_points-1); i++)
+            // Creo la rueda            
+            this.escena.Rueda.Centro.X = this.escena.Terreno.Vertices[10].X;
+            double anguloTerreno = this.escena.Terreno.GetAnguloInclinacion(this.escena.Rueda.Centro.X);
+            double dx = this.escena.Rueda.RadioExterno * Math.Sin(anguloTerreno);
+            double nuevoX = this.escena.Rueda.Centro.X + dx;
+            this.escena.Rueda.Centro.Y = this.escena.Terreno.GetAltura(nuevoX) + this.escena.Rueda.RadioExterno * Math.Cos(anguloTerreno);
+
+            if (this.simularEscenea)
             {
-	            dx = 0.0f;
-	            dy = vertex_buffers[(i+1)*2 + 0] - vertex_buffers[i*2 + 0];
-	            dz = vertex_buffers[(i+1)*2 + 1] - vertex_buffers[i*2 + 1];
-	            normals_buffer[i*3 + 0] = dx;
-	            normals_buffer[i*3 + 1] = -dz;
-	            normals_buffer[i*3 + 2] = dy;
+                IList puntosBzier = (IList)vista.GetPuntosCurvaBzier();
+
+                // Se pasan al formato que pide el fwk
+                default_curve = this.vista.ConvertirPuntos(puntosBzier);
+
+                // Construccion de la Superficie
+                BuildSurface(default_curve, puntosBzier.Count);
             }
 
-            normals_buffer[(nr_points - 1) * 3 + 0] = normals_buffer[(nr_points - 2) * 3 + 0];
-            normals_buffer[(nr_points - 1) * 3 + 1] = normals_buffer[(nr_points - 2) * 3 + 1];
-            normals_buffer[(nr_points - 1) * 3 + 2] = normals_buffer[(nr_points - 2) * 3 + 2];
+            this.timer.Start();
         }
+
+        #region Eventos
 
         private void glControl_Paint(object sender, PaintEventArgs e)
         {
@@ -237,7 +267,7 @@ namespace TPAlgoritmos3D
             }
 
             ///////////////////////////////////////////////////
-            // Panel 2D para la vista superior derecha
+            // Panel 2D para la vista del camino de la camara.
             Gl.glLoadIdentity();
             this.SetPanelTopEnv();
             Gl.glMatrixMode(Gl.GL_MODELVIEW);
@@ -247,115 +277,161 @@ namespace TPAlgoritmos3D
 
             //
             ///////////////////////////////////////////////////
-
-            // TODO: pasarme en limpio y a VISTA!!!
-            Gl.glEnable(Gl.GL_LINE_STIPPLE);
-            Gl.glDisable(Gl.GL_LIGHTING);
-            Gl.glLineStipple(4, 0xAAAA);
-            Gl.glBegin(Gl.GL_LINE_STRIP);
-            Gl.glPushMatrix();
-            foreach (PuntoFlotante punto in this.vista.GetPuntosBspline())
-            {
-                Gl.glVertex2d(punto.X, punto.Y);
-            }
-            Gl.glPopMatrix();
-            Gl.glEnd();
-            Gl.glDisable(Gl.GL_LINE_STIPPLE);
-            Gl.glEnable(Gl.GL_LIGHTING);
-
-            foreach (PuntoFlotante punto in this.vista.GetPuntosBspline())
-            {
-                DibujarPunto(punto.X, punto.Y);
-            }
-
-            if (this.vista.GetPuntosBspline().Count > 4)
-            {
-                // Dibujo la curvita
-                CurvaBsplineSegmentosCubicos curvaCamino = new CurvaBsplineSegmentosCubicos(this.vista.GetPuntosBspline());
-
-                Gl.glDisable(Gl.GL_LIGHTING);
-                Gl.glBegin(Gl.GL_LINE_STRIP);
-                Gl.glPushMatrix();
-                Gl.glColor3d(0.5, 0.5, 0);
-                foreach (PuntoFlotante punto in curvaCamino.GetPuntosDiscretos(0.001))
-                {
-                    Gl.glVertex2d(punto.X, punto.Y);
-                }
-                Gl.glPopMatrix();
-                Gl.glEnd();
-                Gl.glEnable(Gl.GL_LIGHTING);
-                Gl.glColor3d(1, 1, 1);
-            }
+            this.vista.DibujarCamaraPath();
 
             ///////////////////////////////////////////////////
-            // Panel 2D para la vista del perfil de altura
+            // Panel 2D para la vista del perfil del terreno.
             this.SetPanelHeightEnv();
             Gl.glMatrixMode(Gl.GL_MODELVIEW);
             Gl.glLoadIdentity();
             Glu.gluLookAt(0, 0, 0.5, 0, 0, 0, 0, 1, 0);
             Gl.glCallList(DL_AXIS2D_HEIGHT);
+
             //
             ///////////////////////////////////////////////////   
+            this.vista.DibujarTerreno2D();
+        }
 
-            // TODO: pasarme en limpio y a VISTA!!!
-            Gl.glEnable(Gl.GL_LINE_STIPPLE);
-            Gl.glDisable(Gl.GL_LIGHTING);
-            Gl.glLineStipple(4, 0xAAAA);
-            Gl.glColor3d(0, 0, 1);
-            Gl.glBegin(Gl.GL_LINE_STRIP);
-            Gl.glPushMatrix();
-            foreach (PuntoFlotante punto in this.vista.GetPuntosBzier())
+        private void glControl_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            switch (e.KeyChar)
             {
-                Gl.glVertex2d(punto.X, punto.Y);
-            }
-            Gl.glPopMatrix();
-            Gl.glEnd();
-            Gl.glDisable(Gl.GL_LINE_STIPPLE);
-            Gl.glEnable(Gl.GL_LIGHTING);
-
-            foreach (PuntoFlotante punto in this.vista.GetPuntosBzier())
-            {
-                DibujarPunto(punto.X, punto.Y);
+                case (char)27:
+                    Application.Exit();
+                    break;
+                case 'g':
+                    view_grid = !view_grid;
+                    glControl.Refresh();
+                    break;
+                case 'a':
+                    view_axis = !view_axis;
+                    glControl.Refresh();
+                    break;
+                case 'h':
+                    escena.velocidadIteracionCurva *= 2;
+                    glControl.Refresh();
+                    break;
+                case 'l':
+                    escena.velocidadIteracionCurva /= 2;
+                    glControl.Refresh();
+                    break;
+                case 'r':
+                    //vista = new Vista(this, escena);
+                    this.CrearEscena();
+                    glControl.Refresh();
+                    break;
+                case 's':
+                    //vista = new Vista(this, escena);
+                    this.simularEscenea = true;
+                    this.CrearEscena();
+                    glControl.Refresh();
+                    break;
+                default:
+                    break;
             }
         }
 
+        private void glControl_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (IsZona2(e.X, e.Y))
+            {
+                double offsetX = e.X - HEIGHT_VIEW_POSX;
+                double offsetY = e.Y + 40; // TODO: VER COMO CUERNO HACER PARA ARREGLAR EL CORRIMIENTO
+
+                offsetX = (offsetX / (HEIGHT_VIEW_POSX + HEIGHT_VIEW_W));
+                offsetY = ((HEIGHT_VIEW_H - offsetY) / HEIGHT_VIEW_H);
+
+                this.vista.AddPuntosBzier(offsetX, offsetY);
+                glControl.Invalidate();
+            }
+            else if (IsZona3(e.X, e.Y))
+            {
+                double offsetX = e.X - TOP_VIEW_POSX;
+                double offsetY = e.Y + 40; // TODO: VER COMO CUERNO HACER PARA ARREGLAR EL CORRIMIENTO
+
+                offsetX = (offsetX / TOP_VIEW_W);
+                offsetY = ((TOP_VIEW_H - offsetY) / TOP_VIEW_H);
+
+                this.vista.AddPuntosBspline(offsetX, offsetY);
+                glControl.Invalidate();
+            }
+        }
+
+        /// <summary>
+        /// Evento que se llama cada <code>DELTA_TIEMPO</code>. Dentro de este
+        /// evento se simula el paso de DELTA_TIEMPO en el modelo físico.
+        /// </summary>
+        /// <param name="myObject"></param>
+        /// <param name="myEventArgs"></param>
         private void TimerEventProcessor(Object myObject, EventArgs myEventArgs)
         {
             escena.Simular(DELTA_TIEMPO);
-
             glControl.Invalidate();
         }
 
-        private void CrearEscena()
+        #endregion
+
+        #region Armado y Dibujo de Superficie
+
+        private void BuildSurface(float[] vertex_buffers, int nr_points)
         {
-            this.escena = new Escena();
+            float dx, dy, dz;
+            curve_points = nr_points;
 
-            // Creo el terreno
-            foreach (PuntoFlotante punto in vista.GetPuntosCurvaBzier())
+            if (surface_buffer != null)
+                surface_buffer = null;
+            surface_buffer = new float[nr_points * 6];
+            if (normals_buffer != null)
+                normals_buffer = null;
+            normals_buffer = new float[nr_points * 3];
+
+            for (int i = 0; i < nr_points; i++)
             {
-                this.escena.Terreno.AddVertice(punto.GetXFlotante(), punto.GetYFlotante());
+                surface_buffer[i * 3 + 0] = 1.0f;
+                surface_buffer[i * 3 + 1] = vertex_buffers[i * 2 + 0];
+                surface_buffer[i * 3 + 2] = vertex_buffers[i * 2 + 1];
+
+                surface_buffer[nr_points * 3 + i * 3 + 0] = -1.0f;
+                surface_buffer[nr_points * 3 + i * 3 + 1] = vertex_buffers[i * 2 + 0];
+                surface_buffer[nr_points * 3 + i * 3 + 2] = vertex_buffers[i * 2 + 1];
             }
 
-            // Creo la rueda            
-            this.escena.Rueda.Centro.X = this.escena.Terreno.Vertices[10].X;
-            double anguloTerreno = this.escena.Terreno.GetAnguloInclinacion(this.escena.Rueda.Centro.X);
-            double dx = this.escena.Rueda.RadioExterno * Math.Sin(anguloTerreno);
-            double nuevoX = this.escena.Rueda.Centro.X + dx;
-            this.escena.Rueda.Centro.Y = this.escena.Terreno.GetAltura(nuevoX) + this.escena.Rueda.RadioExterno * Math.Cos(anguloTerreno);
-
-            if (this.simularEscenea)
+            for (int i = 0; i < (nr_points - 1); i++)
             {
-                IList puntosBzier = (IList)vista.GetPuntosCurvaBzier();
-
-                // Se pasan al formato que pide el fwk
-                default_curve = this.vista.ConvertirPuntos(puntosBzier);
-
-                // Construccion de la Superficie
-                BuildSurface(default_curve, puntosBzier.Count);
+                dx = 0.0f;
+                dy = vertex_buffers[(i + 1) * 2 + 0] - vertex_buffers[i * 2 + 0];
+                dz = vertex_buffers[(i + 1) * 2 + 1] - vertex_buffers[i * 2 + 1];
+                normals_buffer[i * 3 + 0] = dx;
+                normals_buffer[i * 3 + 1] = -dz;
+                normals_buffer[i * 3 + 2] = dy;
             }
 
-            this.timer.Start();
+            normals_buffer[(nr_points - 1) * 3 + 0] = normals_buffer[(nr_points - 2) * 3 + 0];
+            normals_buffer[(nr_points - 1) * 3 + 1] = normals_buffer[(nr_points - 2) * 3 + 1];
+            normals_buffer[(nr_points - 1) * 3 + 2] = normals_buffer[(nr_points - 2) * 3 + 2];
         }
+
+        private void DrawSurface()
+        {
+            if (surface_buffer != null && normals_buffer != null)
+            {
+                Gl.glEnable(Gl.GL_LIGHT0);
+                Gl.glPushMatrix();
+                Gl.glBegin(Gl.GL_QUAD_STRIP);
+                for (int i = 0; i < curve_points; i++)
+                {
+                    Gl.glNormal3fv(ref normals_buffer[i * 3]);
+                    Gl.glVertex3fv(ref surface_buffer[i * 3]);
+                    Gl.glVertex3fv(ref surface_buffer[3 * curve_points + i * 3]);
+                }
+                Gl.glEnd();
+                Gl.glPopMatrix();
+            }
+        }
+
+        #endregion
+
+        #region Dibujado de Viewports (marcos y axis)
 
         private void DrawAxis()
         {
@@ -429,53 +505,9 @@ namespace TPAlgoritmos3D
             Gl.glEnable(Gl.GL_LIGHTING);
         }
 
-        private void Set3DEnv()
-        {
-            Gl.glViewport(0, 0, W_WIDTH, W_HEIGHT);
-            Gl.glMatrixMode(Gl.GL_PROJECTION);
-            Gl.glLoadIdentity();
-            Glu.gluPerspective(60.0, (float)W_WIDTH / (float)W_HEIGHT, 0.10, 100.0);
-        }
+        #endregion
 
-        /// <summary>
-        /// Panel 2D para la vista superior derecha
-        /// </summary>
-        private void SetPanelTopEnv()
-        {
-            Gl.glViewport(TOP_VIEW_POSX, TOP_VIEW_POSY, TOP_VIEW_W, TOP_VIEW_H);
-            Gl.glMatrixMode(Gl.GL_PROJECTION);
-            Gl.glLoadIdentity();
-            Glu.gluOrtho2D(-0.10, 1.05, -0.10, 1.05);
-        }
-
-        /// <summary>
-        /// Panel 2D para la vista superior izquierda
-        /// </summary>
-        private void SetPanelHeightEnv()
-        {
-            Gl.glViewport(HEIGHT_VIEW_POSX, HEIGHT_VIEW_POSY, HEIGHT_VIEW_W, HEIGHT_VIEW_H);
-            Gl.glMatrixMode(Gl.GL_PROJECTION);
-            Gl.glLoadIdentity();
-            Glu.gluOrtho2D(-0.10, 1.05, -0.10, 1.05);
-        }
-
-        private void DrawSurface()
-        {
-            if (surface_buffer != null && normals_buffer != null)
-            {
-                Gl.glEnable(Gl.GL_LIGHT0);
-                Gl.glPushMatrix();
-                Gl.glBegin(Gl.GL_QUAD_STRIP);
-                for (int i = 0; i < curve_points; i++)
-                {
-                    Gl.glNormal3fv(ref normals_buffer[i * 3]);
-                    Gl.glVertex3fv(ref surface_buffer[i * 3]);
-                    Gl.glVertex3fv(ref surface_buffer[3 * curve_points + i * 3]);
-                }
-                Gl.glEnd();
-                Gl.glPopMatrix();
-            }
-        }
+        #region Configuración de Escena (viewports)
 
         private void SetSceneWindow()
         {
@@ -500,100 +532,40 @@ namespace TPAlgoritmos3D
             Gl.glCallList(DL_AXIS2D_TOP);
         }
 
-        private void Init()
+        private void Set3DEnv()
         {
-            
-
-            dl_handle = Gl.glGenLists(3);
-
-            Gl.glClearColor(0.02f, 0.02f, 0.04f, 0.0f);
-            Gl.glShadeModel(Gl.GL_SMOOTH);
-            Gl.glEnable(Gl.GL_DEPTH_TEST);
-            Gl.glLightfv(Gl.GL_LIGHT0, Gl.GL_DIFFUSE, light_color);
-            Gl.glLightfv(Gl.GL_LIGHT0, Gl.GL_AMBIENT, light_ambient);
-            Gl.glLightfv(Gl.GL_LIGHT0, Gl.GL_POSITION, light_position);
-            Gl.glEnable(Gl.GL_LIGHT0);
-            Gl.glEnable(Gl.GL_LIGHTING);
-
-            // Generación de las Display Lists
-            Gl.glNewList(DL_AXIS, Gl.GL_COMPILE);
-	            DrawAxis();
-            Gl.glEndList();
-            Gl.glNewList(DL_GRID, Gl.GL_COMPILE);
-	            DrawXYGrid();
-            Gl.glEndList();
-            Gl.glNewList(DL_AXIS2D_TOP, Gl.GL_COMPILE);
-	            DrawAxis2DTopView();
-            Gl.glEndList();
-            Gl.glNewList(DL_AXIS2D_HEIGHT, Gl.GL_COMPILE);
-	            DrawAxis2DHeightView();
-            Gl.glEndList();
+            Gl.glViewport(0, 0, W_WIDTH, W_HEIGHT);
+            Gl.glMatrixMode(Gl.GL_PROJECTION);
+            Gl.glLoadIdentity();
+            Glu.gluPerspective(60.0, (float)W_WIDTH / (float)W_HEIGHT, 0.10, 100.0);
         }
 
-        private void glControl_KeyPress(object sender, KeyPressEventArgs e)
+        /// <summary>
+        /// Panel 2D para la vista de la curva correspondiente a la trayectoria
+        /// de la camara.
+        /// </summary>
+        private void SetPanelTopEnv()
         {
-            switch (e.KeyChar)
-            {
-                case (char) 27:
-                    Application.Exit();
-                    break;
-                case 'g':
-                    view_grid = !view_grid;
-                    glControl.Refresh();
-                    break;
-                case 'a':
-                    view_axis = !view_axis;
-                    glControl.Refresh();
-                    break;
-                case 'h':
-                    escena.velocidadIteracionCurva*=2;
-                    glControl.Refresh();
-                    break;
-                case 'l':
-                    escena.velocidadIteracionCurva/=2;
-                    glControl.Refresh();
-                    break;
-                case 'r':
-                    //vista = new Vista(this, escena);
-                    this.CrearEscena();
-                    glControl.Refresh();
-                    break;
-                case 's':
-                    //vista = new Vista(this, escena);
-                    this.simularEscenea = true;
-                    this.CrearEscena();
-                    glControl.Refresh();
-                    break;
-                default:
-                    break;
-            }
+            Gl.glViewport(TOP_VIEW_POSX, TOP_VIEW_POSY, TOP_VIEW_W, TOP_VIEW_H);
+            Gl.glMatrixMode(Gl.GL_PROJECTION);
+            Gl.glLoadIdentity();
+            Glu.gluOrtho2D(-0.10, 1.05, -0.10, 1.05);
         }
 
-        private void glControl_MouseClick(object sender, MouseEventArgs e)
+        /// <summary>
+        /// Panel 2D para la vista de la curva correspondiente al terreno.
+        /// </summary>
+        private void SetPanelHeightEnv()
         {
-            if (IsZona2(e.X, e.Y))
-            {
-                double offsetX = e.X - HEIGHT_VIEW_POSX;
-                double offsetY = e.Y + 40; // TODO: VER COMO CUERNO HACER PARA ARREGLAR EL CORRIMIENTO
-
-                offsetX = (offsetX / (HEIGHT_VIEW_POSX + HEIGHT_VIEW_W));
-                offsetY = ((HEIGHT_VIEW_H - offsetY) / HEIGHT_VIEW_H);
-
-                this.vista.AddPuntosBzier(offsetX, offsetY);
-                glControl.Invalidate();
-            }
-            else if (IsZona3(e.X, e.Y))
-            {
-                double offsetX = e.X - TOP_VIEW_POSX;
-                double offsetY = e.Y + 40; // TODO: VER COMO CUERNO HACER PARA ARREGLAR EL CORRIMIENTO
-
-                offsetX = (offsetX / TOP_VIEW_W);
-                offsetY = ((TOP_VIEW_H - offsetY) / TOP_VIEW_H);
-
-                this.vista.AddPuntosBspline(offsetX, offsetY);
-                glControl.Invalidate();
-            }
+            Gl.glViewport(HEIGHT_VIEW_POSX, HEIGHT_VIEW_POSY, HEIGHT_VIEW_W, HEIGHT_VIEW_H);
+            Gl.glMatrixMode(Gl.GL_PROJECTION);
+            Gl.glLoadIdentity();
+            Glu.gluOrtho2D(-0.10, 1.05, -0.10, 1.05);
         }
+
+        #endregion
+
+        #region Métodos Auxiliares
 
         private bool IsZona2(int x, int y)
         {
@@ -607,23 +579,7 @@ namespace TPAlgoritmos3D
                 (0 <= y && y <= TOP_VIEW_H);
         }
 
-        // TODO: pasarme a VISTA!
-        private void DibujarPunto(double x, double y)
-        {
-            double DELTA = 0.01;
-            Gl.glPushMatrix();
-
-            Gl.glDisable(Gl.GL_LIGHTING);
-            Glu.GLUquadric quad = Glu.gluNewQuadric();
-            Gl.glPushMatrix();
-            Gl.glColor3d(1, 0, 0);
-            Gl.glTranslated(x, y, 0);
-            Glu.gluDisk(quad, 0, DELTA, 20, 20);
-            Gl.glPopMatrix();
-            Gl.glEnable(Gl.GL_LIGHTING);
-            Gl.glColor3d(1, 1, 1);
-            Glu.gluDeleteQuadric(quad);
-        }
+        #endregion
 
     }
 }
