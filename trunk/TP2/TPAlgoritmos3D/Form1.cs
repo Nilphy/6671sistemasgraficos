@@ -21,11 +21,11 @@ namespace TPAlgoritmos3D
     {
 
         private const int DELTA_TIEMPO = 50;
-        
+
         public Escena escena = new Escena();
         public Vista vista;
         private Timer timer;
-        
+
 
         #region Propiedades
 
@@ -121,12 +121,12 @@ namespace TPAlgoritmos3D
 
         public int W_WIDTH
         {
-            get { return this.Width; }
+            get { return glControl.Width; }
         }
 
         public int W_HEIGHT
         {
-            get { return this.Height; }
+            get { return glControl.Height; }
         }
 
         #endregion
@@ -333,26 +333,20 @@ namespace TPAlgoritmos3D
 
         private void glControl_MouseClick(object sender, MouseEventArgs e)
         {
+            System.Console.Out.WriteLine("MouseClick: e.X: " + e.X + System.Console.Out.NewLine + "e.Y: " + e.Y);
             if (IsZona2(e.X, e.Y))
             {
-                double offsetX = e.X - HEIGHT_VIEW_POSX;
-                double offsetY = e.Y + 40; // TODO: VER COMO CUERNO HACER PARA ARREGLAR EL CORRIMIENTO
+                Vertice nuevoVertice = ConvertirVerticeAZona2(new Vertice(e.X, e.Y));
 
-                offsetX = (offsetX / (HEIGHT_VIEW_POSX + HEIGHT_VIEW_W));
-                offsetY = ((HEIGHT_VIEW_H - offsetY) / HEIGHT_VIEW_H);
 
-                this.vista.AddPuntosBzier(offsetX, offsetY);
+
+                this.vista.AddPuntosBzier(nuevoVertice.X, nuevoVertice.Y);
                 glControl.Invalidate();
             }
             else if (IsZona3(e.X, e.Y))
             {
-                double offsetX = e.X - TOP_VIEW_POSX;
-                double offsetY = e.Y + 40; // TODO: VER COMO CUERNO HACER PARA ARREGLAR EL CORRIMIENTO
-
-                offsetX = (offsetX / TOP_VIEW_W);
-                offsetY = ((TOP_VIEW_H - offsetY) / TOP_VIEW_H);
-
-                this.vista.AddPuntosBspline(offsetX, offsetY);
+                Vertice nuevoVertice = ConvertirVerticeAZona3(new Vertice(e.X, e.Y));
+                this.vista.AddPuntosBspline(nuevoVertice.X, nuevoVertice.Y);
                 glControl.Invalidate();
             }
         }
@@ -444,7 +438,7 @@ namespace TPAlgoritmos3D
             Gl.glVertex3d(0, 0, 0);
             Gl.glColor3d(0, 0, 0);
             Gl.glVertex3d(15, 0, 0);
-            
+
             // Y
             Gl.glColor3d(0, 1, 0);
             Gl.glVertex3d(0, 0, 0);
@@ -549,7 +543,8 @@ namespace TPAlgoritmos3D
             Gl.glViewport(TOP_VIEW_POSX, TOP_VIEW_POSY, TOP_VIEW_W, TOP_VIEW_H);
             Gl.glMatrixMode(Gl.GL_PROJECTION);
             Gl.glLoadIdentity();
-            Glu.gluOrtho2D(-0.10, 1.05, -0.10, 1.05);
+            //Glu.gluOrtho2D(-0.10, 1.05, -0.10, 1.05);
+            Glu.gluOrtho2D(0.0, 1.0, 0.0, 1.0);
         }
 
         /// <summary>
@@ -560,7 +555,7 @@ namespace TPAlgoritmos3D
             Gl.glViewport(HEIGHT_VIEW_POSX, HEIGHT_VIEW_POSY, HEIGHT_VIEW_W, HEIGHT_VIEW_H);
             Gl.glMatrixMode(Gl.GL_PROJECTION);
             Gl.glLoadIdentity();
-            Glu.gluOrtho2D(-0.10, 1.05, -0.10, 1.05);
+            Glu.gluOrtho2D(0.0, 1.0, 0.0, 1.0);
         }
 
         #endregion
@@ -573,10 +568,30 @@ namespace TPAlgoritmos3D
                 (0 <= y && y <= HEIGHT_VIEW_H);
         }
 
+        private Vertice ConvertirVerticeAZona2(Vertice vertice)
+        {
+            double newX = (vertice.X - HEIGHT_VIEW_POSX) / HEIGHT_VIEW_W;
+            double newY = ((W_HEIGHT - vertice.Y) - HEIGHT_VIEW_POSY) / HEIGHT_VIEW_H;
+
+            System.Console.Out.WriteLine("offsetX: " + newX + " offsetY: " + newY);
+            System.Console.Out.WriteLine("W_HEIGHT: " + W_HEIGHT + " HEIGHT_VIEW_POSY: " + HEIGHT_VIEW_POSY + " HEIGHT_VIEW_H:" + HEIGHT_VIEW_H);
+            System.Console.Out.WriteLine("W_HEIGHT- vertice.Y: " + (W_HEIGHT - vertice.Y));
+
+            return new Vertice(newX, newY);
+        }
+
         private bool IsZona3(int x, int y)
         {
             return (TOP_VIEW_POSX <= x && x <= (TOP_VIEW_POSX + TOP_VIEW_W)) &&
                 (0 <= y && y <= TOP_VIEW_H);
+        }
+
+        private Vertice ConvertirVerticeAZona3(Vertice vertice)
+        {
+            double newX = (vertice.X - TOP_VIEW_POSX) / TOP_VIEW_W;
+            double newY = ((W_HEIGHT - vertice.Y) - TOP_VIEW_POSY) / TOP_VIEW_H;
+
+            return new Vertice(newX, newY);
         }
 
         #endregion
