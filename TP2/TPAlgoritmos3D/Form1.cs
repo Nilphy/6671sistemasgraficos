@@ -365,6 +365,7 @@ namespace TPAlgoritmos3D
                 case 'p':
                     this.DetenerSimulacion();
                     this.vista.LimpiarCamino();
+                    this.escena.Terreno = new Terreno();
                     glControl.Refresh();
                     break;
                 default:
