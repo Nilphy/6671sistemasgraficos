@@ -66,7 +66,7 @@ namespace SistemasGraficos.Entidades
                 }
 
                 // Se repite el último punto hasta que se complete el segmento de cuatro
-                for (int i = 0; i < cantidadPuntosAgregar -1; i++)
+                for (int i = 0; i < cantidadPuntosAgregar; i++)
                 {
                     retorno.Add(retorno[retorno.Count - 1]);
                 }
