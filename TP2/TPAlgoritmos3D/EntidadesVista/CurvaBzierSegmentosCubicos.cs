@@ -56,13 +56,16 @@ namespace SistemasGraficos.Entidades
             {
                 int cantidadPuntos = puntos.Count;
                 int cantidadTramosCuatroPuntos = cantidadPuntos / CANTIDAD_PUNTOS_SEGMENTO;
-                int cantidadPuntosAgregar = (cantidadTramosCuatroPuntos + 1) * 4 - cantidadPuntos;
+                int cantidadPuntosAgregar = (cantidadTramosCuatroPuntos + 1) * CANTIDAD_PUNTOS_SEGMENTO - cantidadPuntos;
 
-                for (int i = cantidadTramosCuatroPuntos * 4 -1; i < cantidadPuntos; i++)
+                // Se agregan los últimos puntos que no llegaron a completar un segmento de 4
+                int indiceUltimoPuntoAgregado = ((cantidadTramosCuatroPuntos * CANTIDAD_PUNTOS_SEGMENTO - 1) < 0) ? 0 : cantidadTramosCuatroPuntos * CANTIDAD_PUNTOS_SEGMENTO - 1;
+                for (int i = indiceUltimoPuntoAgregado; i < cantidadPuntos; i++)
                 {
                     retorno.Add(puntos[i]);
                 }
 
+                // Se repite el último punto hasta que se complete el segmento de cuatro
                 for (int i = 0; i < cantidadPuntosAgregar -1; i++)
                 {
                     retorno.Add(retorno[retorno.Count - 1]);

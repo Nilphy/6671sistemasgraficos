@@ -106,7 +106,6 @@ namespace SistemasGraficos.Entidades
             IList<PuntoFlotante> retorno = new List<PuntoFlotante>();
 
             int cantidadSegmentos = puntos.Count;
-            int numeroSegmento = 1;
 
             // Para que la curva termine con los puntos que empezó
             puntos.Add(puntos[0]);

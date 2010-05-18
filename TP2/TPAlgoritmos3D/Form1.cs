@@ -19,45 +19,62 @@ namespace TPAlgoritmos3D
 {
     public partial class Form1 : Form
     {
+        #region Atributos y Propiedades
 
-        private const int DELTA_TIEMPO = 50;
+        /// <summary>
+        /// Constante global que indica el tamaño del paso de tiempo en la simulación 
+        /// </summary>
+        private const int DELTA_TIEMPO = 5;
 
+        /// <summary>
+        /// Variable global que representa al modelo 
+        /// </summary>
         public Escena escena = new Escena();
+
+        /// <summary>
+        /// Variable global que representa a la vista 
+        /// </summary>
         public Vista vista;
+
         private Timer timer;
 
-
-        #region Propiedades
-
-        private int dl_handle;
-
-        //private int W_WIDTH = 1024;
-        //private int W_HEIGHT = 768;
-
+        /// <summary>
+        /// Variable global que indica si se ve la grilla en la pantalla 
+        /// </summary>
         private bool view_grid = true;
+
+        /// <summary>
+        /// Variable global que indica si se ven los ejes en la pantalla 
+        /// </summary>
         private bool view_axis = true;
 
-        // Variables que controlan la ubicación de la cámara en la Escena 3D
-        //private float[] eye = new float[3] { 15.0f, 15.0f, 5.0f };
-        //private float[] at = new float[3] { 0.0f, 0.0f, 0.0f };
-        private float[] up = new float[3] { 0.0f, 0.0f, 1.0f };
+        /// <summary>
+        /// Variable que indica si la simulación debe estar detenida o ejecutándose 
+        /// </summary>
+        private bool escenaSimulando = false;
 
-        // Variables asociadas a única fuente de luz de la escena
+        /// <summary>
+        /// Indica si la cámara se está moviendo siguiendo la curva bspline o está fija
+        /// </summary>
+        private bool camaraFija = true;
+
+        #region Variables asociadas a única fuente de luz de la escena 
+
         private float[] light_color = new float[4] { 1.0f, 1.0f, 1.0f, 1.0f };
         private float[] light_position = new float[4] { 0.0f, 0.0f, 1.0f, 1.0f };
         private float[] light_ambient = new float[4] { 0.05f, 0.05f, 0.05f, 1.0f };
 
-        // Color de la esfera en movimiento dentro de la escena
-        private float[] color_esfera = new float[4] { 0.5f, 0.5f, 0.2f, 1.0f };
+        #endregion
+        #region Variables internas al proceso de generación de la superficie
 
         private float[] default_curve;
-
         private float[] surface_buffer = null;
         private float[] normals_buffer = null;
-
         private int curve_points = 0;
+        private int dl_handle;
 
-        private bool simularEscenea = false;
+        #endregion 
+        #region Mugre de constantes de configuración de la pantalla
 
         public int TOP_VIEW_POSX
         {
@@ -130,20 +147,30 @@ namespace TPAlgoritmos3D
         }
 
         #endregion
+        #region Posición defecto de la cámara
 
+        private float[] eye = new float[3] { 15.0f, 15.0f, 10.0f };
+        private float[] at = new float[3] { 0.0f, 0.0f, 0.0f };
+        private float[] up = new float[3] { 0.0f, 0.0f, 1.0f };
+
+        #endregion
+
+        #endregion
+
+        // Constructor de la ventana, se ejecuta una sola vez cuando se habre la misma 
         public Form1()
         {
-            // Creamos la vista.
+            // Se crea la vista, necesita conocer al modelo
             this.vista = new Vista(escena);
 
-            // Inicializamos los controles de la ventana.
+            // Se inicializan los controles de la ventana
             InitializeComponent();
             glControl.InitializeContexts();
 
-            // Inicializamos los componentes de la escena en OpenGL.
+            // Se inicializan los componentes de la escena en OpenGL.
             Init();
 
-            // Configuramos el Timer para la simulación.
+            // Se configura el Timer para la simulación.
             InitTimerSimulacion();
         }
 
@@ -190,82 +217,60 @@ namespace TPAlgoritmos3D
             timer.Interval = DELTA_TIEMPO;
         }
 
-        #endregion
-
-        private void CrearEscena()
+        /// <summary>
+        /// Reinicia todas las variables globales de la aplicación (incluido el modelo)
+        /// </summary>
+        private void InicializarEscena()
         {
             this.escena = new Escena();
-
-            // Creo el terreno
-            foreach (PuntoFlotante punto in vista.GetPuntosCurvaBzier())
-            {
-                this.escena.Terreno.AddVertice(punto.GetXFlotante(), punto.GetYFlotante());
-            }
-
-            // Creo la rueda            
-            this.escena.Rueda.Centro.X = this.escena.Terreno.Vertices[10].X;
-            double anguloTerreno = this.escena.Terreno.GetAnguloInclinacion(this.escena.Rueda.Centro.X);
-            double dx = this.escena.Rueda.RadioExterno * Math.Sin(anguloTerreno);
-            double nuevoX = this.escena.Rueda.Centro.X + dx;
-            this.escena.Rueda.Centro.Y = this.escena.Terreno.GetAltura(nuevoX) + this.escena.Rueda.RadioExterno * Math.Cos(anguloTerreno);
-
-            if (this.simularEscenea)
-            {
-                IList puntosBzier = (IList)vista.GetPuntosCurvaBzier();
-
-                // Se pasan al formato que pide el fwk
-                default_curve = this.vista.ConvertirPuntos(puntosBzier);
-
-                // Construccion de la Superficie
-                BuildSurface(default_curve, puntosBzier.Count);
-            }
-
-            this.timer.Start();
+            this.escenaSimulando = false;
+            this.camaraFija = true;
+            this.view_axis = true;
+            this.view_grid = true;
         }
 
+        #endregion
         #region Eventos
 
+        // Idem a Display
         private void glControl_Paint(object sender, PaintEventArgs e)
         {
             Gl.glClear(Gl.GL_COLOR_BUFFER_BIT | Gl.GL_DEPTH_BUFFER_BIT);
             ///////////////////////////////////////////////////
             // Escena 3D
             this.Set3DEnv();
-
-            if (this.simularEscenea)
+            //
+            // Se corresponde se dibujan los componentes de la simulación
+            if (this.escenaSimulando)
             {
                 Gl.glMatrixMode(Gl.GL_MODELVIEW);
                 Gl.glLoadIdentity();
 
-                IList<PuntoFlotante> puntosCamara = vista.GetPuntosBspline();
+                // Se modifica la cámara para que recorra los puntos de la cámara bspline
+                if (camaraFija) Glu.gluLookAt(eye[0], eye[1], eye[2], at[0], at[1], at[2], up[0], up[1], up[2]);
+                else
+                {
+                    IList<PuntoFlotante> puntosPosicionCamara = vista.GetPuntosPosicionCamara();
+                    Glu.gluLookAt(puntosPosicionCamara[escena.iteradorCurva % puntosPosicionCamara.Count].GetXFlotante(), puntosPosicionCamara[escena.iteradorCurva % puntosPosicionCamara.Count].GetYFlotante(), 10, 0, 0, 0, up[0], up[1], up[2]);
+                }
 
-                // Se escalan los puntos a las coordenadas máximas de la cámara
-                puntosCamara = this.vista.EscalarPuntosVentanitas(puntosCamara, false);
+                // Si corresponde se dibujan los ejes
+                if (view_axis) Gl.glCallList(DL_AXIS);
+                // Se corresponde se dibuja la grilla
+                if (view_grid) Gl.glCallList(DL_GRID);
 
-                // Se crea la curva
-                CurvaBsplineSegmentosCubicos curva = new CurvaBsplineSegmentosCubicos(puntosCamara);
-
-                // Se obtienen los puntos discretos de la curva
-                IList<PuntoFlotante> puntosBspline = curva.GetPuntosDiscretos(0.01);
-
-                Glu.gluLookAt(puntosBspline[escena.iteradorCurva % puntosBspline.Count].GetXFlotante(), puntosBspline[escena.iteradorCurva % puntosBspline.Count].GetYFlotante(), 10, 0, 0, 0, up[0], up[1], up[2]);
-
-                if (view_axis)
-                    Gl.glCallList(DL_AXIS);
-
-                if (view_grid)
-                    Gl.glCallList(DL_GRID);
-
+                // Se aplica escalado para pasar de las coordenadas del mundo a las coordenadas de la escena
                 vista.EscalarMundoToEscena3D();
 
+                // Se dibuja la rueda
                 this.vista.DibujarRueda();
 
-                // Dibujar la superficie generada a partir de la curva
+                // Se dibuja la superficie
                 DrawSurface();
 
                 Gl.glPopMatrix();
             }
-
+            //
             ///////////////////////////////////////////////////
             // Panel 2D para la vista del camino de la camara.
             Gl.glLoadIdentity();
@@ -274,11 +279,9 @@ namespace TPAlgoritmos3D
             Gl.glLoadIdentity();
             Glu.gluLookAt(0, 0, 0.5, 0, 0, 0, 0, 1, 0);
             Gl.glCallList(DL_AXIS2D_TOP);
-
             //
-            ///////////////////////////////////////////////////
             this.vista.DibujarCamaraPath();
-
+            //
             ///////////////////////////////////////////////////
             // Panel 2D para la vista del perfil del terreno.
             this.SetPanelHeightEnv();
@@ -286,12 +289,28 @@ namespace TPAlgoritmos3D
             Gl.glLoadIdentity();
             Glu.gluLookAt(0, 0, 0.5, 0, 0, 0, 0, 1, 0);
             Gl.glCallList(DL_AXIS2D_HEIGHT);
-
+            //
+            this.vista.DibujarTerreno2D();
             //
             ///////////////////////////////////////////////////   
-            this.vista.DibujarTerreno2D();
         }
 
+        /// <summary>
+        /// Maneja los eventos del teclado del usuario
+        /// 
+        /// g = muestra/oculta la grilla
+        /// a = muestra/oculta los ejes
+        /// l = baja la velocidad de la cámara
+        /// h = sube la velocidad de la cámara
+        /// r = limpia todos los valores generados por la simulación, inicializando nuevamente la escena
+        /// s = inicia la simulación
+        /// p = limpia la lista de puntos del camino (detiene la simulación)
+        /// o = limpia la lista de puntos del recorrido de la cámara (setea al modo de recorrido de la cámara como fijo)
+        /// esc = salir de la aplicación
+        /// m = cambia el modo de vista de la camara
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void glControl_KeyPress(object sender, KeyPressEventArgs e)
         {
             switch (e.KeyChar)
@@ -308,26 +327,82 @@ namespace TPAlgoritmos3D
                     glControl.Refresh();
                     break;
                 case 'h':
-                    escena.velocidadIteracionCurva *= 2;
-                    glControl.Refresh();
+                    if (!camaraFija)
+                    {
+                        escena.AumentarVelocidad();
+                        glControl.Refresh();
+                    }
                     break;
                 case 'l':
-                    escena.velocidadIteracionCurva /= 2;
-                    glControl.Refresh();
+                    if (!camaraFija)
+                    {
+                        escena.ReducirVelocidad();
+                        glControl.Refresh();
+                    }
                     break;
                 case 'r':
-                    //vista = new Vista(this, escena);
-                    this.CrearEscena();
+                    this.DetenerSimulacion();
+                    this.InicializarEscena();
                     glControl.Refresh();
                     break;
                 case 's':
-                    //vista = new Vista(this, escena);
-                    this.simularEscenea = true;
-                    this.CrearEscena();
+                    this.Simular();
+                    glControl.Refresh();
+                    break;
+                case 'o':
+                    this.camaraFija = true;
+                    this.vista.LimpiarRecorridoCamara();
+                    glControl.Refresh();
+                    break;
+                case 'm':
+                    this.camaraFija = !this.camaraFija;
+                    if (!this.camaraFija) this.vista.CrearRecorridoCamara();
+                    glControl.Refresh();
+                    break;
+                case 'p':
+                    this.DetenerSimulacion();
+                    this.vista.LimpiarCamino();
                     glControl.Refresh();
                     break;
                 default:
                     break;
+            }
+        }
+
+        private void DetenerSimulacion()
+        {
+            this.escenaSimulando = false;
+            this.timer.Stop();
+        }
+
+        private void Simular()
+        {
+            this.escenaSimulando = true;
+
+            try
+            {
+                this.vista.CrearCamino();
+                if (!camaraFija) this.vista.CrearRecorridoCamara();
+                
+                // Se crea el terreno con los puntos de la curva Bzier
+                foreach (PuntoFlotante punto in this.vista.GetPuntosCamino())
+                {
+                    this.escena.Terreno.AddVertice(punto.GetXFlotante(), punto.GetYFlotante());
+                }
+
+                this.escena.PosicionarRuedaAlComienzoDelTerreno();
+                
+                // Se pasan al formato que pide el fwk
+                default_curve = this.vista.ConvertirPuntos((IList)vista.GetPuntosCamino());
+
+                // Construccion de la Superficie
+                BuildSurface(default_curve, vista.GetPuntosCamino().Count);
+
+                this.timer.Start();
+            }
+            catch (Exception ex)
+            {
+                System.Console.Out.WriteLine(ex.Message);
             }
         }
 
@@ -337,8 +412,6 @@ namespace TPAlgoritmos3D
             if (IsZona2(e.X, e.Y))
             {
                 Vertice nuevoVertice = ConvertirVerticeAZona2(new Vertice(e.X, e.Y));
-
-
 
                 this.vista.AddPuntosBzier(nuevoVertice.X, nuevoVertice.Y);
                 glControl.Invalidate();
@@ -360,11 +433,11 @@ namespace TPAlgoritmos3D
         private void TimerEventProcessor(Object myObject, EventArgs myEventArgs)
         {
             escena.Simular(DELTA_TIEMPO);
+            glControl.Refresh();
             glControl.Invalidate();
         }
 
         #endregion
-
         #region Armado y Dibujo de Superficie
 
         private void BuildSurface(float[] vertex_buffers, int nr_points)
@@ -424,7 +497,6 @@ namespace TPAlgoritmos3D
         }
 
         #endregion
-
         #region Dibujado de Viewports (marcos y axis)
 
         private void DrawAxis()
@@ -500,7 +572,6 @@ namespace TPAlgoritmos3D
         }
 
         #endregion
-
         #region Configuración de Escena (viewports)
 
         private void SetSceneWindow()
@@ -559,7 +630,6 @@ namespace TPAlgoritmos3D
         }
 
         #endregion
-
         #region Métodos Auxiliares
 
         private bool IsZona2(int x, int y)

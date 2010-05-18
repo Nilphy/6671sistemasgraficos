@@ -28,7 +28,6 @@ namespace TPAlgoritmos3D.EntidadesVista
                 PlotHelper.DibujarPunto(punto);
             }
 
-            /*
             // Dibujo la curva que se forma a partir de los puntos.
             if (puntos.Count > 2)
             {
@@ -47,7 +46,6 @@ namespace TPAlgoritmos3D.EntidadesVista
                 Gl.glEnable(Gl.GL_LIGHTING);
                 Gl.glColor3d(1, 1, 1);
             }
-            */
         }
 
     }
