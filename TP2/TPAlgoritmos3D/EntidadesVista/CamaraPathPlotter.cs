@@ -27,7 +27,7 @@ namespace TPAlgoritmos3D.EntidadesVista
             }
 
             // Dibujo la curva que se forma a partir de los puntos.
-            if (puntos.Count > 1)
+            if (puntos.Count > 3)
             {
                 CurvaBsplineSegmentosCubicos curvaCamino = new CurvaBsplineSegmentosCubicos(puntos);
 

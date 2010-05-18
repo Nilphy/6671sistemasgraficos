@@ -104,13 +104,19 @@ namespace SistemasGraficos.Entidades
         private IList<PuntoFlotante> CompletarPuntos(IList<PuntoFlotante> puntos)
         {
             IList<PuntoFlotante> retorno = new List<PuntoFlotante>();
+            IList<PuntoFlotante> copiaPuntos = new List<PuntoFlotante>();
 
-            int cantidadSegmentos = puntos.Count;
+            foreach (PuntoFlotante punto in puntos)
+            {
+                copiaPuntos.Add(punto);
+            }
+
+            int cantidadSegmentos = copiaPuntos.Count;
 
             // Para que la curva termine con los puntos que empezó
-            puntos.Add(puntos[0]);
-            puntos.Add(puntos[1]);
-            puntos.Add(puntos[2]);
+            copiaPuntos.Add(puntos[0]);
+            copiaPuntos.Add(puntos[1]);
+            copiaPuntos.Add(puntos[2]);
 
             // Y ahora el efecto escalera :S
             int indiceInicioSegmento = 0;
@@ -118,7 +124,7 @@ namespace SistemasGraficos.Entidades
             {
                 for (int i = indiceInicioSegmento; i < indiceInicioSegmento + CANTIDAD_PUNTOS_SEGMENTO; i++)
                 {
-                    retorno.Add(puntos[i]);
+                    retorno.Add(copiaPuntos[i]);
                 }
 
                 indiceInicioSegmento++;

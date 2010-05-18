@@ -355,8 +355,11 @@ namespace TPAlgoritmos3D
                     glControl.Refresh();
                     break;
                 case 'm':
-                    this.camaraFija = !this.camaraFija;
-                    if (!this.camaraFija) this.vista.CrearRecorridoCamara();
+                    if (this.vista.GetPuntosBspline().Count >= 4)
+                    {
+                        this.camaraFija = !this.camaraFija;
+                        if (!this.camaraFija) this.vista.CrearRecorridoCamara();
+                    }
                     glControl.Refresh();
                     break;
                 case 'p':
@@ -422,6 +425,8 @@ namespace TPAlgoritmos3D
                 this.vista.AddPuntosBspline(nuevoVertice.X, nuevoVertice.Y);
                 glControl.Invalidate();
             }
+
+            glControl.Refresh();
         }
 
         /// <summary>
