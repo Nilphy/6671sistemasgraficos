@@ -37,6 +37,8 @@ namespace SistemasGraficos.Entidades
 
         private IList<PuntoFlotante> puntosBzier = new List<PuntoFlotante>();
         private IList<PuntoFlotante> puntosBspline = new List<PuntoFlotante>();
+        private IList<PuntoFlotante> puntosCamino = null;
+        private IList<PuntoFlotante> puntosRecorridoCamara = null;
 
         public Vista(Escena escena)
         {
@@ -257,7 +259,31 @@ namespace SistemasGraficos.Entidades
             Glu.gluDeleteQuadric(quad);
         }
 
-        internal IList GetPuntosCurvaBzier()
+        internal IList<PuntoFlotante> GetPuntosCurvaBzier()
+        {
+            return this.puntosCamino;
+        }
+
+        /// <summary>
+        /// Escala los puntos ingresados por el usuario para poder usarlos como posición de la cámara en la escena
+        /// </summary>
+        /// <returns></returns>
+        private IList<PuntoFlotante> GetPuntosBsplineEscalados()
+        {
+            return this.EscalarPuntosVentanitas(this.GetPuntosBspline(), false);
+        }
+
+        public IList<PuntoFlotante> GetPuntosPosicionCamara()
+        {
+            return this.puntosRecorridoCamara;
+        }
+
+        public IList<PuntoFlotante> GetPuntosCamino()
+        {
+            return this.puntosCamino;
+        }
+
+        public void CrearCamino()
         {
             // Se obtienen los puntos seleccionados por el usuario
             IList<PuntoFlotante> puntosPoligonoControlBzier = this.GetPuntosBzier();
@@ -269,9 +295,31 @@ namespace SistemasGraficos.Entidades
             CurvaBzierSegmentosCubicos curva = new CurvaBzierSegmentosCubicos(puntosPoligonoControlBzier);
 
             // Se obtienen los puntos discretos de la curva
-            IList puntosBzier = (IList)curva.GetPuntosDiscretos(0.01);
+            this.puntosCamino = curva.GetPuntosDiscretos(0.01);
+        }
 
-            return puntosBzier;
+        public void CrearRecorridoCamara()
+        {
+            // Se obtienen los puntos ingresados por el usuario escalados a las coordenadas de la escena
+            IList<PuntoFlotante> puntosCamara = this.GetPuntosBsplineEscalados();
+
+            // Se crea la curva Bspline
+            CurvaBsplineSegmentosCubicos curva = new CurvaBsplineSegmentosCubicos(puntosCamara);
+
+            // Se devuelven los puntos discretos de la curva bspline
+            this.puntosRecorridoCamara = curva.GetPuntosDiscretos(0.1);
+        }
+
+        public void LimpiarRecorridoCamara()
+        {
+            this.puntosBspline = new List<PuntoFlotante>();
+            this.puntosRecorridoCamara = null;
+        }
+
+        public void LimpiarCamino()
+        {
+            this.puntosBzier = new List<PuntoFlotante>();
+            this.puntosCamino = null;
         }
     }
 }
