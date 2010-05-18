@@ -307,7 +307,7 @@ namespace SistemasGraficos.Entidades
             CurvaBsplineSegmentosCubicos curva = new CurvaBsplineSegmentosCubicos(puntosCamara);
 
             // Se devuelven los puntos discretos de la curva bspline
-            this.puntosRecorridoCamara = curva.GetPuntosDiscretos(0.1);
+            this.puntosRecorridoCamara = curva.GetPuntosDiscretos(0.001);
         }
 
         public void LimpiarRecorridoCamara()
