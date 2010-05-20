@@ -6,6 +6,7 @@ using System.Collections;
 using System.Windows.Forms;
 
 using Tao.OpenGl;
+using Tao.FreeGlut;
 
 using Modelo;
 using SistemasGraficos.EstrategiasDibujo;
@@ -237,26 +238,101 @@ namespace SistemasGraficos.Entidades
         public void DibujarRueda()
         {
             Glu.GLUquadric quad = Glu.gluNewQuadric();
+            Gl.glDisable(Gl.GL_LIGHTING);
+            Gl.glColor3d(1, 0, 0);
 
             Gl.glPushMatrix();
 
             Gl.glTranslated(0, escena.Rueda.Centro.X, escena.Rueda.Centro.Y);
-            Gl.glRotated(escena.Rueda.AnguloRotacion, 1, 0, 0);
+            Gl.glRotated(escena.Rueda.AnguloRotacion * 180 / Math.PI, 1, 0, 0);
 
             Gl.glRotated(90, 0, 1, 0);
 
-            Glu.gluDisk(quad, 0.6, 1, 20, 20);
+            Gl.glColor3d(1, 0, 0);
+            Glu.gluDisk(quad, escena.Rueda.RadioInterno, escena.Rueda.RadioExterno, 20, 20);
 
-            Glu.gluCylinder(quad, 1, 1, 1, 20, 20);
-            Glu.gluCylinder(quad, 0.6, 0.6, 1, 20, 20);
+            Gl.glColor3d(1, 1, 1);
+            Glu.gluDisk(quad, 0, escena.Rueda.RadioInterno, 20, 20);
 
-            Gl.glTranslated(0, 0, 1);
+            Gl.glColor3d(1, 0, 0);
+            Glu.gluCylinder(quad, escena.Rueda.RadioExterno, escena.Rueda.RadioExterno, 0.3, 20, 20);
 
-            Glu.gluDisk(quad, 0.6, 1, 20, 20);
+            Gl.glTranslated(0, 0, 0.3);
+
+            Gl.glColor3d(1, 0, 0);
+            Glu.gluDisk(quad, escena.Rueda.RadioInterno, escena.Rueda.RadioExterno, 20, 20);
+            Gl.glColor3d(1, 1, 1);
+            Glu.gluDisk(quad, 0, escena.Rueda.RadioInterno, 20, 20);
 
             Gl.glPopMatrix();
 
+            this.DibujarBarrita();
+
+            Gl.glEnable(Gl.GL_LIGHTING);
+            Gl.glColor3d(1, 1, 1);
+
             Glu.gluDeleteQuadric(quad);
+        }
+
+        private void DibujarBarrita()
+        {
+            Gl.glColor3d(0, 0, 1);
+            double size = escena.Rueda.RadioInterno / 2;
+
+            Gl.glPushMatrix();
+
+            // Centro la barra.
+            Gl.glTranslated(-size/4, escena.Rueda.Centro.X, escena.Rueda.Centro.Y);
+            Gl.glRotated(escena.Rueda.AnguloRotacion * 180 / Math.PI, 1, 0, 0);
+            Gl.glTranslated(-size/2, -size/2, 0);
+            Gl.glRotated(90, 0, 1, 0); // Rota para quedar acostada la barra
+
+            // En lugar de dibujar una barra 3D, se puede dibujar simplemente un rectangulo\
+            // estampado en la rueda.
+            //Gl.glRectd(-size / 2, -size / 2, size / 2, size / 2); 
+
+            
+            Gl.glBegin(Gl.GL_QUADS);
+            
+            // Tapa de abajo
+            Gl.glVertex3d(0, 0, 0);
+            Gl.glVertex3d(size, 0, 0);
+            Gl.glVertex3d(size, size*4, 0);
+            Gl.glVertex3d(0, size*4, 0);
+
+            // Tapa de arriba
+            Gl.glVertex3d(0, 0, size);
+            Gl.glVertex3d(size, 0, size);
+            Gl.glVertex3d(size, size*4, size);
+            Gl.glVertex3d(0, size*4, size);
+
+            // Tapa de atras
+            Gl.glVertex3d(0, 0, 0);
+            Gl.glVertex3d(size, 0, 0);
+            Gl.glVertex3d(size, 0, size);
+            Gl.glVertex3d(0, 0, size);
+
+            // Tapa de derecha
+            Gl.glVertex3d(size, 0, 0);
+            Gl.glVertex3d(size, size*4, 0);
+            Gl.glVertex3d(size, size*4, size);
+            Gl.glVertex3d(size, 0, size);
+
+            // Tapa de adelante
+            Gl.glVertex3d(size, size*4, 0);
+            Gl.glVertex3d(size, size*4, size);
+            Gl.glVertex3d(0, size*4, size);
+            Gl.glVertex3d(0, size*4, 0);
+
+            // Tapa de izquierda
+            Gl.glVertex3d(0, size*4, 0);
+            Gl.glVertex3d(0, 0, 0);
+            Gl.glVertex3d(0, 0, size);
+            Gl.glVertex3d(0, size*4, size);
+
+            Gl.glEnd();
+            
+            Gl.glPopMatrix();
         }
 
         internal IList<PuntoFlotante> GetPuntosCurvaBzier()
