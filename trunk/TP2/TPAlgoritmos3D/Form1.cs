@@ -60,7 +60,7 @@ namespace TPAlgoritmos3D
 
         #region Variables asociadas a única fuente de luz de la escena 
 
-        private float[] light_color = new float[4] { 1.0f, 1.0f, 1.0f, 1.0f };
+        private float[] light_color = new float[4] { 0.5f, 0.5f, 0.6f, 1.0f };
         private float[] light_position = new float[4] { 0.0f, 0.0f, 1.0f, 1.0f };
         private float[] light_ambient = new float[4] { 0.05f, 0.05f, 0.05f, 1.0f };
 
@@ -149,7 +149,7 @@ namespace TPAlgoritmos3D
         #endregion
         #region Posición defecto de la cámara
 
-        private float[] eye = new float[3] { 15.0f, 15.0f, 10.0f };
+        private float[] eye = new float[3] { 15.0f, 15.0f, 5.0f };
         private float[] at = new float[3] { 0.0f, 0.0f, 0.0f };
         private float[] up = new float[3] { 0.0f, 0.0f, 1.0f };
 
@@ -239,6 +239,7 @@ namespace TPAlgoritmos3D
             ///////////////////////////////////////////////////
             // Escena 3D
             this.Set3DEnv();
+
             //
             // Se corresponde se dibujan los componentes de la simulación
             if (this.escenaSimulando)
@@ -412,7 +413,6 @@ namespace TPAlgoritmos3D
 
         private void glControl_MouseClick(object sender, MouseEventArgs e)
         {
-            System.Console.Out.WriteLine("MouseClick: e.X: " + e.X + System.Console.Out.NewLine + "e.Y: " + e.Y);
             if (IsZona2(e.X, e.Y))
             {
                 Vertice nuevoVertice = ConvertirVerticeAZona2(new Vertice(e.X, e.Y));
