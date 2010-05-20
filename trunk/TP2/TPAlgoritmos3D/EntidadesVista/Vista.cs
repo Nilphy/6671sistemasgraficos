@@ -264,75 +264,79 @@ namespace SistemasGraficos.Entidades
             Gl.glColor3d(1, 1, 1);
             Glu.gluDisk(quad, 0, escena.Rueda.RadioInterno, 20, 20);
 
-            Gl.glPopMatrix();
 
             this.DibujarBarrita();
+
+            Gl.glPopMatrix();
+
 
             Gl.glEnable(Gl.GL_LIGHTING);
             Gl.glColor3d(1, 1, 1);
 
             Glu.gluDeleteQuadric(quad);
+
+            
         }
 
         private void DibujarBarrita()
         {
             Gl.glColor3d(0, 0, 1);
-            double size = escena.Rueda.RadioInterno / 2;
+            double size = escena.Rueda.RadioExterno*0.8;
+            double height = size/2.5;
+            double width = size;
+            double depth = size;
 
-            Gl.glPushMatrix();
+         //   Gl.glPushMatrix();
 
             // Centro la barra.
-            Gl.glTranslated(-size/4, escena.Rueda.Centro.X, escena.Rueda.Centro.Y);
-            Gl.glRotated(escena.Rueda.AnguloRotacion * 180 / Math.PI, 1, 0, 0);
-            Gl.glTranslated(-size/2, -size/2, 0);
-            Gl.glRotated(90, 0, 1, 0); // Rota para quedar acostada la barra
+            Gl.glTranslated(-depth / 2, -width/ 2, -height/1.3);
 
             // En lugar de dibujar una barra 3D, se puede dibujar simplemente un rectangulo\
             // estampado en la rueda.
-            //Gl.glRectd(-size / 2, -size / 2, size / 2, size / 2); 
-
+           // Gl.glRectd(0, 0, size, size); 
+            
             
             Gl.glBegin(Gl.GL_QUADS);
             
             // Tapa de abajo
             Gl.glVertex3d(0, 0, 0);
-            Gl.glVertex3d(size, 0, 0);
-            Gl.glVertex3d(size, size*4, 0);
-            Gl.glVertex3d(0, size*4, 0);
+            Gl.glVertex3d(depth, 0, 0);
+            Gl.glVertex3d(depth, width, 0);
+            Gl.glVertex3d(0, width, 0);
 
             // Tapa de arriba
-            Gl.glVertex3d(0, 0, size);
-            Gl.glVertex3d(size, 0, size);
-            Gl.glVertex3d(size, size*4, size);
-            Gl.glVertex3d(0, size*4, size);
+            Gl.glVertex3d(0, 0, height);
+            Gl.glVertex3d(depth, 0, height);
+            Gl.glVertex3d(depth, width, height);
+            Gl.glVertex3d(0, width, height);
 
             // Tapa de atras
             Gl.glVertex3d(0, 0, 0);
-            Gl.glVertex3d(size, 0, 0);
-            Gl.glVertex3d(size, 0, size);
-            Gl.glVertex3d(0, 0, size);
+            Gl.glVertex3d(0, width, 0);
+            Gl.glVertex3d(0, width, height);
+            Gl.glVertex3d(0, 0, height);
 
             // Tapa de derecha
-            Gl.glVertex3d(size, 0, 0);
-            Gl.glVertex3d(size, size*4, 0);
-            Gl.glVertex3d(size, size*4, size);
-            Gl.glVertex3d(size, 0, size);
+            Gl.glVertex3d(0, width, 0);
+            Gl.glVertex3d(depth, width, 0);
+            Gl.glVertex3d(depth, width, height);
+            Gl.glVertex3d(0, width, height);
 
             // Tapa de adelante
-            Gl.glVertex3d(size, size*4, 0);
-            Gl.glVertex3d(size, size*4, size);
-            Gl.glVertex3d(0, size*4, size);
-            Gl.glVertex3d(0, size*4, 0);
+            Gl.glVertex3d(depth, 0, 0);
+            Gl.glVertex3d(depth, width, 0);
+            Gl.glVertex3d(depth, width, height);
+            Gl.glVertex3d(depth, 0, height);
 
             // Tapa de izquierda
-            Gl.glVertex3d(0, size*4, 0);
             Gl.glVertex3d(0, 0, 0);
-            Gl.glVertex3d(0, 0, size);
-            Gl.glVertex3d(0, size*4, size);
+            Gl.glVertex3d(depth, 0, 0);
+            Gl.glVertex3d(depth, 0, height);
+            Gl.glVertex3d(0, 0, height);
 
             Gl.glEnd();
             
-            Gl.glPopMatrix();
+        //    Gl.glPopMatrix();
         }
 
         internal IList<PuntoFlotante> GetPuntosCurvaBzier()

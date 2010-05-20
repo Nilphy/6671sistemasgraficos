@@ -620,8 +620,7 @@ namespace TPAlgoritmos3D
             Gl.glViewport(TOP_VIEW_POSX, TOP_VIEW_POSY, TOP_VIEW_W, TOP_VIEW_H);
             Gl.glMatrixMode(Gl.GL_PROJECTION);
             Gl.glLoadIdentity();
-            //Glu.gluOrtho2D(-0.10, 1.05, -0.10, 1.05);
-            Glu.gluOrtho2D(0.0, 1.0, 0.0, 1.0);
+            Glu.gluOrtho2D(-0.001, 1.001, -0.001, 1.001);
         }
 
         /// <summary>
@@ -632,7 +631,7 @@ namespace TPAlgoritmos3D
             Gl.glViewport(HEIGHT_VIEW_POSX, HEIGHT_VIEW_POSY, HEIGHT_VIEW_W, HEIGHT_VIEW_H);
             Gl.glMatrixMode(Gl.GL_PROJECTION);
             Gl.glLoadIdentity();
-            Glu.gluOrtho2D(0.0, 1.0, 0.0, 1.0);
+            Glu.gluOrtho2D(-0.001, 1.001, -0.001, 1.001);
         }
 
         #endregion
