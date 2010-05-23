@@ -265,7 +265,7 @@ namespace SistemasGraficos.Entidades
             Glu.gluDisk(quad, 0, escena.Rueda.RadioInterno, 20, 20);
 
 
-            this.DibujarBarrita();
+            this.DibujarBarra();
 
             Gl.glPopMatrix();
 
@@ -278,7 +278,7 @@ namespace SistemasGraficos.Entidades
             
         }
 
-        private void DibujarBarrita()
+        private void DibujarBarra()
         {
             Gl.glColor3d(0, 0, 1);
             double size = escena.Rueda.RadioExterno*0.8;
@@ -286,15 +286,8 @@ namespace SistemasGraficos.Entidades
             double width = size;
             double depth = size;
 
-         //   Gl.glPushMatrix();
-
             // Centro la barra.
             Gl.glTranslated(-depth / 2, -width/ 2, -height/1.3);
-
-            // En lugar de dibujar una barra 3D, se puede dibujar simplemente un rectangulo\
-            // estampado en la rueda.
-           // Gl.glRectd(0, 0, size, size); 
-            
             
             Gl.glBegin(Gl.GL_QUADS);
             
@@ -335,8 +328,6 @@ namespace SistemasGraficos.Entidades
             Gl.glVertex3d(0, 0, height);
 
             Gl.glEnd();
-            
-        //    Gl.glPopMatrix();
         }
 
         internal IList<PuntoFlotante> GetPuntosCurvaBzier()
