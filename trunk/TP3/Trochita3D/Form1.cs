@@ -52,8 +52,8 @@ namespace TPAlgoritmos3D
 
         #region Variables asociadas a única fuente de luz de la escena 
 
-        private float[] light_color = new float[4] { 0.5f, 0.5f, 0.6f, 1.0f };
-        private float[] light_position = new float[4] { 0.0f, 0.0f, 1.0f, 1.0f };
+        private float[] light_color = new float[4] { 1.0f, 1.0f, 1.0f, 1.0f };
+        private float[] light_position = new float[4] { 0.0f, 20.0f, 10.0f, 1.0f };
         private float[] light_ambient = new float[4] { 0.05f, 0.05f, 0.05f, 1.0f };
 
         #endregion
@@ -141,7 +141,7 @@ namespace TPAlgoritmos3D
         #endregion
         #region Posición defecto de la cámara
 
-        private float[] eye = new float[3] { 4.0f, 0.0f, 5.0f };
+        private float[] eye = new float[3] { -5.0f, -3.0f, 5.0f };
         private float[] at = new float[3] { 0.0f, 0.0f, 0.0f };
         private float[] up = new float[3] { 0.0f, 0.0f, 1.0f };
 
@@ -170,16 +170,17 @@ namespace TPAlgoritmos3D
         /// </summary>
         private void Init()
         {
-            dl_handle = Gl.glGenLists(3);
+            dl_handle = Gl.glGenLists(2);
 
             Gl.glClearColor(0.02f, 0.02f, 0.04f, 0.0f);
             Gl.glShadeModel(Gl.GL_SMOOTH);
             Gl.glEnable(Gl.GL_DEPTH_TEST);
-            Gl.glLightfv(Gl.GL_LIGHT0, Gl.GL_DIFFUSE, light_color);
-            Gl.glLightfv(Gl.GL_LIGHT0, Gl.GL_AMBIENT, light_ambient);
-            Gl.glLightfv(Gl.GL_LIGHT0, Gl.GL_POSITION, light_position);
-            Gl.glEnable(Gl.GL_LIGHT0);
-            Gl.glEnable(Gl.GL_LIGHTING);
+
+            // Inicialización de iluminación
+            this.InitializeLighting();
+
+            // Inicialización de escena
+            this.InitializeScene();
 
             // Generación de las Display Lists
             Gl.glNewList(DL_AXIS, Gl.GL_COMPILE);
@@ -188,12 +189,24 @@ namespace TPAlgoritmos3D
             Gl.glNewList(DL_GRID, Gl.GL_COMPILE);
             DrawXYGrid();
             Gl.glEndList();
-            Gl.glNewList(DL_AXIS2D_TOP, Gl.GL_COMPILE);
-            DrawAxis2DTopView();
-            Gl.glEndList();
-            Gl.glNewList(DL_AXIS2D_HEIGHT, Gl.GL_COMPILE);
-            DrawAxis2DHeightView();
-            Gl.glEndList();
+        }
+
+        private void InitializeScene()
+        {
+            Terraplen terraplen = new Terraplen();
+
+        }
+
+        /// <summary>
+        /// Inicialización de la iluminación de la escena.
+        /// </summary>
+        private void InitializeLighting()
+        {
+            Gl.glLightfv(Gl.GL_LIGHT0, Gl.GL_DIFFUSE, light_color);
+            Gl.glLightfv(Gl.GL_LIGHT0, Gl.GL_AMBIENT, light_ambient);
+            Gl.glLightfv(Gl.GL_LIGHT0, Gl.GL_POSITION, light_position);
+            Gl.glEnable(Gl.GL_LIGHT0);
+            Gl.glEnable(Gl.GL_LIGHTING);
         }
 
         /// <summary>
@@ -231,6 +244,10 @@ namespace TPAlgoritmos3D
             Riel riel = new Riel();
             riel.Dibujar();
 
+            SurfaceInitializer surfaceInitializer = new SurfaceInitializer();
+            //surfaceInitializer.Dibujar();
+            surfaceInitializer.DrawSurface();
+
             //Gl.glPopMatrix();
             Gl.glEnable(Gl.GL_LIGHTING);
             Gl.glColor3d(1, 1, 1);
@@ -261,6 +278,18 @@ namespace TPAlgoritmos3D
                 case Keys.Right:
                     {
                         eye[1]++;
+                        glControl.Refresh();
+                        break;
+                    }
+                case Keys.Add:
+                    {
+                        eye[2]--;
+                        glControl.Refresh();
+                        break;
+                    }
+                case Keys.Subtract:
+                    {
+                        eye[2]++;
                         glControl.Refresh();
                         break;
                     }
@@ -435,32 +464,6 @@ namespace TPAlgoritmos3D
             Gl.glEnable(Gl.GL_LIGHTING);
         }
 
-        private void DrawAxis2DTopView()
-        {
-            Gl.glDisable(Gl.GL_LIGHTING);
-            Gl.glBegin(Gl.GL_LINE_LOOP);
-            Gl.glColor3d(1, 0.6, 0);
-            Gl.glVertex3d(0, 0, 0);
-            Gl.glVertex3d(1, 0, 0);
-            Gl.glVertex3d(1, 1, 0);
-            Gl.glVertex3d(0, 1, 0);
-            Gl.glEnd();
-            Gl.glEnable(Gl.GL_LIGHTING);
-        }
-
-        private void DrawAxis2DHeightView()
-        {
-            Gl.glDisable(Gl.GL_LIGHTING);
-            Gl.glBegin(Gl.GL_LINE_LOOP);
-            Gl.glColor3d(1.0, 0.5, 1.0);
-            Gl.glVertex3d(0.0, 0.0, 0.0);
-            Gl.glVertex3d(1.0, 0.0, 0.0);
-            Gl.glVertex3d(1.0, 1.0, 0.0);
-            Gl.glVertex3d(0.0, 1.0, 0.0);
-            Gl.glEnd();
-            Gl.glEnable(Gl.GL_LIGHTING);
-        }
-
         private void DrawXYGrid()
         {
             int i;
@@ -510,29 +513,6 @@ namespace TPAlgoritmos3D
             Gl.glMatrixMode(Gl.GL_PROJECTION);
             Gl.glLoadIdentity();
             Glu.gluPerspective(60.0, (float)W_WIDTH / (float)W_HEIGHT, 0.10, 100.0);
-        }
-
-        /// <summary>
-        /// Panel 2D para la vista de la curva correspondiente a la trayectoria
-        /// de la camara.
-        /// </summary>
-        private void SetPanelTopEnv()
-        {
-            Gl.glViewport(TOP_VIEW_POSX, TOP_VIEW_POSY, TOP_VIEW_W, TOP_VIEW_H);
-            Gl.glMatrixMode(Gl.GL_PROJECTION);
-            Gl.glLoadIdentity();
-            Glu.gluOrtho2D(-0.001, 1.001, -0.001, 1.001);
-        }
-
-        /// <summary>
-        /// Panel 2D para la vista de la curva correspondiente al terreno.
-        /// </summary>
-        private void SetPanelHeightEnv()
-        {
-            Gl.glViewport(HEIGHT_VIEW_POSX, HEIGHT_VIEW_POSY, HEIGHT_VIEW_W, HEIGHT_VIEW_H);
-            Gl.glMatrixMode(Gl.GL_PROJECTION);
-            Gl.glLoadIdentity();
-            Glu.gluOrtho2D(-0.001, 1.001, -0.001, 1.001);
         }
 
         #endregion

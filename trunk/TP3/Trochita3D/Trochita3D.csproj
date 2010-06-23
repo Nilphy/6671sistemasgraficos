@@ -51,6 +51,8 @@
     <Reference Include="Tao.Platform.Windows, Version=1.0.0.5, Culture=neutral, PublicKeyToken=701104b2da67a104" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\Seccion.cs" />
+    <Compile Include="Core\SurfaceInitializer.cs" />
     <Compile Include="Curvas\CurvaBsplineSegmentosCubicos.cs" />
     <Compile Include="Curvas\CurvaBzierSegmentosCubicos.cs" />
     <Compile Include="Core\Punto.cs" />
