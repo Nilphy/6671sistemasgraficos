@@ -227,6 +227,7 @@ namespace TPAlgoritmos3D
             Gl.glClear(Gl.GL_COLOR_BUFFER_BIT | Gl.GL_DEPTH_BUFFER_BIT);
 
             this.Set3DEnv();
+            
 
             Glu.gluLookAt(eye[0], eye[1], eye[2], at[0], at[1], at[2], up[0], up[1], up[2]);
 
@@ -244,9 +245,17 @@ namespace TPAlgoritmos3D
             Riel riel = new Riel();
             riel.Dibujar();
 
+            // TODO: dibujar al menos 10, parametrizados por:
+            //  puntos de control de la copa (Bezier)
+            //  altura total
+            //  radio máximo
+            Arbol arbol = new Arbol();
+            arbol.Dibujar();
+
             SurfaceInitializer surfaceInitializer = new SurfaceInitializer();
             //surfaceInitializer.Dibujar();
             surfaceInitializer.DrawSurface();
+
 
             //Gl.glPopMatrix();
             Gl.glEnable(Gl.GL_LIGHTING);
