@@ -7,9 +7,14 @@ namespace Trochita3D.Core
 {
     public class PuntoFlotante : Punto
     {
-        public double x;
+        private double x;
         private double y;
         private double z;
+
+
+        private double normalX;
+        private double normalY;
+        private double normalZ;
         
         public double X
         {
@@ -28,6 +33,24 @@ namespace Trochita3D.Core
             get { return this.z; }
         }
 
+
+        public double NormalX
+        {
+            set { this.normalX = value; }
+            get { return this.normalX; }
+        }
+        public double NormalY
+        {
+            set { this.normalY = value; }
+            get { return this.normalY; }
+        }
+
+        public double NormalZ
+        {
+            set { this.normalZ = value; }
+            get { return this.normalZ; }
+        }
+        
         public PuntoFlotante(double x, double y, double z, Punto origenCoordenadas)
         {
             this.X = x;
@@ -41,6 +64,17 @@ namespace Trochita3D.Core
             this.X = x;
             this.Y = y;
             this.Z = z;
+        }
+
+        public PuntoFlotante(PuntoFlotante punto)
+        {
+            this.X = punto.X;
+            this.Y = punto.Y;
+            this.Z = punto.Z;
+            this.NormalX = punto.NormalX;
+            this.NormalY = punto.NormalY;
+            this.NormalZ = punto.NormalZ;
+            this.OrigenCoordenadas = punto.OrigenCoordenadas;
         }
 
         public override double GetXFlotante()
@@ -70,6 +104,26 @@ namespace Trochita3D.Core
             punto.X *= escalar;
             punto.Y *= escalar;
             punto.Z *= escalar;
+            return punto;
+        }
+
+        // Producto vectorial, normalizado
+        public static PuntoFlotante operator *(PuntoFlotante punto1, PuntoFlotante punto2)
+        {
+            PuntoFlotante punto = new PuntoFlotante(0, 0, 0);
+
+            punto.X = punto1.Y * punto2.Z - punto1.Z * punto2.Y;
+            punto.Y = punto1.Z * punto2.X - punto1.X * punto2.Z;
+            punto.Z = punto1.X * punto2.Y - punto1.Y * punto2.X;
+
+            double modulo = punto.Modulo();
+            if (modulo != 0)
+            {
+                punto.x = punto.x / modulo;
+                punto.y = punto.y / modulo;
+                punto.z = punto.z / modulo;
+            }
+
             return punto;
         }
         
@@ -111,6 +165,11 @@ namespace Trochita3D.Core
         public PuntoFlotante SumarPunto(PuntoFlotante punto)
         {
             return new PuntoFlotante(this.GetXFlotante() + punto.GetXFlotante(), this.GetYFlotante() + punto.GetYFlotante(), this.Z + punto.Z);
+        }
+
+        public double Modulo()
+        {
+            return Math.Sqrt(this.X * this.X + this.Y * this.Y + this.Z * this.Z);
         }
 
         internal void SetXFlotante(double p)
