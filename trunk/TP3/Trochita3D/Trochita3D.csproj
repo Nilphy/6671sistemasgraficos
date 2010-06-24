@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.30729</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{4B6C7258-BC20-45A8-9AC8-994B089A8362}</ProjectGuid>
     <OutputType>WinExe</OutputType>
@@ -60,6 +60,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\BMPUtils.cs" />
+    <Compile Include="Core\TerrainInitializer.cs" />
     <Compile Include="Core\Seccion.cs" />
     <Compile Include="Core\SurfaceInitializer.cs" />
     <Compile Include="Curvas\CurvaBsplineSegmentosCubicos.cs" />
@@ -106,6 +108,9 @@
       <Project>{D83D0D21-8DA9-4C3D-8647-2373EFB6BEFC}</Project>
       <Name>Modelo</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="bin\Debug\Imagenes\Bitmap.bmp" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

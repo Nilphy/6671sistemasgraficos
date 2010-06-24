@@ -59,7 +59,6 @@ namespace TPAlgoritmos3D
         #endregion
         #region Variables internas al proceso de generación de la superficie
 
-        private float[] default_curve;
         private float[] surface_buffer = null;
         private float[] normals_buffer = null;
         private int curve_points = 0;
@@ -141,7 +140,7 @@ namespace TPAlgoritmos3D
         #endregion
         #region Posición defecto de la cámara
 
-        private float[] eye = new float[3] { -5.0f, -3.0f, 5.0f };
+        private float[] eye = new float[3] { -10.0f, -30.0f, 30.0f };
         private float[] at = new float[3] { 0.0f, 0.0f, 0.0f };
         private float[] up = new float[3] { 0.0f, 0.0f, 1.0f };
 
@@ -237,13 +236,18 @@ namespace TPAlgoritmos3D
             if (view_grid) Gl.glCallList(DL_GRID);
 
             Gl.glDisable(Gl.GL_LIGHTING);
-            //Gl.glPushMatrix();
+            Gl.glPushMatrix();
 
+            /*
             Terraplen terraplen = new Terraplen();
             terraplen.Dibujar();
 
             Riel riel = new Riel();
-            riel.Dibujar();
+            riel.Dibujar(); 
+             * */
+            /*
+            SurfaceInitializer surfaceInitializer = new SurfaceInitializer();            
+            surfaceInitializer.DrawSurface();*/
 
             // TODO: dibujar al menos 10, parametrizados por:
             //  puntos de control de la copa (Bezier)
@@ -255,9 +259,13 @@ namespace TPAlgoritmos3D
             SurfaceInitializer surfaceInitializer = new SurfaceInitializer();
             //surfaceInitializer.Dibujar();
             surfaceInitializer.DrawSurface();
+            TerrainInitializer terrainInitializer = new TerrainInitializer();
+            terrainInitializer.DrawTerrain();
 
-
-            //Gl.glPopMatrix();
+<<<<<<< .mine            
+            
+=======
+>>>>>>> .theirs            //Gl.glPopMatrix();
             Gl.glEnable(Gl.GL_LIGHTING);
             Gl.glColor3d(1, 1, 1);
         }
