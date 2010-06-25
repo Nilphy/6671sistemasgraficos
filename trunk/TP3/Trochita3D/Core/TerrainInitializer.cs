@@ -13,7 +13,7 @@ namespace Trochita3D.Core
     /// </summary>
     public class TerrainInitializer
     {
-        private static int ALTURA_MAXIMA = 3;
+        private static int ALTURA_MAXIMA = 8;
         private static double X_MAX = 25;
         private static double Y_MAX = 25;
         private static int CANTIDAD_PIXELES_ANCHO_IMAGEN = 512;
@@ -35,10 +35,10 @@ namespace Trochita3D.Core
         private void BuildTerrain()
         {
             // Se procesa la imagen bmp
-            byte[] bytesDeLaImagen = BMPUtils.ObtenerBytesDeArchivo(@"Imagenes/Bitmap.bmp");
+            byte[] bytesDeLaImagen = BMPUtils.ObtenerBytesDeArchivo(@"../../Imagenes/Bitmap.bmp");
             byte[] bytesUtiles = BMPUtils.ObtenerBytesUtilesDelArchivo(bytesDeLaImagen);
             double[] bytesDeLaImagenEscalados = BMPUtils.EscalarBytes(ALTURA_MAXIMA, bytesDeLaImagen);
-
+            
             IList<double> zetas = new List<double>(bytesDeLaImagenEscalados);
 
             this.vertices = this.CompletarVerticesConXY(zetas);
@@ -56,7 +56,7 @@ namespace Trochita3D.Core
             IList<double> vertices = new List<double>();
             int i = 0;
 
-            for (int y = 0; y < CANTIDAD_PIXELES_ALTO_IMAGEN; y++)
+            for (int y = CANTIDAD_PIXELES_ALTO_IMAGEN - 1; y >= 0; y--)
             {
                 for (int x = 0; x < CANTIDAD_PIXELES_ANCHO_IMAGEN; x++)
                 {
@@ -73,16 +73,14 @@ namespace Trochita3D.Core
         {
             this.indices = new List<int>();
 
-
-            for (int k = 0; k < cantidadPixelesAncho - 1; k++)
-            {
             for (int i = 0; i < ((cantidadPixelesAlto - 1) * cantidadPixelesAncho); i += cantidadPixelesAncho)
             {
-                
+                for (int k = 0; k < cantidadPixelesAncho - 1; k++)
+                {
                     indices.Add(k + i);
-                    indices.Add(k + i + cantidadPixelesAncho);
-                    indices.Add(k + i + cantidadPixelesAncho + 1);
                     indices.Add(k + i + 1);
+                    indices.Add(k + i + cantidadPixelesAncho + 1);
+                    indices.Add(k + i + cantidadPixelesAncho);                    
                 }
             }
         }
@@ -95,7 +93,7 @@ namespace Trochita3D.Core
 
             Gl.glEnable(Gl.GL_LIGHTING);
             Gl.glColor3d(1, 0, 0);
-            Gl.glDrawElements(Gl.GL_QUADS, indices.Count, Gl.GL_UNSIGNED_INT, indices.ToArray<int>());
+            Gl.glDrawElements(Gl.GL_QUAD_STRIP, indices.Count, Gl.GL_UNSIGNED_INT, indices.ToArray<int>());
             Gl.glDisable(Gl.GL_LIGHTING);
         }
     }

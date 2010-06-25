@@ -140,7 +140,7 @@ namespace TPAlgoritmos3D
         #endregion
         #region Posición defecto de la cámara
 
-        private float[] eye = new float[3] { -10.0f, -30.0f, 30.0f };
+        private float[] eye = new float[3] { 25.0f, 25.0f, 20.0f };
         private float[] at = new float[3] { 0.0f, 0.0f, 0.0f };
         private float[] up = new float[3] { 0.0f, 0.0f, 1.0f };
 
@@ -253,15 +253,17 @@ namespace TPAlgoritmos3D
             //  puntos de control de la copa (Bezier)
             //  altura total
             //  radio máximo
-            //Arbol arbol = new Arbol();
-            //arbol.Dibujar();
+            /*
+            Arbol arbol = new Arbol();
+            arbol.Dibujar();
 
             SurfaceInitializer surfaceInitializer = new SurfaceInitializer();
             //surfaceInitializer.Dibujar();
-            surfaceInitializer.DrawSurface();
-            //TerrainInitializer terrainInitializer = new TerrainInitializer();
-            //terrainInitializer.DrawTerrain();
-            
+            surfaceInitializer.DrawSurface();*/
+            TerrainInitializer terrainInitializer = new TerrainInitializer();
+            terrainInitializer.DrawTerrain();
+
+
             //Gl.glPopMatrix();
             Gl.glEnable(Gl.GL_LIGHTING);
             Gl.glColor3d(1, 1, 1);
