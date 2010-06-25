@@ -11,7 +11,6 @@ namespace Trochita3D.Core
         private double y;
         private double z;
 
-
         private double normalX;
         private double normalY;
         private double normalZ;
@@ -137,6 +136,8 @@ namespace Trochita3D.Core
 
         public static PuntoFlotante operator +(PuntoFlotante punto1, PuntoFlotante punto2)
         {
+            if (punto1 == null) return punto2;
+            if (punto2 == null) return punto1;
             return new PuntoFlotante(punto1.X + punto2.X, punto1.Y + punto2.Y, punto1.Z + punto2.Z);
         }
 
@@ -165,6 +166,15 @@ namespace Trochita3D.Core
         public PuntoFlotante SumarPunto(PuntoFlotante punto)
         {
             return new PuntoFlotante(this.GetXFlotante() + punto.GetXFlotante(), this.GetYFlotante() + punto.GetYFlotante(), this.Z + punto.Z);
+        }
+
+        public void Normalizar()
+        {
+            double modulo = this.Modulo();
+
+            this.X /= modulo;
+            this.Y /= modulo;
+            this.Z /= modulo;
         }
 
         public double Modulo()

@@ -41,6 +41,19 @@ namespace Trochita3D.Core
             }
         }
 
+        /// <summary>
+        /// Reordena los vertices para que el primer vertice sea el mas próximo al origen.
+        /// </summary>
+        public void ReordenarVertices()
+        {
+            // Calculo las normas de los vectores extremo de la superficie
+            double norm1 = Math.Sqrt(Math.Pow(Vertices[0].X, 2) + (Math.Pow(Vertices[0].Y, 2)));
+            double norm2 = Math.Sqrt(Math.Pow(Vertices[Vertices.Count - 1].X, 2) + (Math.Pow(Vertices[Vertices.Count - 1].Y, 2)));
+
+            if (norm2 < norm1)
+                Vertices = Vertices.Reverse<PuntoFlotante>().ToList<PuntoFlotante>();
+        }
+
         public void Trasladar(double dx, double dy, double dz)
         {
             foreach (PuntoFlotante punto in Vertices)

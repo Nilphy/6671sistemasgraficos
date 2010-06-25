@@ -47,7 +47,6 @@ namespace Trochita3D.Core
             this.GenerarIndices(bytesDeLaImagenEscalados.Length, CANTIDAD_PIXELES_ALTO_IMAGEN, CANTIDAD_PIXELES_ANCHO_IMAGEN);
 
             // Se genera la lista de normales
-
             Gl.glVertexPointer(3, Gl.GL_DOUBLE, 3 * sizeof(double), vertices.ToArray<double>());
             Gl.glEnableClientState(Gl.GL_VERTEX_ARRAY);
         }
