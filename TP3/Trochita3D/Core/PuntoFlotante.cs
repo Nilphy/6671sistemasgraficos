@@ -182,6 +182,16 @@ namespace Trochita3D.Core
             return Math.Sqrt(this.X * this.X + this.Y * this.Y + this.Z * this.Z);
         }
 
+        public void ZPositivo()
+        {
+            if (this.Z < 0)
+            {
+                this.X *= -1;
+                this.Y *= -1;
+                this.Z *= -1;
+            }
+        }
+
         internal void SetXFlotante(double p)
         {
             this.x = p;

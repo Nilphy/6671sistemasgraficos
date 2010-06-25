@@ -40,10 +40,12 @@ namespace TPAlgoritmos3D
         /// </summary>
         private bool view_axis = true;
                 
+        private SurfaceInitializer surfaceInitializer = new SurfaceInitializer();
+
         #region Variables asociadas a única fuente de luz de la escena 
 
         private float[] light_color = new float[4] { 0.80f, 0.80f, 0.80f, 1.0f };
-        private float[] light_position = new float[4] { 0.0f, 0.0f, 5.0f, 1.0f };
+        private float[] light_position = new float[4] { 0.0f, 0.0f, 5.0f, 0.0f };
         private float[] light_ambient = new float[4] { 0.05f, 0.05f, 0.05f, 1.0f };
 
         #endregion
@@ -130,7 +132,7 @@ namespace TPAlgoritmos3D
         #endregion
         #region Posición defecto de la cámara
 
-        private float[] eye = new float[3] { 15.0f, 15.0f, 10.0f };
+        private float[] eye = new float[3] { 13.0f, 0.0f, 5.0f };
         private float[] at = new float[3] { 0.0f, 0.0f, 0.0f };
         private float[] up = new float[3] { 0.0f, 0.0f, 1.0f };
 
@@ -196,8 +198,8 @@ namespace TPAlgoritmos3D
 
         private void InitializeScene()
         {
-            Terraplen terraplen = new Terraplen();
-
+            this.surfaceInitializer = new SurfaceInitializer();
+            this.surfaceInitializer.BuildSurface();
         }
 
         /// <summary>
@@ -233,26 +235,17 @@ namespace TPAlgoritmos3D
 
             Gl.glMatrixMode(Gl.GL_MODELVIEW);
             Gl.glLoadIdentity();
+
             Glu.gluLookAt(eye[0], eye[1], eye[2], at[0], at[1], at[2], up[0], up[1], up[2]);
+            
             // Si corresponde se dibujan los ejes
             if (view_axis) Gl.glCallList(DL_AXIS);
             // Se corresponde se dibuja la grilla
             if (view_grid) Gl.glCallList(DL_GRID);
 
-            // Gl.glDisable(Gl.GL_LIGHTING);
+            surfaceInitializer.DrawSurface();
 
             /*
-            Terraplen terraplen = new Terraplen();
-            terraplen.Dibujar();
-
-            Riel riel = new Riel();
-            riel.Dibujar(); 
-             * */
-            /*
-            SurfaceInitializer surfaceInitializer = new SurfaceInitializer();            
-            surfaceInitializer.DrawSurface();*/
-
-
             for (int i = 0; i < arboles.Length; ++i)
             {
                 Gl.glPushMatrix();
@@ -262,15 +255,10 @@ namespace TPAlgoritmos3D
                 Gl.glPopMatrix();
             }
             
-            /*
-            SurfaceInitializer surfaceInitializer = new SurfaceInitializer();
-            //surfaceInitializer.Dibujar();
-            surfaceInitializer.DrawSurface();*/
             TerrainInitializer terrainInitializer = new TerrainInitializer();
             terrainInitializer.DrawTerrain();
-            Gl.glEnable(Gl.GL_LIGHTING);
-            Gl.glColor3d(1, 1, 1);
-		}
+            */
+        }
 
         protected void RefreshEye() 
         {
@@ -280,7 +268,6 @@ namespace TPAlgoritmos3D
             Gl.glMatrixMode(Gl.GL_MODELVIEW);
             Gl.glLoadIdentity();
             Glu.gluLookAt(eye[0], eye[1], eye[2], at[0], at[1], at[2], up[0], up[1], up[2]);
-
         }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
@@ -379,6 +366,14 @@ namespace TPAlgoritmos3D
                     glControl.Refresh();
                     break;
                 case 'p':
+                    glControl.Refresh();
+                    break;
+                case 'w':
+                    Gl.glPolygonMode(Gl.GL_FRONT_AND_BACK, Gl.GL_LINE);
+                    glControl.Refresh();
+                    break;
+                case 'W':
+                    Gl.glPolygonMode(Gl.GL_FRONT_AND_BACK, Gl.GL_FILL);
                     glControl.Refresh();
                     break;
                 default:
