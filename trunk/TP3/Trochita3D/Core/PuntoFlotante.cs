@@ -118,9 +118,9 @@ namespace Trochita3D.Core
             double modulo = punto.Modulo();
             if (modulo != 0)
             {
-                punto.x = punto.x / modulo;
-                punto.y = punto.y / modulo;
-                punto.z = punto.z / modulo;
+                punto.X = punto.X / modulo;
+                punto.Y = punto.Y / modulo;
+                punto.Z = punto.Z / modulo;
             }
 
             return punto;

@@ -239,7 +239,7 @@ namespace TPAlgoritmos3D
             // Se corresponde se dibuja la grilla
             if (view_grid) Gl.glCallList(DL_GRID);
 
-           // Gl.glDisable(Gl.GL_LIGHTING);
+            // Gl.glDisable(Gl.GL_LIGHTING);
 
             /*
             Terraplen terraplen = new Terraplen();
@@ -262,7 +262,6 @@ namespace TPAlgoritmos3D
                 Gl.glPopMatrix();
             }
             
-            //arbol.Dibujar();
             /*
             SurfaceInitializer surfaceInitializer = new SurfaceInitializer();
             //surfaceInitializer.Dibujar();
