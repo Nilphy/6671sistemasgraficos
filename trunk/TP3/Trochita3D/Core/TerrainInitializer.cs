@@ -13,7 +13,7 @@ namespace Trochita3D.Core
     /// </summary>
     public class TerrainInitializer
     {
-        private static int ALTURA_MAXIMA = 8;
+        private static int ALTURA_MAXIMA = 1;
         private static double X_MAX = 25;
         private static double Y_MAX = 25;
         private static int CANTIDAD_PIXELES_ANCHO_IMAGEN = 512;
@@ -21,8 +21,8 @@ namespace Trochita3D.Core
 
         private IList<int> indices = new List<int>();
         private IList<double> vertices = new List<double>();
+        private IList<double> normales = new List<double>();
         
-
         public TerrainInitializer()
         {
             this.BuildTerrain();
@@ -40,33 +40,52 @@ namespace Trochita3D.Core
             double[] bytesDeLaImagenEscalados = BMPUtils.EscalarBytes(ALTURA_MAXIMA, bytesDeLaImagen);
             
             IList<double> zetas = new List<double>(bytesDeLaImagenEscalados);
+            
+            this.GenerarVerticesYNormales(zetas);
 
-            this.vertices = this.CompletarVerticesConXY(zetas);
-
-            // Se genera la lista de índices
             this.GenerarIndices(bytesDeLaImagenEscalados.Length, CANTIDAD_PIXELES_ALTO_IMAGEN, CANTIDAD_PIXELES_ANCHO_IMAGEN);
 
-            // Se genera la lista de normales
             Gl.glVertexPointer(3, Gl.GL_DOUBLE, 3 * sizeof(double), vertices.ToArray<double>());
+            Gl.glNormalPointer(Gl.GL_DOUBLE, 3 * sizeof(double), normales.ToArray<double>());
             Gl.glEnableClientState(Gl.GL_VERTEX_ARRAY);
         }
 
-        private IList<double> CompletarVerticesConXY(IList<double> zetas)
+        private void GenerarVerticesYNormales(IList<double> zetas)
         {
-            IList<double> vertices = new List<double>();
-            int i = 0;
+            this.vertices = new List<double>();
+            PuntoFlotante[][] matriz = new PuntoFlotante[CANTIDAD_PIXELES_ALTO_IMAGEN][];
+            int k = 0;
 
             for (int y = CANTIDAD_PIXELES_ALTO_IMAGEN - 1; y >= 0; y--)
             {
+                matriz[y] = new PuntoFlotante[CANTIDAD_PIXELES_ANCHO_IMAGEN];
                 for (int x = 0; x < CANTIDAD_PIXELES_ANCHO_IMAGEN; x++)
                 {
-                    vertices.Add((double)x * (double)X_MAX / (double)CANTIDAD_PIXELES_ANCHO_IMAGEN);
-                    vertices.Add((double)y * (double)Y_MAX / (double)CANTIDAD_PIXELES_ALTO_IMAGEN);
-                    vertices.Add(zetas[i++]);
+                    double coordenadaX = (double)x * (double)X_MAX / (double)CANTIDAD_PIXELES_ANCHO_IMAGEN;
+                    double coordenadaY = (double)y * (double)Y_MAX / (double)CANTIDAD_PIXELES_ALTO_IMAGEN;
+                    double coordenadaZ = zetas[k++];
+                        
+                    this.vertices.Add(coordenadaX);
+                    this.vertices.Add(coordenadaY);
+                    this.vertices.Add(coordenadaZ);
+
+                    matriz[y][x] = new PuntoFlotante(coordenadaX, coordenadaY, coordenadaZ);
                 }
             }
 
-            return vertices;
+            // calculo las normales en toda la matriz
+            for (int i = CANTIDAD_PIXELES_ALTO_IMAGEN -2 ; i <= 0; i--)
+            {
+                for (int j = 0; j < CANTIDAD_PIXELES_ANCHO_IMAGEN - 1; j++)
+                {
+                    PuntoFlotante normal = (matriz[i + 1][j] - matriz[i][j]) * (matriz[i][j + 1] - matriz[i][j]);
+                    this.normales.Add(normal.X);
+                    this.normales.Add(normal.Y);
+                    this.normales.Add(normal.Z);
+                }
+            }
+            
+            
         }
 
         private void GenerarIndices(int cantidadTotalPixeles, int cantidadPixelesAlto, int cantidadPixelesAncho)
@@ -92,8 +111,12 @@ namespace Trochita3D.Core
             Gl.glTranslated(-(double)X_MAX / (double)2, -(double)Y_MAX / (double)2, 0.0f);
 
             Gl.glEnable(Gl.GL_LIGHTING);
-            Gl.glColor3d(1, 0, 0);
-            Gl.glDrawElements(Gl.GL_QUAD_STRIP, indices.Count, Gl.GL_UNSIGNED_INT, indices.ToArray<int>());
+            
+            Gl.glPolygonMode(Gl.GL_FRONT, Gl.GL_LINE);
+            Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_AMBIENT, new float[] { 0.3f, 0.3f, 0.3f, 1 });
+            Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_DIFFUSE, new float[] { 0.0f, 1.0f, 0, 1 });
+            Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_SPECULAR, new float[] { 0, 0, 0, 1 });
+            Gl.glDrawElements(Gl.GL_QUADS, indices.Count, Gl.GL_UNSIGNED_INT, indices.ToArray<int>());
             Gl.glDisable(Gl.GL_LIGHTING);
         }
     }

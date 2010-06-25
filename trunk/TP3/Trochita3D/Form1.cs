@@ -39,17 +39,7 @@ namespace TPAlgoritmos3D
         /// Variable global que indica si se ven los ejes en la pantalla 
         /// </summary>
         private bool view_axis = true;
-
-        /// <summary>
-        /// Variable que indica si la simulación debe estar detenida o ejecutándose 
-        /// </summary>
-        private bool escenaSimulando = false;
-
-        /// <summary>
-        /// Indica si la cámara se está moviendo siguiendo la curva bspline o está fija
-        /// </summary>
-        private bool camaraFija = true;
-
+                
         #region Variables asociadas a única fuente de luz de la escena 
 
         private float[] light_color = new float[4] { 0.80f, 0.80f, 0.80f, 1.0f };
@@ -140,7 +130,7 @@ namespace TPAlgoritmos3D
         #endregion
         #region Posición defecto de la cámara
 
-        private float[] eye = new float[3] { 25.0f, 25.0f, 20.0f };
+        private float[] eye = new float[3] { 15.0f, 15.0f, 10.0f };
         private float[] at = new float[3] { 0.0f, 0.0f, 0.0f };
         private float[] up = new float[3] { 0.0f, 0.0f, 1.0f };
 
