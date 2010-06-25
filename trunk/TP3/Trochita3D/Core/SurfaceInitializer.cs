@@ -18,23 +18,29 @@ namespace Trochita3D.Core
         private const int CANT_PUNTOS_TERRAPLEN = 10;
 
         private IList<Seccion> seccionesTerraplen = new List<Seccion>();
-        private IList<Seccion> seccionesRieles = new List<Seccion>();
+        private IList<Seccion> seccionesRieles1 = new List<Seccion>();
+        private IList<Seccion> seccionesRieles2 = new List<Seccion>();
         private IList<PuntoFlotante> path;
 
-        private IList<int> indices = new List<int>();
-        private IList<double> vertices = new List<double>();
-        private IList<double> normales = new List<double>();
+        private static int[] indicesTerraplen;
+        private static int[] indicesRieles1;
+        private static int[] indicesRieles2;
+
+        private static double[] verticesTerraplen;
+        private static double[] verticesRieles1;
+        private static double[] verticesRieles2;
+
+        private static double[] normalesTerraplen;
+        private static double[] normalesRieles1;
+        private static double[] normalesRieles2;
 
         public SurfaceInitializer()
         {
             this.path = GetBsplineControlPoints(DELTA_U);
             this.BuildTerraplen();
             this.BuildRieles();
-
-            // TODO: eliminar de aca para abajo.
-            this.BuildSurface();
-            //Gl.glEnable(Gl.GL_NORMALIZE);
-            //Gl.glEnable(Gl.GL_AUTO_NORMAL);
+            Gl.glEnableClientState(Gl.GL_VERTEX_ARRAY);
+            Gl.glEnableClientState(Gl.GL_NORMAL_ARRAY);
         }
 
         private void BuildTerraplen()
@@ -105,10 +111,31 @@ namespace Trochita3D.Core
                 seccionRiel2.Rotar(Math.Atan(angulo));
                 seccionRiel2.Trasladar(puntoActual.X, puntoActual.Y, puntoActual.Z + Terraplen.ALTURA);
 
-                seccionesRieles.Add(seccionRiel1);
-                seccionesRieles.Add(seccionRiel2);
+                seccionesRieles1.Add(seccionRiel1);
+                seccionesRieles2.Add(seccionRiel2);
                 puntoAnterior = puntoActual;
             }
+
+            puntoActual = path[0];
+            seccionRiel1 = riel.GetSeccion();
+            seccionRiel2 = riel.GetSeccion();
+
+            dx = puntoActual.X - puntoAnterior.X;
+            dy = puntoActual.Y - puntoAnterior.Y;
+
+            angulo = dy / dx;
+            seccionRiel1.Escalar(1, 0.2, 0.2);
+            seccionRiel1.Trasladar(0, -DIST_RIELES, 0);
+            seccionRiel1.Rotar(Math.Atan(angulo));
+            seccionRiel1.Trasladar(puntoActual.X, puntoActual.Y, puntoActual.Z + Terraplen.ALTURA);
+
+            seccionRiel2.Escalar(1, 0.2, 0.2);
+            seccionRiel2.Trasladar(0, DIST_RIELES, 0);
+            seccionRiel2.Rotar(Math.Atan(angulo));
+            seccionRiel2.Trasladar(puntoActual.X, puntoActual.Y, puntoActual.Z + Terraplen.ALTURA);
+
+            seccionesRieles1.Add(seccionRiel1);
+            seccionesRieles2.Add(seccionRiel2);
         }
 
         /// <summary>
@@ -133,17 +160,65 @@ namespace Trochita3D.Core
             return path.GetPuntosDiscretos(du);
         }
 
+        /// <summary>
+        /// Construye las distintas superficies de la escena.
+        /// </summary>
         public void BuildSurface()
+        {
+            IList<int> indices = new List<int>();
+            IList<double> vertices = new List<double>();
+            IList<double> normales = new List<double>();
+
+            // Terraplen
+            this.BuildSurfaceDataBuffers(seccionesTerraplen, vertices, indices, normales);
+            verticesTerraplen = vertices.ToArray<double>();
+            normalesTerraplen = normales.ToArray<double>();
+            indicesTerraplen = indices.ToArray<int>();
+
+            // Riel 1
+            this.BuildSurfaceDataBuffers(seccionesRieles1, vertices, indices, normales);
+            verticesRieles1 = vertices.ToArray<double>();
+            normalesRieles1 = normales.ToArray<double>();
+            indicesRieles1 = indices.ToArray<int>();
+
+            // Riel 2
+            this.BuildSurfaceDataBuffers(seccionesRieles2, vertices, indices, normales);
+            verticesRieles2 = vertices.ToArray<double>();
+            normalesRieles2 = normales.ToArray<double>();
+            indicesRieles2 = indices.ToArray<int>();
+        }
+
+        /// <summary>
+        /// Calcula los datos necesarios para poder generar la superficie indicada por las secciones
+        /// contiguas indicadas en la colección de secciones. A través de esta completa las listas de
+        /// vértices, normales e índices correspondientes a la superficie a representar.
+        /// </summary>
+        /// <remarks>
+        /// El método tiene cuatro parámetros de los cuales solo uno es de entrada (la lista de secciones)
+        /// y los tres restantes son de salida. Es decir, se pasan tres listas las cuales serán LIMPIADAS
+        /// por el método y cargadas con los valores correspondientes a las secciones indicadas.
+        /// </remarks>
+        /// <param name="secciones">Lista de secciones contiguas y ordenadas que representan
+        /// la superficie final que se desea representar.</param>
+        /// <param name="vertices">Lista de vertices que representan la superficies. La misma se encuentra
+        /// ordenada para dibujar la superficie de manera directa con Gl.GL_QUAD_STRIP o Gl.GL_TRIANGLE_STRIP</param>
+        /// <param name="indices">Lista de índices que de los vertices que forman los distintos polígonos 
+        /// para graficar la superficie.</param>
+        /// <param name="normales">Lista de normales correspondientes a los vértices de la superficie.</param>
+        private void BuildSurfaceDataBuffers(IList<Seccion> secciones, IList<double> vertices, IList<int> indices, IList<double> normales)
         {
             Seccion seccion;
             Seccion seccionSiguiente;
             Seccion seccionAnterior;
             int indexCount = 0;
+            vertices.Clear();
+            indices.Clear();
+            normales.Clear();
 
             // Armo la lista de vertices e indices. Esta ultima pensada que se arma con TRIANGLE.
-            for (int i = 0; i < seccionesTerraplen.Count; i++)
+            for (int i = 0; i < secciones.Count; i++)
             {
-                seccion = seccionesTerraplen[i];
+                seccion = secciones[i];
                 seccion.ReordenarVertices();
 
                 for (int j = 0; j < seccion.Vertices.Count; j++)
@@ -155,23 +230,18 @@ namespace Trochita3D.Core
 
                     // Indices
                     indices.Add(indexCount);
-                    indices.Add((indexCount + seccion.Vertices.Count) % (seccionesTerraplen.Count * seccion.Vertices.Count));
+                    indices.Add((indexCount + seccion.Vertices.Count) % (secciones.Count * seccion.Vertices.Count));
                     indexCount++;
 
                     // Normales
-                    seccionAnterior = this.GetSeccionAnterior(seccionesTerraplen, i);
-                    seccionSiguiente = this.GetSeccionSiguiente(seccionesTerraplen, i);
+                    seccionAnterior = this.GetSeccionAnterior(secciones, i);
+                    seccionSiguiente = this.GetSeccionSiguiente(secciones, i);
                     PuntoFlotante normal = this.GetNormalForVertex(seccion, seccionAnterior, seccionSiguiente, j);
                     normales.Add(normal.X);
                     normales.Add(normal.Y);
                     normales.Add(normal.Z);
                 }
             }
-
-            Gl.glVertexPointer(3, Gl.GL_DOUBLE, 3 * sizeof(double), vertices.ToArray<double>());
-            Gl.glNormalPointer(Gl.GL_DOUBLE, 3 * sizeof(double), normales.ToArray<double>());
-            Gl.glEnableClientState(Gl.GL_VERTEX_ARRAY);
-            Gl.glEnableClientState(Gl.GL_NORMAL_ARRAY);
         }
 
         private PuntoFlotante GetNormalForVertex(Seccion seccion, Seccion seccionAnterior, Seccion seccionSiguiente, int vertexPos)
@@ -183,23 +253,22 @@ namespace Trochita3D.Core
             {
                 n1 = GetNormalInferior(seccion, seccionAnterior, vertexPos);
                 n2 = GetNormalInferior(seccion, seccionSiguiente, vertexPos);
+                n1.ZPositivo();
+                n2.ZPositivo();
             }
 
             if (vertexPos < seccion.Vertices.Count - 1)
             {
                 n3 = GetNormalSuperior(seccion, seccionAnterior, vertexPos);
                 n4 = GetNormalSuperior(seccion, seccionSiguiente, vertexPos);
+                n3.ZPositivo();
+                n4.ZPositivo();
             }
 
             PuntoFlotante n13 = n1 + n3;
             PuntoFlotante n24 = n2 + n4;
             PuntoFlotante n = n13 + n24;
-
             n.Normalizar();
-
-            if (n.Z < 0)
-                n = n * -1;
-
             return n;
         }
 
@@ -244,46 +313,47 @@ namespace Trochita3D.Core
         public void DrawSurface()
         {
             Gl.glEnable(Gl.GL_LIGHTING);
-            //Gl.glColor3d(1, 0, 0);
-            //Gl.glPolygonMode(Gl.GL_FRONT_AND_BACK, Gl.GL_LINE);
-            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_AMBIENT, new float[] { 0.3f, 0, 0, 1 });
-            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_DIFFUSE, new float[] { 1.0f, 0, 0, 1 });
-            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_SPECULAR, new float[] { 0, 0, 0, 1 });
-            Gl.glDrawElements(Gl.GL_QUAD_STRIP, indices.Count, Gl.GL_UNSIGNED_INT, indices.ToArray<int>());
+
+            this.DrawTerraplen();
+            this.DrawRieles();
+
             Gl.glDisable(Gl.GL_LIGHTING);
         }
 
-        public void Dibujar()
+        /// <summary>
+        /// Dibuja la superficie correspondiente a los rieles tomando los valores
+        /// previamente cargados en las listas de vertices, normales e índices.
+        /// </summary>
+        private void DrawRieles()
         {
-            Gl.glBegin(Gl.GL_LINE_STRIP);
-            Gl.glColor3d(1, 0, 0);
-            foreach (PuntoFlotante punto in GetBsplineControlPoints(DELTA_U))
-            {
-                Gl.glVertex3d(punto.X, punto.Y, punto.Z);
-            }
-            Gl.glEnd();
-            
-            Gl.glColor3d(0, 0, 1);
-            foreach (Seccion seccion in seccionesTerraplen)
-            {
-                Gl.glBegin(Gl.GL_LINE_STRIP);
-                foreach (PuntoFlotante punto in seccion.Vertices)
-                {
-                    Gl.glVertex3d(punto.X, punto.Y, punto.Z);
-                }
-                Gl.glEnd();
-            }
+            Gl.glVertexPointer(3, Gl.GL_DOUBLE, 3 * sizeof(double), verticesRieles1);
+            Gl.glNormalPointer(Gl.GL_DOUBLE, 3 * sizeof(double), normalesRieles1);
+            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_AMBIENT, new float[] { 0.25f, 0.25f, 0.25f, 1.0f });
+            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_DIFFUSE, new float[] { 0.7f, 0.7f, 0.7f, 1 });
+            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_SPECULAR, new float[] { 1, 1, 1, 1 });
+            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_SHININESS, new float[] { 1.75f });
+            Gl.glDrawElements(Gl.GL_QUAD_STRIP, indicesRieles1.Length, Gl.GL_UNSIGNED_INT, indicesRieles1);
 
-            Gl.glColor3d(0, 1, 0);
-            foreach (Seccion seccion in seccionesRieles)
-            {
-                Gl.glBegin(Gl.GL_LINE_STRIP);
-                foreach (PuntoFlotante punto in seccion.Vertices)
-                {
-                    Gl.glVertex3d(punto.X, punto.Y, punto.Z);
-                }
-                Gl.glEnd();
-            }
+            Gl.glVertexPointer(3, Gl.GL_DOUBLE, 3 * sizeof(double), verticesRieles2);
+            Gl.glNormalPointer(Gl.GL_DOUBLE, 3 * sizeof(double), normalesRieles2);
+            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_AMBIENT, new float[] { 0.25f, 0.25f, 0.25f, 1.0f });
+            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_DIFFUSE, new float[] { 0.7f, 0.7f, 0.7f, 1 });
+            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_SPECULAR, new float[] { 0, 0, 0, 1 });
+            Gl.glDrawElements(Gl.GL_QUAD_STRIP, indicesRieles2.Length, Gl.GL_UNSIGNED_INT, indicesRieles2);
+        }
+
+        /// <summary>
+        /// Dibuja la superficie correspondiente al terraplen tomando los valores
+        /// previamente cargados en las listas de vertices, normales e índices.
+        /// </summary>
+        private void DrawTerraplen()
+        {
+            Gl.glVertexPointer(3, Gl.GL_DOUBLE, 3 * sizeof(double), verticesTerraplen);
+            Gl.glNormalPointer(Gl.GL_DOUBLE, 3 * sizeof(double), normalesTerraplen);
+            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_AMBIENT, new float[] { 0.6f, 0.5f, 0.35f, 0.25f });
+            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_DIFFUSE, new float[] { 0.61568f, 0.48627f, 0.34117f, 1 });
+            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_SPECULAR, new float[] { 0, 0, 0, 1 });
+            Gl.glDrawElements(Gl.GL_TRIANGLE_STRIP, indicesTerraplen.Length, Gl.GL_UNSIGNED_INT, indicesTerraplen);
         }
 
     }
