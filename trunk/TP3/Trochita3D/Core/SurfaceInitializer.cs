@@ -23,6 +23,7 @@ namespace Trochita3D.Core
 
         private IList<int> indices = new List<int>();
         private IList<double> vertices = new List<double>();
+        private IList<double> normales = new List<double>();
 
         public SurfaceInitializer()
         {
@@ -32,8 +33,8 @@ namespace Trochita3D.Core
 
             // TODO: eliminar de aca para abajo.
             this.BuildSurface();
-            Gl.glEnable(Gl.GL_NORMALIZE);
-            Gl.glEnable(Gl.GL_AUTO_NORMAL);
+            //Gl.glEnable(Gl.GL_NORMALIZE);
+            //Gl.glEnable(Gl.GL_AUTO_NORMAL);
         }
 
         private void BuildTerraplen()
@@ -143,6 +144,7 @@ namespace Trochita3D.Core
             for (int i = 0; i < seccionesTerraplen.Count; i++)
             {
                 seccion = seccionesTerraplen[i];
+                seccion.ReordenarVertices();
 
                 for (int j = 0; j < seccion.Vertices.Count; j++)
                 {
@@ -159,18 +161,68 @@ namespace Trochita3D.Core
                     // Normales
                     seccionAnterior = this.GetSeccionAnterior(seccionesTerraplen, i);
                     seccionSiguiente = this.GetSeccionSiguiente(seccionesTerraplen, i);
-                    this.GetNormalForVertex(seccion, seccionAnterior, seccionSiguiente, j);
+                    PuntoFlotante normal = this.GetNormalForVertex(seccion, seccionAnterior, seccionSiguiente, j);
+                    normales.Add(normal.X);
+                    normales.Add(normal.Y);
+                    normales.Add(normal.Z);
                 }
             }
 
             Gl.glVertexPointer(3, Gl.GL_DOUBLE, 3 * sizeof(double), vertices.ToArray<double>());
+            Gl.glNormalPointer(Gl.GL_DOUBLE, 3 * sizeof(double), normales.ToArray<double>());
             Gl.glEnableClientState(Gl.GL_VERTEX_ARRAY);
-            //Gl.glEnableClientState(Gl.GL_NORMAL_ARRAY);
+            Gl.glEnableClientState(Gl.GL_NORMAL_ARRAY);
         }
 
-        private void GetNormalForVertex(Seccion seccion, Seccion seccionAnterior, Seccion seccionSiguiente, int vertexPos)
+        private PuntoFlotante GetNormalForVertex(Seccion seccion, Seccion seccionAnterior, Seccion seccionSiguiente, int vertexPos)
         {
-            
+            PuntoFlotante n1 = null, n2 = null, n3 = null, n4 = null;
+
+            // Planos inferiores
+            if (vertexPos > 0)
+            {
+                n1 = GetNormalInferior(seccion, seccionAnterior, vertexPos);
+                n2 = GetNormalInferior(seccion, seccionSiguiente, vertexPos);
+            }
+
+            if (vertexPos < seccion.Vertices.Count - 1)
+            {
+                n3 = GetNormalSuperior(seccion, seccionAnterior, vertexPos);
+                n4 = GetNormalSuperior(seccion, seccionSiguiente, vertexPos);
+            }
+
+            PuntoFlotante n13 = n1 + n3;
+            PuntoFlotante n24 = n2 + n4;
+            PuntoFlotante n = n13 + n24;
+
+            n.Normalizar();
+
+            if (n.Z < 0)
+                n = n * -1;
+
+            return n;
+        }
+
+        private PuntoFlotante GetNormalInferior(Seccion seccion, Seccion seccion2, int vertexPos)
+        {
+            PuntoFlotante v1 = new PuntoFlotante(seccion2.Vertices[vertexPos].X - seccion.Vertices[vertexPos].X,
+                                                 seccion2.Vertices[vertexPos].Y - seccion.Vertices[vertexPos].Y,
+                                                 seccion2.Vertices[vertexPos].Z - seccion.Vertices[vertexPos].Z);
+            PuntoFlotante v2 = new PuntoFlotante(seccion.Vertices[vertexPos - 1].X - seccion.Vertices[vertexPos].X,
+                                                 seccion.Vertices[vertexPos - 1].Y - seccion.Vertices[vertexPos].Y,
+                                                 seccion.Vertices[vertexPos - 1].Z - seccion.Vertices[vertexPos].Z);
+            return v1 * v2;
+        }
+
+        private PuntoFlotante GetNormalSuperior(Seccion seccion, Seccion seccion2, int vertexPos)
+        {
+            PuntoFlotante v1 = new PuntoFlotante(seccion2.Vertices[vertexPos].X - seccion.Vertices[vertexPos].X,
+                                                 seccion2.Vertices[vertexPos].Y - seccion.Vertices[vertexPos].Y,
+                                                 seccion2.Vertices[vertexPos].Z - seccion.Vertices[vertexPos].Z);
+            PuntoFlotante v2 = new PuntoFlotante(seccion.Vertices[vertexPos + 1].X - seccion.Vertices[vertexPos].X,
+                                                 seccion.Vertices[vertexPos + 1].Y - seccion.Vertices[vertexPos].Y,
+                                                 seccion.Vertices[vertexPos + 1].Z - seccion.Vertices[vertexPos].Z);
+            return v1 * v2;
         }
 
         private Seccion GetSeccionAnterior(IList<Seccion> secciones, int posSeccionActual)
@@ -192,7 +244,11 @@ namespace Trochita3D.Core
         public void DrawSurface()
         {
             Gl.glEnable(Gl.GL_LIGHTING);
-            Gl.glColor3d(1, 0, 0);
+            //Gl.glColor3d(1, 0, 0);
+            //Gl.glPolygonMode(Gl.GL_FRONT_AND_BACK, Gl.GL_LINE);
+            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_AMBIENT, new float[] { 0.3f, 0, 0, 1 });
+            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_DIFFUSE, new float[] { 1.0f, 0, 0, 1 });
+            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_SPECULAR, new float[] { 0, 0, 0, 1 });
             Gl.glDrawElements(Gl.GL_QUAD_STRIP, indices.Count, Gl.GL_UNSIGNED_INT, indices.ToArray<int>());
             Gl.glDisable(Gl.GL_LIGHTING);
         }
@@ -206,7 +262,6 @@ namespace Trochita3D.Core
                 Gl.glVertex3d(punto.X, punto.Y, punto.Z);
             }
             Gl.glEnd();
-
             
             Gl.glColor3d(0, 0, 1);
             foreach (Seccion seccion in seccionesTerraplen)

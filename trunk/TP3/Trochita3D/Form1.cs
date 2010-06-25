@@ -52,8 +52,8 @@ namespace TPAlgoritmos3D
 
         #region Variables asociadas a única fuente de luz de la escena 
 
-        private float[] light_color = new float[4] { 1.0f, 1.0f, 1.0f, 1.0f };
-        private float[] light_position = new float[4] { 0.0f, 20.0f, 10.0f, 1.0f };
+        private float[] light_color = new float[4] { 0.80f, 0.80f, 0.80f, 1.0f };
+        private float[] light_position = new float[4] { 0.0f, 0.0f, 5.0f, 1.0f };
         private float[] light_ambient = new float[4] { 0.05f, 0.05f, 0.05f, 1.0f };
 
         #endregion
@@ -253,19 +253,16 @@ namespace TPAlgoritmos3D
             //  puntos de control de la copa (Bezier)
             //  altura total
             //  radio máximo
-            Arbol arbol = new Arbol();
-            arbol.Dibujar();
+            //Arbol arbol = new Arbol();
+            //arbol.Dibujar();
 
             SurfaceInitializer surfaceInitializer = new SurfaceInitializer();
             //surfaceInitializer.Dibujar();
             surfaceInitializer.DrawSurface();
-            TerrainInitializer terrainInitializer = new TerrainInitializer();
-            terrainInitializer.DrawTerrain();
-
-<<<<<<< .mine            
+            //TerrainInitializer terrainInitializer = new TerrainInitializer();
+            //terrainInitializer.DrawTerrain();
             
-=======
->>>>>>> .theirs            //Gl.glPopMatrix();
+            //Gl.glPopMatrix();
             Gl.glEnable(Gl.GL_LIGHTING);
             Gl.glColor3d(1, 1, 1);
         }
