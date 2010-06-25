@@ -146,6 +146,20 @@ namespace TPAlgoritmos3D
 
         #endregion
 
+        Arbol[] arboles = Arbol.GenerarArbolesAleatorios(10);
+        PuntoFlotante[] posicionArboles = new PuntoFlotante[10] {
+            new PuntoFlotante(0, 0, 0),
+            new PuntoFlotante(6, 6, 0),
+            new PuntoFlotante(-4, -4, 0),
+            new PuntoFlotante(6, 12, 0),
+            new PuntoFlotante(-10, 4, 0),
+            new PuntoFlotante(8, 15, 0),
+            new PuntoFlotante(-15, 7, 0),
+            new PuntoFlotante(1, -10, 0),
+            new PuntoFlotante(3, -15, 0),
+            new PuntoFlotante(15, 15, 0)
+        };
+
         #endregion
 
         // Constructor de la ventana, se ejecuta una sola vez cuando se habre la misma 
@@ -226,17 +240,16 @@ namespace TPAlgoritmos3D
             Gl.glClear(Gl.GL_COLOR_BUFFER_BIT | Gl.GL_DEPTH_BUFFER_BIT);
 
             this.Set3DEnv();
-            
 
+            Gl.glMatrixMode(Gl.GL_MODELVIEW);
+            Gl.glLoadIdentity();
             Glu.gluLookAt(eye[0], eye[1], eye[2], at[0], at[1], at[2], up[0], up[1], up[2]);
-
             // Si corresponde se dibujan los ejes
             if (view_axis) Gl.glCallList(DL_AXIS);
             // Se corresponde se dibuja la grilla
             if (view_grid) Gl.glCallList(DL_GRID);
 
-            Gl.glDisable(Gl.GL_LIGHTING);
-            Gl.glPushMatrix();
+           // Gl.glDisable(Gl.GL_LIGHTING);
 
             /*
             Terraplen terraplen = new Terraplen();
@@ -249,24 +262,36 @@ namespace TPAlgoritmos3D
             SurfaceInitializer surfaceInitializer = new SurfaceInitializer();            
             surfaceInitializer.DrawSurface();*/
 
-            // TODO: dibujar al menos 10, parametrizados por:
-            //  puntos de control de la copa (Bezier)
-            //  altura total
-            //  radio máximo
-            /*
-            Arbol arbol = new Arbol();
-            arbol.Dibujar();
 
+            for (int i = 0; i < arboles.Length; ++i)
+            {
+                Gl.glPushMatrix();
+                PuntoFlotante posicion = posicionArboles[i];
+                Gl.glTranslated(posicion.X, posicion.Y, posicion.Z);
+                arboles[i].Dibujar();
+                Gl.glPopMatrix();
+            }
+            
+            //arbol.Dibujar();
+            /*
             SurfaceInitializer surfaceInitializer = new SurfaceInitializer();
             //surfaceInitializer.Dibujar();
             surfaceInitializer.DrawSurface();*/
             TerrainInitializer terrainInitializer = new TerrainInitializer();
             terrainInitializer.DrawTerrain();
-
-
-            //Gl.glPopMatrix();
             Gl.glEnable(Gl.GL_LIGHTING);
             Gl.glColor3d(1, 1, 1);
+		}
+
+        protected void RefreshEye() 
+        {
+            glControl.Refresh();
+            return;
+            this.Set3DEnv();
+            Gl.glMatrixMode(Gl.GL_MODELVIEW);
+            Gl.glLoadIdentity();
+            Glu.gluLookAt(eye[0], eye[1], eye[2], at[0], at[1], at[2], up[0], up[1], up[2]);
+
         }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
@@ -276,37 +301,37 @@ namespace TPAlgoritmos3D
                 case Keys.Up:
                     {
                         eye[0]--;
-                        glControl.Refresh();
+                        this.RefreshEye();
                         break;
                     }
                 case Keys.Down:
                     {
                         eye[0]++;
-                        glControl.Refresh();
+                        this.RefreshEye();
                         break;
                     }
                 case Keys.Left:
                     {
                         eye[1]--;
-                        glControl.Refresh();
+                        this.RefreshEye();
                         break;
                     }
                 case Keys.Right:
                     {
                         eye[1]++;
-                        glControl.Refresh();
+                        this.RefreshEye();
                         break;
                     }
                 case Keys.Add:
                     {
                         eye[2]--;
-                        glControl.Refresh();
+                        this.RefreshEye();
                         break;
                     }
                 case Keys.Subtract:
                     {
                         eye[2]++;
-                        glControl.Refresh();
+                        this.RefreshEye();
                         break;
                     }
                 default: break;
