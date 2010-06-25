@@ -18,23 +18,26 @@ namespace Trochita3D.Entidades
 
         private static int CANTIDAD_CARAS = 15;
         private static double FACTOR_TRONCO = 6.0f;
-        private static double PASO_BSPLINE = .1f; 
+        private static double PASO_BEZIER = .1f;
+        private static bool DIBUJAR_NORMALES = false;
+        private static double MINIMO_RADIO = .3f;
 
         private Glu.GLUquadric quadraticCylinder = Glu.gluNewQuadric();
 
         private static double LONGITUD_TRONCO_DEFAULT = 2.0f;
         private static PuntoFlotante[] FORMA_COPA_DEFAULT = new PuntoFlotante[] 
             {
-                new PuntoFlotante ( 0,   0, 0 ), // repito bordes para interpolar
                 new PuntoFlotante ( 0,   0, 0 ),
-                new PuntoFlotante ( .5,   .5, 0 ),
-                new PuntoFlotante ( .75, 1, 0 ),
-                new PuntoFlotante ( 1,   1.5, 0 ), 
-                new PuntoFlotante ( .75, 2, 0 ), 
-                new PuntoFlotante ( .5,   2.5, 0 ), 
-                new PuntoFlotante ( .6,   2.75, 0 ), 
-                new PuntoFlotante ( 0,   3, 0 ), 
-                new PuntoFlotante ( 0,   3, 0 ), // repito bordes para interpolar
+                new PuntoFlotante ( .4,   .5, 0 ),
+                new PuntoFlotante ( .8, 1, 0 ),
+                new PuntoFlotante ( 1.0,   1.5, 0 ), 
+                new PuntoFlotante ( .8, 2, 0 ), 
+                new PuntoFlotante ( 1.1,   2.5, 0 ), 
+                new PuntoFlotante ( 1.0,   3, 0 ), 
+                new PuntoFlotante ( .9,   3.5, 0 ), 
+                new PuntoFlotante ( .8,   4.0, 0 ), 
+                new PuntoFlotante ( .5,   4.5, 0 ), 
+                new PuntoFlotante ( 0,   5, 0 )
             };
 
         public static Arbol[] GenerarArbolesAleatorios(int cantidad)
@@ -45,11 +48,26 @@ namespace Trochita3D.Entidades
                 PuntoFlotante[] formaCopa = new PuntoFlotante[FORMA_COPA_DEFAULT.Length];
                 for (int j = 0; j < formaCopa.Length; ++j)
                 {
-                    formaCopa[j] = new PuntoFlotante(
-                        Arbol.FORMA_COPA_DEFAULT[j].X + Arbol.RandomEntre(-.1f, +.7f),
-                        Arbol.FORMA_COPA_DEFAULT[j].Y + Arbol.RandomEntre(-.1f, +.7f),
-                        Arbol.FORMA_COPA_DEFAULT[j].Z
-                        );
+                    if (j == 0 || j == formaCopa.Length - 1) // siempre terminan y empiezan en el mismo lugar
+                    {
+                        formaCopa[j] = new PuntoFlotante(
+                            Arbol.FORMA_COPA_DEFAULT[j].X,
+                            Arbol.FORMA_COPA_DEFAULT[j].Y,
+                            Arbol.FORMA_COPA_DEFAULT[j].Z
+                            );
+                    }
+                    else
+                    {
+                        double nuevoX = Arbol.FORMA_COPA_DEFAULT[j].X + Arbol.RandomEntre(-.5f, +1.0f);
+                        double nuevoY = Arbol.FORMA_COPA_DEFAULT[j].Y + Arbol.RandomEntre(-.5f, +1.0f);
+                        double nuevoZ = Arbol.FORMA_COPA_DEFAULT[j].Z;
+
+                        formaCopa[j] = new PuntoFlotante(
+                                nuevoX > MINIMO_RADIO ? nuevoX : MINIMO_RADIO,
+                                nuevoY > MINIMO_RADIO ? nuevoY : MINIMO_RADIO,
+                                nuevoZ > MINIMO_RADIO ? nuevoZ : MINIMO_RADIO
+                            );
+                    }
                 }
 
                 double longitudTronco = LONGITUD_TRONCO_DEFAULT + Arbol.RandomEntre(-.5f, +1.5f);
@@ -76,18 +94,12 @@ namespace Trochita3D.Entidades
 
         public void Dibujar()
         {
-            Gl.glDisable(Gl.GL_LIGHTING);
-
             this.DibujarTronco();
 
             Gl.glPushMatrix();
-            Gl.glTranslated(0, 0, this.longitudTronco * .8);
+            Gl.glTranslated(0, 0, this.longitudTronco * .6);
             this.DibujarCopa();
-
             Gl.glPopMatrix();
-
-            Gl.glEnable(Gl.GL_LIGHTING);
-
         }
 
         private void DibujarTronco()
@@ -111,6 +123,7 @@ namespace Trochita3D.Entidades
             Gl.glBegin(Gl.GL_TRIANGLE_STRIP);
             for (int i = 0; i < matrizPuntosCopa.Length - 2; i++) // por columnas duplicadas
             {
+                // Verde...
                 Gl.glColor3d(0, 1, 0);
                 for (int j = 0; j < matrizPuntosCopa[i].Length; j++)
                 {
@@ -122,31 +135,47 @@ namespace Trochita3D.Entidades
                 }
             }
             Gl.glEnd();
+
+            if (DIBUJAR_NORMALES)
+            {
+                for (int i = 0; i < matrizPuntosCopa.Length - 2; i++) // por columnas duplicadas
+                {
+                    for (int j = 0; j < matrizPuntosCopa[i].Length; j++)
+                    {
+                        Gl.glBegin(Gl.GL_LINES);
+                        Gl.glVertex3d(matrizPuntosCopa[i][j].X, matrizPuntosCopa[i][j].Y, matrizPuntosCopa[i][j].Z);
+                        Gl.glVertex3d(matrizPuntosCopa[i][j].NormalX, matrizPuntosCopa[i][j].NormalY, matrizPuntosCopa[i][j].NormalZ);
+                        Gl.glEnd();
+                        Gl.glColor3d(1, 0, 0);
+                    }
+                }
+                
+            }
             Gl.glPopMatrix();
         }
 
         private PuntoFlotante[][] generarMatrizVertices(PuntoFlotante[] curva, double gradosRevolucion, int cantidadCaras)
         {
             double anguloRotacionRadianes = GradosARadianes(gradosRevolucion / cantidadCaras);
-            CurvaBsplineSegmentosCubicos curvaBS = new CurvaBsplineSegmentosCubicos(curva);
-            PuntoFlotante[] curvaDiscretizada = curvaBS.GetPuntosDiscretos(PASO_BSPLINE).ToArray<PuntoFlotante>();
+            CurvaBzierSegmentosCubicos curvaBS = new CurvaBzierSegmentosCubicos(curva);
+            PuntoFlotante[] curvaDiscretizada = curvaBS.GetPuntosDiscretos(PASO_BEZIER).ToArray<PuntoFlotante>();
 
             PuntoFlotante[][] matriz = new PuntoFlotante[cantidadCaras + 2][];
 
             for (int iteradorRotacion = 0; iteradorRotacion < cantidadCaras; ++iteradorRotacion)
             {
                 matriz[iteradorRotacion] = new PuntoFlotante[curvaDiscretizada.Length];
-                for (int iteradorSpline = 0; iteradorSpline < curvaDiscretizada.Length; ++iteradorSpline)
+                for (int iteradorBezier = 0; iteradorBezier < curvaDiscretizada.Length; ++iteradorBezier)
                 {
-                    PuntoFlotante puntoCurva = curvaDiscretizada[iteradorSpline];
-                    matriz[iteradorRotacion][iteradorSpline] = new PuntoFlotante(puntoCurva);
+                    PuntoFlotante puntoCurva = curvaDiscretizada[iteradorBezier];
+                    matriz[iteradorRotacion][iteradorBezier] = new PuntoFlotante(puntoCurva);
 
                     // roto, al mismo tiempo, los puntos de la curva alrededor del eje Y
                     PuntoFlotante puntoCurvaBack = new PuntoFlotante(puntoCurva);
                     puntoCurva.X = puntoCurvaBack.X * Math.Cos(anguloRotacionRadianes) + puntoCurvaBack.Z * Math.Sin(anguloRotacionRadianes);
                     puntoCurva.Z = puntoCurvaBack.Z * Math.Cos(anguloRotacionRadianes) - puntoCurvaBack.X * Math.Sin(anguloRotacionRadianes);
 
-                    curvaDiscretizada[iteradorSpline] = puntoCurva;
+                    curvaDiscretizada[iteradorBezier] = puntoCurva;
                 }
             }
 
@@ -156,9 +185,13 @@ namespace Trochita3D.Entidades
             // calculo las normales en toda la matriz
             for (int i = 0; i < matriz.Length - 1; ++i)
             {
-                for (int j = 0; j < curva.Length - 1; ++j)
+                for (int j = 0; j < curvaDiscretizada.Length - 1; ++j)
                 {
                     PuntoFlotante normal = (matriz[i + 1][j] - matriz[i][j]) * (matriz[i][j + 1] - matriz[i][j]);
+                    normal = normal - matriz[i][j];
+                    normal = normal * (-1.0d);
+                    normal = normal + matriz[i][j];
+
                     matriz[i][j].NormalX = normal.X;
                     matriz[i][j].NormalY = normal.Y;
                     matriz[i][j].NormalZ = normal.Z;

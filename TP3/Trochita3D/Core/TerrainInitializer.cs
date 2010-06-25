@@ -118,6 +118,7 @@ namespace Trochita3D.Core
             Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_SPECULAR, new float[] { 0, 0, 0, 1 });
             Gl.glDrawElements(Gl.GL_QUADS, indices.Count, Gl.GL_UNSIGNED_INT, indices.ToArray<int>());
             Gl.glDisable(Gl.GL_LIGHTING);
+            Gl.glPopMatrix();
         }
     }
 }
