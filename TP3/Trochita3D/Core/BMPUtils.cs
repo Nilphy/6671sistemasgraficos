@@ -11,11 +11,6 @@ namespace Trochita3D.Core
         private static int CANTIDAD_BYTES_POR_PIXEL = 3;
         private static int PRIMER_BYTE_CON_INFO_DE_COLOR = 55;
 
-        /// <summary>
-        /// Devuelve un array con los bytes del archivo
-        /// </summary>
-        /// <param name="archivo"></param>
-        /// <returns></returns>
         public static byte[] ObtenerBytesDeArchivo(string archivo)
         {
             System.IO.Stream str = new System.IO.FileStream(archivo, System.IO.FileMode.Open);

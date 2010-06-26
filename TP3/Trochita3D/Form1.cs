@@ -41,6 +41,7 @@ namespace TPAlgoritmos3D
         private bool view_axis = true;
                 
         private SurfaceInitializer surfaceInitializer = new SurfaceInitializer();
+        private TerrainInitializer terrainInitializer = new TerrainInitializer();
 
         #region Variables asociadas a única fuente de luz de la escena 
 
@@ -132,7 +133,7 @@ namespace TPAlgoritmos3D
         #endregion
         #region Posición defecto de la cámara
 
-        private float[] eye = new float[3] { 13.0f, 0.0f, 5.0f };
+        private float[] eye = new float[3] { 13.0f, 0.0f, 20.0f };
         private float[] at = new float[3] { 0.0f, 0.0f, 0.0f };
         private float[] up = new float[3] { 0.0f, 0.0f, 1.0f };
 
@@ -243,6 +244,7 @@ namespace TPAlgoritmos3D
             // Se corresponde se dibuja la grilla
             if (view_grid) Gl.glCallList(DL_GRID);
 
+            
             surfaceInitializer.DrawSurface();
 
             /*
@@ -254,10 +256,10 @@ namespace TPAlgoritmos3D
                 arboles[i].Dibujar();
                 Gl.glPopMatrix();
             }
-            
-            TerrainInitializer terrainInitializer = new TerrainInitializer();
-            terrainInitializer.DrawTerrain();
             */
+            //TerrainInitializer terrainInitializer = new TerrainInitializer();
+            terrainInitializer.DrawTerrain();
+            
         }
 
         protected void RefreshEye() 
