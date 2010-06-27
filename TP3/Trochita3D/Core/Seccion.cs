@@ -14,14 +14,17 @@ namespace Trochita3D.Core
     {
 
         public IList<PuntoFlotante> Vertices { get; set; }
+        public double Angulo { get; set; }
 
         public Seccion()
         {
+            this.Angulo = 0;
             this.Vertices = new List<PuntoFlotante>();
         }
 
         public Seccion(IList<PuntoFlotante> puntos)
         {
+            this.Angulo = 0;
             this.Vertices = new List<PuntoFlotante>();
 
             foreach (PuntoFlotante punto in puntos)
@@ -32,6 +35,7 @@ namespace Trochita3D.Core
 
         public void Rotar(double angulo)
         {
+            this.Angulo += angulo;
             foreach (PuntoFlotante punto in Vertices)
             {
                 double x = punto.X;
