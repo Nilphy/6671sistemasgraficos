@@ -13,7 +13,6 @@ namespace Trochita3D.Core
     /// </summary>
     public class SurfaceInitializer
     {
-
         private const double DELTA_U = 0.05;
         private const int CANT_PUNTOS_TERRAPLEN = 10;
 
@@ -42,7 +41,36 @@ namespace Trochita3D.Core
             Gl.glEnableClientState(Gl.GL_VERTEX_ARRAY);
             Gl.glEnableClientState(Gl.GL_NORMAL_ARRAY);
         }
-        
+
+        /// <summary>
+        /// Obtiene los puntos discretos del trayecto a realizar por el terraplen
+        /// a partir de los puntos de control definidos en esta misma funcion.
+        /// </summary>
+        /// <param name="du">Delta U</param>
+        /// <returns>
+        /// Lista de vertices que corresponden a la curva que representa el trayecto.
+        /// </returns>
+        private IList<PuntoFlotante> GetBsplineControlPoints(double du)
+        {
+            IList<PuntoFlotante> ptsControl = new List<PuntoFlotante>();
+
+            ptsControl.Add(new PuntoFlotante(10, 10, 0));
+            ptsControl.Add(new PuntoFlotante(10, -10, 0));
+            ptsControl.Add(new PuntoFlotante(-10, -10, 0));
+            ptsControl.Add(new PuntoFlotante(-10, 10, 0));
+
+            CurvaBsplineSegmentosCubicos path = new CurvaBsplineSegmentosCubicos(ptsControl);
+
+            return path.GetPuntosDiscretos(du);
+        }
+
+        #region Armado de Superficies
+
+        /// <summary>
+        /// Construye las secciones correspondientes al terraplen. Completa el listado
+        /// de secciones ubicadas a través del trayecto indicado en path para ir
+        /// formando las secciones correspondientes a la superficie del terraplen.
+        /// </summary>
         private void BuildTerraplen()
         {
             Terraplen terraplen = new Terraplen();
@@ -65,7 +93,6 @@ namespace Trochita3D.Core
                 int cuadrante = vectorPuntoAnteriorActual.GetCuadrante();
                 if (cuadrante.Equals(1) || cuadrante.Equals(4))
                     angulo -= Math.PI;
-                    //seccion.InvertirVertices();
 
                 seccion.Rotar(angulo);
                 seccion.Trasladar(puntoActual.X, puntoActual.Y, puntoActual.Z);
@@ -74,6 +101,11 @@ namespace Trochita3D.Core
             }
         }
 
+        /// <summary>
+        /// Construye las secciones correspondientes al riel. Completa el listado
+        /// de secciones ubicadas a través del trayecto indicado en path para ir
+        /// formando las secciones correspondientes a la superficie de los rieles.
+        /// </summary>
         private void BuildRieles()
         {
             const double DIST_RIELES = 0.4;
@@ -115,28 +147,6 @@ namespace Trochita3D.Core
                 seccionesRieles2.Add(seccionRiel2);
                 puntoAnterior = puntoActual;
             }
-        }
-
-        /// <summary>
-        /// Obtiene los puntos discretos del trayecto a realizar por el terraplen
-        /// a partir de los puntos de control definidos en esta misma funcion.
-        /// </summary>
-        /// <param name="du">Delta U</param>
-        /// <returns>
-        /// Lista de vertices que corresponden a la curva que representa el trayecto.
-        /// </returns>
-        private IList<PuntoFlotante> GetBsplineControlPoints(double du)
-        {
-            IList<PuntoFlotante> ptsControl = new List<PuntoFlotante>();
-
-            ptsControl.Add(new PuntoFlotante(10, 10, 0));
-            ptsControl.Add(new PuntoFlotante(10, -10, 0));
-            ptsControl.Add(new PuntoFlotante(-10, -10, 0));
-            ptsControl.Add(new PuntoFlotante(-10, 10, 0));
-
-            CurvaBsplineSegmentosCubicos path = new CurvaBsplineSegmentosCubicos(ptsControl);
-
-            return path.GetPuntosDiscretos(du);
         }
 
         /// <summary>
@@ -222,6 +232,60 @@ namespace Trochita3D.Core
             }
         }
 
+        #endregion
+
+        #region Dibujo
+
+        public void DrawSurface()
+        {
+            Gl.glEnable(Gl.GL_LIGHTING);
+
+            this.DrawTerraplen();
+            this.DrawRieles();
+
+            Gl.glDisable(Gl.GL_LIGHTING);
+        }
+
+        /// <summary>
+        /// Dibuja la superficie correspondiente a los rieles tomando los valores
+        /// previamente cargados en las listas de vertices, normales e índices.
+        /// </summary>
+        private void DrawRieles()
+        {
+            Gl.glVertexPointer(3, Gl.GL_DOUBLE, 3 * sizeof(double), verticesRieles1);
+            Gl.glNormalPointer(Gl.GL_DOUBLE, 3 * sizeof(double), normalesRieles1);
+            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_AMBIENT, new float[] { 0.25f, 0.25f, 0.25f, 1.0f });
+            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_DIFFUSE, new float[] { 0.7f, 0.7f, 0.7f, 1 });
+            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_SPECULAR, new float[] { 1, 1, 1, 1 });
+            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_SHININESS, new float[] { 1.75f });
+            Gl.glDrawElements(Gl.GL_QUAD_STRIP, indicesRieles1.Length, Gl.GL_UNSIGNED_INT, indicesRieles1);
+
+            Gl.glVertexPointer(3, Gl.GL_DOUBLE, 3 * sizeof(double), verticesRieles2);
+            Gl.glNormalPointer(Gl.GL_DOUBLE, 3 * sizeof(double), normalesRieles2);
+            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_AMBIENT, new float[] { 0.25f, 0.25f, 0.25f, 1.0f });
+            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_DIFFUSE, new float[] { 0.7f, 0.7f, 0.7f, 1 });
+            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_SPECULAR, new float[] { 0, 0, 0, 1 });
+            Gl.glDrawElements(Gl.GL_QUAD_STRIP, indicesRieles2.Length, Gl.GL_UNSIGNED_INT, indicesRieles2);
+        }
+
+        /// <summary>
+        /// Dibuja la superficie correspondiente al terraplen tomando los valores
+        /// previamente cargados en las listas de vertices, normales e índices.
+        /// </summary>
+        private void DrawTerraplen()
+        {
+            Gl.glVertexPointer(3, Gl.GL_DOUBLE, 3 * sizeof(double), verticesTerraplen);
+            Gl.glNormalPointer(Gl.GL_DOUBLE, 3 * sizeof(double), normalesTerraplen);
+            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_AMBIENT, new float[] { 0.6f, 0.5f, 0.35f, 0.25f });
+            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_DIFFUSE, new float[] { 0.61568f, 0.48627f, 0.34117f, 1 });
+            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_SPECULAR, new float[] { 0, 0, 0, 1 });
+            Gl.glDrawElements(Gl.GL_TRIANGLE_STRIP, indicesTerraplen.Length, Gl.GL_UNSIGNED_INT, indicesTerraplen);
+        }
+
+        #endregion
+
+        #region Métodos Auxiliares
+
         private PuntoFlotante GetNormalForVertex(Seccion seccion, Seccion seccionAnterior, Seccion seccionSiguiente, int vertexPos)
         {
             PuntoFlotante n1 = null, n2 = null, n3 = null, n4 = null;
@@ -288,51 +352,7 @@ namespace Trochita3D.Core
                 return secciones[posSeccionActual + 1];
         }
 
-        public void DrawSurface()
-        {
-            Gl.glEnable(Gl.GL_LIGHTING);
-
-            this.DrawTerraplen();
-            this.DrawRieles();
-
-            Gl.glDisable(Gl.GL_LIGHTING);
-        }
-
-        /// <summary>
-        /// Dibuja la superficie correspondiente a los rieles tomando los valores
-        /// previamente cargados en las listas de vertices, normales e índices.
-        /// </summary>
-        private void DrawRieles()
-        {
-            Gl.glVertexPointer(3, Gl.GL_DOUBLE, 3 * sizeof(double), verticesRieles1);
-            Gl.glNormalPointer(Gl.GL_DOUBLE, 3 * sizeof(double), normalesRieles1);
-            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_AMBIENT, new float[] { 0.25f, 0.25f, 0.25f, 1.0f });
-            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_DIFFUSE, new float[] { 0.7f, 0.7f, 0.7f, 1 });
-            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_SPECULAR, new float[] { 1, 1, 1, 1 });
-            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_SHININESS, new float[] { 1.75f });
-            Gl.glDrawElements(Gl.GL_QUAD_STRIP, indicesRieles1.Length, Gl.GL_UNSIGNED_INT, indicesRieles1);
-
-            Gl.glVertexPointer(3, Gl.GL_DOUBLE, 3 * sizeof(double), verticesRieles2);
-            Gl.glNormalPointer(Gl.GL_DOUBLE, 3 * sizeof(double), normalesRieles2);
-            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_AMBIENT, new float[] { 0.25f, 0.25f, 0.25f, 1.0f });
-            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_DIFFUSE, new float[] { 0.7f, 0.7f, 0.7f, 1 });
-            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_SPECULAR, new float[] { 0, 0, 0, 1 });
-            Gl.glDrawElements(Gl.GL_QUAD_STRIP, indicesRieles2.Length, Gl.GL_UNSIGNED_INT, indicesRieles2);
-        }
-
-        /// <summary>
-        /// Dibuja la superficie correspondiente al terraplen tomando los valores
-        /// previamente cargados en las listas de vertices, normales e índices.
-        /// </summary>
-        private void DrawTerraplen()
-        {
-            Gl.glVertexPointer(3, Gl.GL_DOUBLE, 3 * sizeof(double), verticesTerraplen);
-            Gl.glNormalPointer(Gl.GL_DOUBLE, 3 * sizeof(double), normalesTerraplen);
-            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_AMBIENT, new float[] { 0.6f, 0.5f, 0.35f, 0.25f });
-            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_DIFFUSE, new float[] { 0.61568f, 0.48627f, 0.34117f, 1 });
-            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_SPECULAR, new float[] { 0, 0, 0, 1 });
-            Gl.glDrawElements(Gl.GL_TRIANGLE_STRIP, indicesTerraplen.Length, Gl.GL_UNSIGNED_INT, indicesTerraplen);
-        }
+        #endregion
 
     }
 }
