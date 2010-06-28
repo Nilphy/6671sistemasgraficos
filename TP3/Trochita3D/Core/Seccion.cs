@@ -35,7 +35,7 @@ namespace Trochita3D.Core
 
         public void Rotar(double angulo)
         {
-            this.Angulo += angulo;
+            this.Angulo = ((this.Angulo + angulo) % (2 * Math.PI));
             foreach (PuntoFlotante punto in Vertices)
             {
                 double x = punto.X;
@@ -76,6 +76,11 @@ namespace Trochita3D.Core
                 punto.Y *= ey;
                 punto.Z *= ez;
             }
+        }
+
+        public void InvertirVertices()
+        {
+            Vertices = Vertices.Reverse<PuntoFlotante>().ToList<PuntoFlotante>();
         }
     }
 }

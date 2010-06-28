@@ -41,7 +41,7 @@ namespace TPAlgoritmos3D
         private bool view_axis = true;
                 
         private SurfaceInitializer surfaceInitializer = new SurfaceInitializer();
-        private TerrainInitializer terrainInitializer = new TerrainInitializer();
+        //private TerrainInitializer terrainInitializer = new TerrainInitializer();
 
         #region Variables asociadas a única fuente de luz de la escena 
 
@@ -258,7 +258,7 @@ namespace TPAlgoritmos3D
             }
             */
             //TerrainInitializer terrainInitializer = new TerrainInitializer();
-            terrainInitializer.DrawTerrain();
+            //terrainInitializer.DrawTerrain();
             
         }
 
@@ -279,24 +279,28 @@ namespace TPAlgoritmos3D
                 case Keys.Up:
                     {
                         eye[0]--;
+                        //at[0]--;
                         this.RefreshEye();
                         break;
                     }
                 case Keys.Down:
                     {
                         eye[0]++;
+                        //at[0]++;
                         this.RefreshEye();
                         break;
                     }
                 case Keys.Left:
                     {
                         eye[1]--;
+                        //at[1]--;
                         this.RefreshEye();
                         break;
                     }
                 case Keys.Right:
                     {
                         eye[1]++;
+                        //at[1]++;
                         this.RefreshEye();
                         break;
                     }

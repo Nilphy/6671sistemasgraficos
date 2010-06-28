@@ -201,5 +201,10 @@ namespace Trochita3D.Core
         {
             this.y = p;
         }
+
+        public double ProductoEscalar(PuntoFlotante punto)
+        {
+            return (this.X * punto.X) + (this.Y * punto.Y) + (this.Z * punto.Z);
+        }
     }
 }
