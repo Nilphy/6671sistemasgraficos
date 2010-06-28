@@ -30,6 +30,7 @@ namespace Trochita3D.Entidades
             puntosControl.Add(new PuntoFlotante(0, -0.3, 0.65));
             puntosControl.Add(new PuntoFlotante(0, -0.3, 0.3));
             puntosControl.Add(new PuntoFlotante(0, -0.5, 0.3));
+            puntosControl.Add(new PuntoFlotante(0, -0.5, 0));
         }
 
         /// <summary>

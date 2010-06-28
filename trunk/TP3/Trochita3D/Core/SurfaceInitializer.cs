@@ -43,50 +43,12 @@ namespace Trochita3D.Core
             Gl.glEnableClientState(Gl.GL_NORMAL_ARRAY);
         }
         
-        /*
         private void BuildTerraplen()
         {
             Terraplen terraplen = new Terraplen();
             PuntoFlotante puntoAnterior = path[path.Count - 1];
             PuntoFlotante puntoActual;
-            Seccion seccion;
-            seccion = terraplen.GetSeccion(CANT_PUNTOS_TERRAPLEN);
-            seccion.Rotar(Math.Atan(puntoAnterior.Y / puntoAnterior.X));
-            seccion.Trasladar(puntoAnterior.X, puntoAnterior.Y, puntoAnterior.Z);
-            seccionesTerraplen.Add(seccion);
-
-            double dx, dy, angulo;
-
-            for (int i = 0; i < path.Count; i++)
-            {
-                puntoActual = path[i];
-                seccion = new Seccion(seccion.Vertices);
-
-                double anguloAnterior = seccionesTerraplen.Last<Seccion>().Angulo;
-                double anguloActual = Math.Atan(puntoActual.Y / puntoActual.X);
-
-                dx = puntoActual.X - puntoAnterior.X;
-                dy = puntoActual.Y - puntoAnterior.Y;
-
-                angulo = dy / dx;
-
-                seccion.Trasladar(-puntoAnterior.X, -puntoAnterior.Y, -puntoAnterior.Z);
-                seccion.Rotar(Math.Atan(angulo));
-                //seccion.Rotar(anguloAnterior);
-                //seccion.Rotar(anguloActual - anguloAnterior);
-                seccion.Trasladar(puntoActual.X, puntoActual.Y, puntoActual.Z);
-
-                seccionesTerraplen.Add(seccion);
-                //seccion = new Seccion(seccion.Vertices);
-            }
-        }
-        */
-        
-        private void BuildTerraplen()
-        {
-            Terraplen terraplen = new Terraplen();
-            PuntoFlotante puntoAnterior = path[path.Count - 1];
-            PuntoFlotante puntoActual;
+            PuntoFlotante vectorPuntoAnteriorActual;
             Seccion seccion;
             seccion = terraplen.GetSeccion(CANT_PUNTOS_TERRAPLEN);
             double dx, dy, angulo;
@@ -94,22 +56,21 @@ namespace Trochita3D.Core
             for (int i = 0; i < path.Count; i++)
             {
                 puntoActual = path[i];
+                vectorPuntoAnteriorActual = puntoActual - puntoAnterior;
                 seccion = terraplen.GetSeccion(CANT_PUNTOS_TERRAPLEN);
-
-                double anguloAnterior = Math.Atan(puntoAnterior.Y / puntoAnterior.X);
-                double anguloActual = Math.Atan(puntoActual.Y / puntoActual.X);
-
                 dx = puntoActual.X - puntoAnterior.X;
                 dy = puntoActual.Y - puntoAnterior.Y;
+                angulo = Math.Atan(dy / dx);
 
-                angulo = dy / dx;
-                seccion.Rotar(Math.Atan(angulo));
-                //seccion.Rotar(anguloActual - anguloAnterior);
+                int cuadrante = vectorPuntoAnteriorActual.GetCuadrante();
+                if (cuadrante.Equals(1) || cuadrante.Equals(4))
+                    angulo -= Math.PI;
+                    //seccion.InvertirVertices();
+
+                seccion.Rotar(angulo);
                 seccion.Trasladar(puntoActual.X, puntoActual.Y, puntoActual.Z);
-
                 seccionesTerraplen.Add(seccion);
                 puntoAnterior = puntoActual;
-                seccion = new Seccion(seccion.Vertices);
             }
         }
 
@@ -119,6 +80,7 @@ namespace Trochita3D.Core
             Riel riel = new Riel();
             PuntoFlotante puntoAnterior = path[path.Count - 1];
             PuntoFlotante puntoActual;
+            PuntoFlotante vectorPuntoAnteriorActual;
             Seccion seccionRiel1;
             Seccion seccionRiel2;
             double dx, dy, angulo;
@@ -126,21 +88,27 @@ namespace Trochita3D.Core
             for (int i = 0; i < path.Count; i++)
             {
                 puntoActual = path[i];
+                vectorPuntoAnteriorActual = puntoActual - puntoAnterior;
                 seccionRiel1 = riel.GetSeccion();
                 seccionRiel2 = riel.GetSeccion();
 
                 dx = puntoActual.X - puntoAnterior.X;
                 dy = puntoActual.Y - puntoAnterior.Y;
 
-                angulo = dy / dx;
+                angulo = Math.Atan(dy / dx);
+
+                int cuadrante = vectorPuntoAnteriorActual.GetCuadrante();
+                if (cuadrante.Equals(1) || cuadrante.Equals(4))
+                    angulo -= Math.PI;
+
                 seccionRiel1.Escalar(1, 0.2, 0.2);
                 seccionRiel1.Trasladar(0, -DIST_RIELES, 0);
-                seccionRiel1.Rotar(Math.Atan(angulo));
+                seccionRiel1.Rotar(angulo);
                 seccionRiel1.Trasladar(puntoActual.X, puntoActual.Y, puntoActual.Z + Terraplen.ALTURA);
 
                 seccionRiel2.Escalar(1, 0.2, 0.2);
                 seccionRiel2.Trasladar(0, DIST_RIELES, 0);
-                seccionRiel2.Rotar(Math.Atan(angulo));
+                seccionRiel2.Rotar(angulo);
                 seccionRiel2.Trasladar(puntoActual.X, puntoActual.Y, puntoActual.Z + Terraplen.ALTURA);
 
                 seccionesRieles1.Add(seccionRiel1);
@@ -230,7 +198,6 @@ namespace Trochita3D.Core
             for (int i = 0; i < secciones.Count; i++)
             {
                 seccion = secciones[i];
-                //seccion.ReordenarVertices();
 
                 for (int j = 0; j < seccion.Vertices.Count; j++)
                 {
