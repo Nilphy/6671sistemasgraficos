@@ -27,19 +27,11 @@ namespace TPAlgoritmos3D
         /// Constante global que indica el tamaño del paso de tiempo en la simulación 
         /// </summary>
         private const int DELTA_TIEMPO = 5;
-
         private Timer timer;
-
-        /// <summary>
-        /// Variable global que indica si se ve la grilla en la pantalla 
-        /// </summary>
+        
         private bool view_grid = true;
-
-        /// <summary>
-        /// Variable global que indica si se ven los ejes en la pantalla 
-        /// </summary>
         private bool view_axis = true;
-                
+
         private SurfaceInitializer surfaceInitializer = new SurfaceInitializer();
         private TerrainInitializer terrainInitializer = new TerrainInitializer();
 
@@ -62,46 +54,6 @@ namespace TPAlgoritmos3D
 
         #endregion 
         #region Mugre de constantes de configuración de la pantalla
-
-        public int TOP_VIEW_POSX
-        {
-            get { return (int)((float)W_WIDTH * 0.70f); }
-        }
-
-        public int TOP_VIEW_POSY
-        {
-            get { return (int)((float)W_HEIGHT * 0.70f); }
-        }
-
-        public int TOP_VIEW_W
-        {
-            get { return (int)((float)W_WIDTH * 0.30f); }
-        }
-
-        public int TOP_VIEW_H
-        {
-            get { return (int)((float)W_HEIGHT * 0.30f); }
-        }
-
-        public int HEIGHT_VIEW_POSX
-        {
-            get { return (int)((float)W_WIDTH * 0.00f); }
-        }
-
-        public int HEIGHT_VIEW_POSY
-        {
-            get { return (int)((float)W_HEIGHT * 0.70f); }
-        }
-
-        public int HEIGHT_VIEW_W
-        {
-            get { return (int)((float)W_WIDTH * 0.30f); }
-        }
-
-        public int HEIGHT_VIEW_H
-        {
-            get { return (int)((float)W_HEIGHT * 0.30f); }
-        }
 
         public int DL_AXIS
         {
@@ -136,7 +88,7 @@ namespace TPAlgoritmos3D
         #endregion
         #region Posición defecto de la cámara
 
-        private float[] eye = new float[3] { 13.0f, 0.0f, 20.0f };
+        private float[] eye = new float[3] { 17.0f, 0.0f, 25.0f };
         private float[] at = new float[3] { 0.0f, 0.0f, 0.0f };
         private float[] up = new float[3] { 0.0f, 0.0f, 1.0f };
 
@@ -270,9 +222,12 @@ namespace TPAlgoritmos3D
             // Se corresponde se dibuja la grilla
             if (view_grid) Gl.glCallList(DL_GRID);
 
-            
-            surfaceInitializer.DrawSurface();
+            Gl.glEnable(Gl.GL_NORMALIZE);
+            Gl.glEnable(Gl.GL_AUTO_NORMAL);
 
+            surfaceInitializer.DrawSurface();
+            terrainInitializer.DrawTerrain();
+            
             /*
             for (int i = 0; i < arboles.Length; ++i)
             {
@@ -281,11 +236,7 @@ namespace TPAlgoritmos3D
                 Gl.glTranslated(posicion.X, posicion.Y, posicion.Z);
                 arboles[i].Dibujar();
                 Gl.glPopMatrix();
-            }
-            */
-            //TerrainInitializer terrainInitializer = new TerrainInitializer();
-            terrainInitializer.DrawTerrain();
-            
+            } */
         }
 
         protected void RefreshEye() 
@@ -379,27 +330,6 @@ namespace TPAlgoritmos3D
                     view_axis = !view_axis;
                     glControl.Refresh();
                     break;
-                case 'h':
-                    glControl.Refresh();
-                    break;
-                case 'l':
-                    glControl.Refresh();
-                    break;
-                case 'r':
-                    glControl.Refresh();
-                    break;
-                case 's':
-                    glControl.Refresh();
-                    break;
-                case 'o':
-                    glControl.Refresh();
-                    break;
-                case 'm':
-                    glControl.Refresh();
-                    break;
-                case 'p':
-                    glControl.Refresh();
-                    break;
                 case 'w':
                     Gl.glPolygonMode(Gl.GL_FRONT_AND_BACK, Gl.GL_LINE);
                     glControl.Refresh();
@@ -428,65 +358,6 @@ namespace TPAlgoritmos3D
         {
             glControl.Refresh();
             glControl.Invalidate();
-        }
-
-        #endregion
-        #region Armado y Dibujo de Superficie
-
-        private void BuildSurface(float[] vertex_buffers, int nr_points)
-        {
-            float dx, dy, dz;
-            curve_points = nr_points;
-
-            if (surface_buffer != null)
-                surface_buffer = null;
-            surface_buffer = new float[nr_points * 6];
-            if (normals_buffer != null)
-                normals_buffer = null;
-            normals_buffer = new float[nr_points * 3];
-
-            for (int i = 0; i < nr_points; i++)
-            {
-                surface_buffer[i * 3 + 0] = 1.0f;
-                surface_buffer[i * 3 + 1] = vertex_buffers[i * 2 + 0];
-                surface_buffer[i * 3 + 2] = vertex_buffers[i * 2 + 1];
-
-                surface_buffer[nr_points * 3 + i * 3 + 0] = -1.0f;
-                surface_buffer[nr_points * 3 + i * 3 + 1] = vertex_buffers[i * 2 + 0];
-                surface_buffer[nr_points * 3 + i * 3 + 2] = vertex_buffers[i * 2 + 1];
-            }
-
-            for (int i = 0; i < (nr_points - 1); i++)
-            {
-                dx = 0.0f;
-                dy = vertex_buffers[(i + 1) * 2 + 0] - vertex_buffers[i * 2 + 0];
-                dz = vertex_buffers[(i + 1) * 2 + 1] - vertex_buffers[i * 2 + 1];
-                normals_buffer[i * 3 + 0] = dx;
-                normals_buffer[i * 3 + 1] = -dz;
-                normals_buffer[i * 3 + 2] = dy;
-            }
-
-            normals_buffer[(nr_points - 1) * 3 + 0] = normals_buffer[(nr_points - 2) * 3 + 0];
-            normals_buffer[(nr_points - 1) * 3 + 1] = normals_buffer[(nr_points - 2) * 3 + 1];
-            normals_buffer[(nr_points - 1) * 3 + 2] = normals_buffer[(nr_points - 2) * 3 + 2];
-        }
-
-        private void DrawSurface()
-        {
-            if (surface_buffer != null && normals_buffer != null)
-            {
-                Gl.glEnable(Gl.GL_LIGHT0);
-                Gl.glPushMatrix();
-                Gl.glBegin(Gl.GL_QUAD_STRIP);
-                for (int i = 0; i < curve_points; i++)
-                {
-                    Gl.glNormal3fv(ref normals_buffer[i * 3]);
-                    Gl.glVertex3fv(ref surface_buffer[i * 3]);
-                    Gl.glVertex3fv(ref surface_buffer[3 * curve_points + i * 3]);
-                }
-                Gl.glEnd();
-                Gl.glPopMatrix();
-            }
         }
 
         #endregion
@@ -540,29 +411,6 @@ namespace TPAlgoritmos3D
 
         #endregion
         #region Configuración de Escena (viewports)
-
-        private void SetSceneWindow()
-        {
-            Gl.glViewport(0, 0, W_WIDTH, W_WIDTH / 2);
-            Gl.glMatrixMode(Gl.GL_PROJECTION);
-            Gl.glLoadIdentity();
-            Glu.gluOrtho2D(-10, 10, -5.0, 5.0);
-            Gl.glMatrixMode(Gl.GL_MODELVIEW);
-            Gl.glLoadIdentity();
-            Glu.gluLookAt(0, 0, 0.5, 0, 0, 0, 0, 1, 0);
-        }
-
-        private void SetCamera()
-        {
-            Gl.glViewport(TOP_VIEW_POSX, TOP_VIEW_POSY, TOP_VIEW_W, TOP_VIEW_H);
-            Gl.glMatrixMode(Gl.GL_PROJECTION);
-            Gl.glLoadIdentity();
-            Glu.gluOrtho2D(-0.0, 1.0, -0.0, 1.0);
-            Gl.glMatrixMode(Gl.GL_MODELVIEW);
-            Gl.glLoadIdentity();
-            Glu.gluLookAt(0, 0, 0.5, 0, 0, 0, 0, 1, 0);
-            Gl.glCallList(DL_AXIS2D_TOP);
-        }
 
         private void Set3DEnv()
         {
