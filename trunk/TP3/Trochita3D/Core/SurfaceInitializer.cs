@@ -222,9 +222,7 @@ namespace Trochita3D.Core
                     indexCount++;
 
                     // Normales
-                    seccionAnterior = this.GetSeccionAnterior(secciones, i);
-                    seccionSiguiente = this.GetSeccionSiguiente(secciones, i);
-                    PuntoFlotante normal = this.GetNormalForVertex(seccion, seccionAnterior, seccionSiguiente, j);
+                    PuntoFlotante normal = this.GetNormalForVertex(seccion, j);
                     normales.Add(normal.X);
                     normales.Add(normal.Y);
                     normales.Add(normal.Z);
@@ -286,73 +284,43 @@ namespace Trochita3D.Core
 
         #region Métodos Auxiliares
 
-        private PuntoFlotante GetNormalForVertex(Seccion seccion, Seccion seccionAnterior, Seccion seccionSiguiente, int vertexPos)
+        private PuntoFlotante GetNormalForVertex(Seccion seccion, int vertexPos)
         {
-            PuntoFlotante n1 = null, n2 = null, n3 = null, n4 = null;
+            PuntoFlotante normalSeccion = (seccion.Vertices[1] - seccion.Vertices[0]) * (seccion.Vertices[2] - seccion.Vertices[1]);
 
-            // Planos inferiores
-            if (vertexPos > 0)
+            if (vertexPos == 0)
             {
-                n1 = GetNormalInferior(seccion, seccionAnterior, vertexPos);
-                n2 = GetNormalInferior(seccion, seccionSiguiente, vertexPos);
-                n1.ZPositivo();
-                n2.ZPositivo();
+                return (seccion.Vertices[vertexPos + 1] - seccion.Vertices[vertexPos]) * normalSeccion;
             }
-
-            if (vertexPos < seccion.Vertices.Count - 1)
+            else if (vertexPos == (seccion.Vertices.Count - 1))
             {
-                n3 = GetNormalSuperior(seccion, seccionAnterior, vertexPos);
-                n4 = GetNormalSuperior(seccion, seccionSiguiente, vertexPos);
-                n3.ZPositivo();
-                n4.ZPositivo();
+                return (seccion.Vertices[vertexPos] - seccion.Vertices[vertexPos - 1]) * normalSeccion;
             }
-
-            PuntoFlotante n13 = n1 + n3;
-            PuntoFlotante n24 = n2 + n4;
-            PuntoFlotante n = n13 + n24;
-            n.Normalizar();
-            return n;
-        }
-
-        private PuntoFlotante GetNormalInferior(Seccion seccion, Seccion seccion2, int vertexPos)
-        {
-            PuntoFlotante v1 = new PuntoFlotante(seccion2.Vertices[vertexPos].X - seccion.Vertices[vertexPos].X,
-                                                 seccion2.Vertices[vertexPos].Y - seccion.Vertices[vertexPos].Y,
-                                                 seccion2.Vertices[vertexPos].Z - seccion.Vertices[vertexPos].Z);
-            PuntoFlotante v2 = new PuntoFlotante(seccion.Vertices[vertexPos - 1].X - seccion.Vertices[vertexPos].X,
-                                                 seccion.Vertices[vertexPos - 1].Y - seccion.Vertices[vertexPos].Y,
-                                                 seccion.Vertices[vertexPos - 1].Z - seccion.Vertices[vertexPos].Z);
-            return v1 * v2;
-        }
-
-        private PuntoFlotante GetNormalSuperior(Seccion seccion, Seccion seccion2, int vertexPos)
-        {
-            PuntoFlotante v1 = new PuntoFlotante(seccion2.Vertices[vertexPos].X - seccion.Vertices[vertexPos].X,
-                                                 seccion2.Vertices[vertexPos].Y - seccion.Vertices[vertexPos].Y,
-                                                 seccion2.Vertices[vertexPos].Z - seccion.Vertices[vertexPos].Z);
-            PuntoFlotante v2 = new PuntoFlotante(seccion.Vertices[vertexPos + 1].X - seccion.Vertices[vertexPos].X,
-                                                 seccion.Vertices[vertexPos + 1].Y - seccion.Vertices[vertexPos].Y,
-                                                 seccion.Vertices[vertexPos + 1].Z - seccion.Vertices[vertexPos].Z);
-            return v1 * v2;
-        }
-
-        private Seccion GetSeccionAnterior(IList<Seccion> secciones, int posSeccionActual)
-        {
-            if (posSeccionActual == 0)
-                return secciones[secciones.Count - 1];
             else
-                return secciones[posSeccionActual - 1];
-        }
-
-        private Seccion GetSeccionSiguiente(IList<Seccion> secciones, int posSeccionActual)
-        {
-            if (posSeccionActual == (secciones.Count - 1))
-                return secciones[0];
-            else
-                return secciones[posSeccionActual + 1];
+            {
+                return (seccion.Vertices[vertexPos + 1] - seccion.Vertices[vertexPos - 1]) * normalSeccion;
+            }
         }
 
         #endregion
+
+        private void DibujarNormales(double[] vertices, double[] normales)
+        {
+            Gl.glDisable(Gl.GL_LIGHTING);
+            for (int i = 0; i < vertices.Length; i += 3)
+            {
+                Gl.glPushMatrix();
+                Gl.glTranslated(vertices[i], vertices[i + 1], vertices[i + 2]);
+                Gl.glBegin(Gl.GL_LINES);
+                Gl.glColor3d(1, 0, 0);
+                Gl.glVertex3d(0, 0, 0);
+                Gl.glColor3d(0.2, 0, 0);
+                Gl.glVertex3d(normales[i], normales[i + 1], normales[i + 2]);
+                Gl.glEnd();
+                Gl.glPopMatrix();
+            }
+            Gl.glEnable(Gl.GL_LIGHTING);
+        }
 
     }
 }
