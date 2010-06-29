@@ -13,9 +13,9 @@ namespace Trochita3D.Core
     /// </summary>
     public class TerrainInitializer
     {
-        private static int ALTURA_MAXIMA = 1;
-        private static double X_MAX = 25;
-        private static double Y_MAX = 25;
+        private static int ALTURA_MAXIMA = 2;
+        private static double X_MAX = 30;
+        private static double Y_MAX = 30;
         private static int CANTIDAD_PIXELES_ANCHO_IMAGEN = 512;
         private static int CANTIDAD_PIXELES_ALTO_IMAGEN = 384;
 
@@ -26,10 +26,6 @@ namespace Trochita3D.Core
         public TerrainInitializer()
         {
             this.BuildTerrain();
-
-            // TODO: sacar esto de acá es una trampa mortal¿?¿?
-            //Gl.glEnable(Gl.GL_NORMALIZE);
-            //Gl.glEnable(Gl.GL_AUTO_NORMAL);
         }
 
         private void BuildTerrain()
@@ -52,7 +48,7 @@ namespace Trochita3D.Core
             PuntoFlotante[][] matriz = new PuntoFlotante[CANTIDAD_PIXELES_ALTO_IMAGEN][];
             int k = 0;
 
-            for (int y = CANTIDAD_PIXELES_ALTO_IMAGEN - 1; y >= 0; y--)
+            for (int y = 0; y < CANTIDAD_PIXELES_ALTO_IMAGEN; y++)
             {
                 matriz[y] = new PuntoFlotante[CANTIDAD_PIXELES_ANCHO_IMAGEN];
                 for (int x = 0; x < CANTIDAD_PIXELES_ANCHO_IMAGEN; x++)
@@ -65,24 +61,42 @@ namespace Trochita3D.Core
                     vertex.Add(coordenadaY);
                     vertex.Add(coordenadaZ);
 
+                    // Se ponen los puntos en una matriz para el cálculo de las normales
                     matriz[y][x] = new PuntoFlotante(coordenadaX, coordenadaY, coordenadaZ);
                 }
             }
 
             // se calculan las normales en toda la matriz
-            IList<double> normales = new List<double>();
+            IList<double> normals = new List<double>();
+            PuntoFlotante normal;
             for (int i = 0; i < CANTIDAD_PIXELES_ALTO_IMAGEN - 1; i++)
             {
                 for (int j = 0; j < CANTIDAD_PIXELES_ANCHO_IMAGEN - 1; j++)
                 {
-                    PuntoFlotante normal = (matriz[i + 1][j] - matriz[i][j]) * (matriz[i][j + 1] - matriz[i][j]);
-                    normales.Add(normal.X);
-                    normales.Add(normal.Y);
-                    normales.Add(normal.Z);
+                    normal = (matriz[i + 1][j] - matriz[i][j]) * (matriz[i][j + 1] - matriz[i][j]);
+                    normals.Add(normal.X);
+                    normals.Add(normal.Y);
+                    normals.Add(normal.Z);
                 }
+
+                // última columna
+                normal = (matriz[i + 1][CANTIDAD_PIXELES_ANCHO_IMAGEN - 1] - matriz[i][CANTIDAD_PIXELES_ANCHO_IMAGEN - 1]) * (matriz[i][CANTIDAD_PIXELES_ANCHO_IMAGEN - 2] - matriz[i][CANTIDAD_PIXELES_ANCHO_IMAGEN - 1]);
+                normals.Add(normal.X);
+                normals.Add(normal.Y);
+                normals.Add(normal.Z);
+            }
+
+            // Las de la última fila se calculan con la fila anterior
+            for (int j = 0; j < CANTIDAD_PIXELES_ANCHO_IMAGEN - 1; j++)
+            {
+                normal = (matriz[CANTIDAD_PIXELES_ALTO_IMAGEN - 2][j] - matriz[CANTIDAD_PIXELES_ALTO_IMAGEN - 1][j]) * (matriz[CANTIDAD_PIXELES_ALTO_IMAGEN - 1][j + 1] - matriz[CANTIDAD_PIXELES_ALTO_IMAGEN - 1][j]);
+                normals.Add(normal.X);
+                normals.Add(normal.Y);
+                normals.Add(normal.Z);
             }
 
             vertices = vertex.ToArray<double>();
+            normales = normals.ToArray<double>();
         }
 
         private void GenerarIndices(int cantidadTotalPixeles, int cantidadPixelesAlto, int cantidadPixelesAncho)
@@ -105,22 +119,23 @@ namespace Trochita3D.Core
 
         public void DrawTerrain()
         {
-            Gl.glVertexPointer(3, Gl.GL_DOUBLE, 3 * sizeof(double), vertices.ToArray<double>());
-            //Gl.glNormalPointer(Gl.GL_DOUBLE, 3 * sizeof(double), normales.ToArray<double>());
-            Gl.glEnableClientState(Gl.GL_VERTEX_ARRAY);
-            Gl.glDisableClientState(Gl.GL_NORMAL_ARRAY);
-            
-
             Gl.glMatrixMode(Gl.GL_MODELVIEW);
             Gl.glPushMatrix();
+
+            Gl.glEnable(Gl.GL_LIGHTING);
             Gl.glTranslated(-(double)X_MAX / (double)2, -(double)Y_MAX / (double)2, 0.0f);
             
-            Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_AMBIENT, new float[] { 0.3f, 0.3f, 0.3f, 1 });
+            Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_AMBIENT, new float[] { 0.5f, 0.5f, 0.5f, 1 });
             Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_DIFFUSE, new float[] { 0.0f, 1.0f, 0, 1 });
-            Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_SPECULAR, new float[] { 0, 0, 0, 1 });
+            Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_SPECULAR, new float[] { 0, 1.0f, 0, 1 });
+
+            Gl.glVertexPointer(3, Gl.GL_DOUBLE, 3 * sizeof(double), vertices);
+            Gl.glNormalPointer(Gl.GL_DOUBLE, 3 * sizeof(double), normales);
+
             Gl.glDrawElements(Gl.GL_QUADS, indices.Length, Gl.GL_UNSIGNED_INT, indices);
+            Gl.glDisable(Gl.GL_LIGHTING);
+
             Gl.glPopMatrix();
-            Gl.glEnableClientState(Gl.GL_NORMAL_ARRAY);
         }
     }
 }
