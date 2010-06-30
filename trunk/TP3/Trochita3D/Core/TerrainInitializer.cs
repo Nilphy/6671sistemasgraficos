@@ -69,30 +69,29 @@ namespace Trochita3D.Core
             // se calculan las normales en toda la matriz
             IList<double> normals = new List<double>();
             PuntoFlotante normal;
-            for (int i = 0; i < CANTIDAD_PIXELES_ALTO_IMAGEN - 1; i++)
+            PuntoFlotante puntoNorte = null;
+            PuntoFlotante puntoSur = null;
+            PuntoFlotante puntoEste = null;
+            PuntoFlotante puntoOeste = null;
+
+            for (int i = 0; i < CANTIDAD_PIXELES_ALTO_IMAGEN; i++)
             {
-                for (int j = 0; j < CANTIDAD_PIXELES_ANCHO_IMAGEN - 1; j++)
+                for (int j = 0; j < CANTIDAD_PIXELES_ANCHO_IMAGEN; j++)
                 {
-                    normal = (matriz[i + 1][j] - matriz[i][j]) * (matriz[i][j + 1] - matriz[i][j]);
+                    puntoNorte = null;
+                    puntoSur = null;
+                    puntoEste = null;
+                    puntoOeste = null;
+                    if (i + 1 < CANTIDAD_PIXELES_ALTO_IMAGEN - 1) puntoNorte = matriz[i + 1][j];
+                    if (i - 1 > 0) puntoSur = matriz[i - 1][j];
+                    if (j + 1 < CANTIDAD_PIXELES_ANCHO_IMAGEN - 1) puntoEste = matriz[i][j + 1];
+                    if (j - 1 > 0) puntoOeste = matriz[i][j - 1];
+
+                    normal = this.CalcularNormal(matriz[i][j], puntoNorte, puntoEste, puntoSur, puntoOeste);
                     normals.Add(normal.X);
                     normals.Add(normal.Y);
                     normals.Add(normal.Z);
                 }
-
-                // última columna
-                normal = (matriz[i + 1][CANTIDAD_PIXELES_ANCHO_IMAGEN - 1] - matriz[i][CANTIDAD_PIXELES_ANCHO_IMAGEN - 1]) * (matriz[i][CANTIDAD_PIXELES_ANCHO_IMAGEN - 2] - matriz[i][CANTIDAD_PIXELES_ANCHO_IMAGEN - 1]);
-                normals.Add(normal.X);
-                normals.Add(normal.Y);
-                normals.Add(normal.Z);
-            }
-
-            // Las de la última fila se calculan con la fila anterior
-            for (int j = 0; j < CANTIDAD_PIXELES_ANCHO_IMAGEN - 1; j++)
-            {
-                normal = (matriz[CANTIDAD_PIXELES_ALTO_IMAGEN - 2][j] - matriz[CANTIDAD_PIXELES_ALTO_IMAGEN - 1][j]) * (matriz[CANTIDAD_PIXELES_ALTO_IMAGEN - 1][j + 1] - matriz[CANTIDAD_PIXELES_ALTO_IMAGEN - 1][j]);
-                normals.Add(normal.X);
-                normals.Add(normal.Y);
-                normals.Add(normal.Z);
             }
 
             vertices = vertex.ToArray<double>();
@@ -108,9 +107,9 @@ namespace Trochita3D.Core
                 for (int k = 0; k < cantidadPixelesAncho - 1; k++)
                 {
                     index.Add(k + i);
-                    index.Add(k + i + 1);
+                    index.Add(k + i + cantidadPixelesAncho);
                     index.Add(k + i + cantidadPixelesAncho + 1);
-                    index.Add(k + i + cantidadPixelesAncho);                    
+                    index.Add(k + i + 1);
                 }
             }
 
@@ -126,8 +125,8 @@ namespace Trochita3D.Core
             Gl.glTranslated(-(double)X_MAX / (double)2, -(double)Y_MAX / (double)2, 0.0f);
             
             Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_AMBIENT, new float[] { 0.5f, 0.5f, 0.5f, 1 });
-            Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_DIFFUSE, new float[] { 0.0f, 1.0f, 0, 1 });
-            Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_SPECULAR, new float[] { 0, 1.0f, 0, 1 });
+            Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_DIFFUSE, new float[] { 0.1f, 0.3f, 0.15f, 1 });
+            Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_SPECULAR, new float[] { 0.1f, 0.3f, 0.15f, 1 });
 
             Gl.glVertexPointer(3, Gl.GL_DOUBLE, 3 * sizeof(double), vertices);
             Gl.glNormalPointer(Gl.GL_DOUBLE, 3 * sizeof(double), normales);
@@ -136,6 +135,48 @@ namespace Trochita3D.Core
             Gl.glDisable(Gl.GL_LIGHTING);
 
             Gl.glPopMatrix();
+        }
+
+        // Promedia...
+        private PuntoFlotante CalcularNormal(PuntoFlotante verticeCentro, PuntoFlotante verticeNorte, PuntoFlotante verticeEste, PuntoFlotante verticeSur, PuntoFlotante verticeOeste)
+        {
+            if (verticeCentro == null) throw new InvalidOperationException("Este método no puede ser invocado con el vertice central nulo");
+
+            // Numeradas en sentido horario son 4
+            PuntoFlotante normalNorEste = null;
+            PuntoFlotante normalSurEste = null;
+            PuntoFlotante normalSurOeste = null;
+            PuntoFlotante normalNorOeste = null;
+            PuntoFlotante normalRetorno = null;
+
+            if (verticeNorte != null && verticeEste != null)
+                normalNorEste = (verticeEste - verticeCentro) * (verticeNorte - verticeCentro);
+            
+            
+            if (verticeSur != null && verticeEste != null)
+                normalSurEste = (verticeSur - verticeCentro) * (verticeEste - verticeCentro);
+
+            if (verticeSur != null && verticeOeste != null)
+                normalSurOeste = (verticeOeste - verticeCentro) * (verticeSur - verticeCentro);
+
+            if (verticeNorte != null && verticeOeste != null)
+                normalNorOeste = (verticeNorte - verticeCentro) * (verticeOeste - verticeCentro);
+
+            normalRetorno = new PuntoFlotante(0, 0, 0);
+
+            if (normalNorEste != null)
+                normalRetorno = normalRetorno.SumarPunto(normalNorEste);
+
+            if (normalNorOeste != null)
+                normalRetorno = normalRetorno.SumarPunto(normalNorOeste);
+
+            if (normalSurEste != null)
+                normalRetorno = normalRetorno.SumarPunto(normalSurEste);
+
+            if (normalSurOeste != null)
+                normalRetorno = normalRetorno.SumarPunto(normalSurOeste);
+
+            return normalRetorno;
         }
     }
 }
