@@ -14,7 +14,7 @@ namespace Trochita3D.Entidades
     {
         private double longitudTronco;
         private double radioBaseTronco;
-        private PuntoFlotante[][] matrizPuntosCopa;
+        private Punto[][] matrizPuntosCopa;
 
         private static int CANTIDAD_CARAS = 15;
         private static double FACTOR_TRONCO = 6.0f;
@@ -25,19 +25,19 @@ namespace Trochita3D.Entidades
         private Glu.GLUquadric quadraticCylinder = Glu.gluNewQuadric();
 
         private static double LONGITUD_TRONCO_DEFAULT = 2.0f;
-        private static PuntoFlotante[] FORMA_COPA_DEFAULT = new PuntoFlotante[] 
+        private static Punto[] FORMA_COPA_DEFAULT = new Punto[] 
             {
-                new PuntoFlotante ( 0,   0, 0 ),
-                new PuntoFlotante ( .4,   .5, 0 ),
-                new PuntoFlotante ( .8, 1, 0 ),
-                new PuntoFlotante ( 1.0,   1.5, 0 ), 
-                new PuntoFlotante ( .8, 2, 0 ), 
-                new PuntoFlotante ( 1.1,   2.5, 0 ), 
-                new PuntoFlotante ( 1.0,   3, 0 ), 
-                new PuntoFlotante ( .9,   3.5, 0 ), 
-                new PuntoFlotante ( .8,   4.0, 0 ), 
-                new PuntoFlotante ( .5,   4.5, 0 ), 
-                new PuntoFlotante ( 0,   5, 0 )
+                new Punto ( 0,   0, 0 ),
+                new Punto ( .4,   .5, 0 ),
+                new Punto ( .8, 1, 0 ),
+                new Punto ( 1.0,   1.5, 0 ), 
+                new Punto ( .8, 2, 0 ), 
+                new Punto ( 1.1,   2.5, 0 ), 
+                new Punto ( 1.0,   3, 0 ), 
+                new Punto ( .9,   3.5, 0 ), 
+                new Punto ( .8,   4.0, 0 ), 
+                new Punto ( .5,   4.5, 0 ), 
+                new Punto ( 0,   5, 0 )
             };
 
         public static Arbol[] GenerarArbolesAleatorios(int cantidad)
@@ -45,12 +45,12 @@ namespace Trochita3D.Entidades
             Arbol[] arboles = new Arbol[cantidad];
             for (int i = 0; i < cantidad; ++i)
             {
-                PuntoFlotante[] formaCopa = new PuntoFlotante[FORMA_COPA_DEFAULT.Length];
+                Punto[] formaCopa = new Punto[FORMA_COPA_DEFAULT.Length];
                 for (int j = 0; j < formaCopa.Length; ++j)
                 {
                     if (j == 0 || j == formaCopa.Length - 1) // siempre terminan y empiezan en el mismo lugar
                     {
-                        formaCopa[j] = new PuntoFlotante(
+                        formaCopa[j] = new Punto(
                             Arbol.FORMA_COPA_DEFAULT[j].X,
                             Arbol.FORMA_COPA_DEFAULT[j].Y,
                             Arbol.FORMA_COPA_DEFAULT[j].Z
@@ -62,7 +62,7 @@ namespace Trochita3D.Entidades
                         double nuevoY = Arbol.FORMA_COPA_DEFAULT[j].Y + Arbol.RandomEntre(-.5f, +1.0f);
                         double nuevoZ = Arbol.FORMA_COPA_DEFAULT[j].Z;
 
-                        formaCopa[j] = new PuntoFlotante(
+                        formaCopa[j] = new Punto(
                                 nuevoX > MINIMO_RADIO ? nuevoX : MINIMO_RADIO,
                                 nuevoY > MINIMO_RADIO ? nuevoY : MINIMO_RADIO,
                                 nuevoZ > MINIMO_RADIO ? nuevoZ : MINIMO_RADIO
@@ -85,7 +85,7 @@ namespace Trochita3D.Entidades
             this.matrizPuntosCopa = this.generarMatrizVertices(FORMA_COPA_DEFAULT, 360.0f, CANTIDAD_CARAS);
         }
 
-        public Arbol(double longitudTronco, PuntoFlotante[] formaCopa)
+        public Arbol(double longitudTronco, Punto[] formaCopa)
         {
             this.longitudTronco = longitudTronco;
             this.radioBaseTronco = this.longitudTronco / FACTOR_TRONCO;
@@ -154,24 +154,24 @@ namespace Trochita3D.Entidades
             Gl.glPopMatrix();
         }
 
-        private PuntoFlotante[][] generarMatrizVertices(PuntoFlotante[] curva, double gradosRevolucion, int cantidadCaras)
+        private Punto[][] generarMatrizVertices(Punto[] curva, double gradosRevolucion, int cantidadCaras)
         {
             double anguloRotacionRadianes = GradosARadianes(gradosRevolucion / cantidadCaras);
             CurvaBzierSegmentosCubicos curvaBS = new CurvaBzierSegmentosCubicos(curva);
-            PuntoFlotante[] curvaDiscretizada = curvaBS.GetPuntosDiscretos(PASO_BEZIER).ToArray<PuntoFlotante>();
+            Punto[] curvaDiscretizada = curvaBS.GetPuntosDiscretos(PASO_BEZIER).ToArray<Punto>();
 
-            PuntoFlotante[][] matriz = new PuntoFlotante[cantidadCaras + 2][];
+            Punto[][] matriz = new Punto[cantidadCaras + 2][];
 
             for (int iteradorRotacion = 0; iteradorRotacion < cantidadCaras; ++iteradorRotacion)
             {
-                matriz[iteradorRotacion] = new PuntoFlotante[curvaDiscretizada.Length];
+                matriz[iteradorRotacion] = new Punto[curvaDiscretizada.Length];
                 for (int iteradorBezier = 0; iteradorBezier < curvaDiscretizada.Length; ++iteradorBezier)
                 {
-                    PuntoFlotante puntoCurva = curvaDiscretizada[iteradorBezier];
-                    matriz[iteradorRotacion][iteradorBezier] = new PuntoFlotante(puntoCurva);
+                    Punto puntoCurva = curvaDiscretizada[iteradorBezier];
+                    matriz[iteradorRotacion][iteradorBezier] = puntoCurva.Clone();
 
                     // roto, al mismo tiempo, los puntos de la curva alrededor del eje Y
-                    PuntoFlotante puntoCurvaBack = new PuntoFlotante(puntoCurva);
+                    Punto puntoCurvaBack = puntoCurva.Clone();
                     puntoCurva.X = puntoCurvaBack.X * Math.Cos(anguloRotacionRadianes) + puntoCurvaBack.Z * Math.Sin(anguloRotacionRadianes);
                     puntoCurva.Z = puntoCurvaBack.Z * Math.Cos(anguloRotacionRadianes) - puntoCurvaBack.X * Math.Sin(anguloRotacionRadianes);
 
@@ -187,7 +187,7 @@ namespace Trochita3D.Entidades
             {
                 for (int j = 0; j < curvaDiscretizada.Length - 1; ++j)
                 {
-                    PuntoFlotante normal = (matriz[i + 1][j] - matriz[i][j]) * (matriz[i][j + 1] - matriz[i][j]);
+                    Punto normal = (matriz[i + 1][j] - matriz[i][j]) * (matriz[i][j + 1] - matriz[i][j]);
                     normal = normal - matriz[i][j];
                     normal = normal * (-1.0d);
                     normal = normal + matriz[i][j];

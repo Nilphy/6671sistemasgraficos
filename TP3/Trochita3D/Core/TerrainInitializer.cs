@@ -45,12 +45,12 @@ namespace Trochita3D.Core
         private void GenerarVerticesYNormales(IList<double> zetas)
         {
             IList<double> vertex = new List<double>();
-            PuntoFlotante[][] matriz = new PuntoFlotante[CANTIDAD_PIXELES_ALTO_IMAGEN][];
+            Punto[][] matriz = new Punto[CANTIDAD_PIXELES_ALTO_IMAGEN][];
             int k = 0;
 
             for (int y = 0; y < CANTIDAD_PIXELES_ALTO_IMAGEN; y++)
             {
-                matriz[y] = new PuntoFlotante[CANTIDAD_PIXELES_ANCHO_IMAGEN];
+                matriz[y] = new Punto[CANTIDAD_PIXELES_ANCHO_IMAGEN];
                 for (int x = 0; x < CANTIDAD_PIXELES_ANCHO_IMAGEN; x++)
                 {
                     double coordenadaX = (double)x * (double)X_MAX / (double)CANTIDAD_PIXELES_ANCHO_IMAGEN;
@@ -62,17 +62,17 @@ namespace Trochita3D.Core
                     vertex.Add(coordenadaZ);
 
                     // Se ponen los puntos en una matriz para el cálculo de las normales
-                    matriz[y][x] = new PuntoFlotante(coordenadaX, coordenadaY, coordenadaZ);
+                    matriz[y][x] = new Punto(coordenadaX, coordenadaY, coordenadaZ);
                 }
             }
 
             // se calculan las normales en toda la matriz
             IList<double> normals = new List<double>();
-            PuntoFlotante normal;
-            PuntoFlotante puntoNorte = null;
-            PuntoFlotante puntoSur = null;
-            PuntoFlotante puntoEste = null;
-            PuntoFlotante puntoOeste = null;
+            Punto normal;
+            Punto puntoNorte = null;
+            Punto puntoSur = null;
+            Punto puntoEste = null;
+            Punto puntoOeste = null;
 
             for (int i = 0; i < CANTIDAD_PIXELES_ALTO_IMAGEN; i++)
             {
@@ -137,17 +137,25 @@ namespace Trochita3D.Core
             Gl.glPopMatrix();
         }
 
-        // Promedia...
-        private PuntoFlotante CalcularNormal(PuntoFlotante verticeCentro, PuntoFlotante verticeNorte, PuntoFlotante verticeEste, PuntoFlotante verticeSur, PuntoFlotante verticeOeste)
+        /// <summary>
+        /// Promedia las normales calculadas con todos los puntos de alrededor
+        /// </summary>
+        /// <param name="verticeCentro"></param>
+        /// <param name="verticeNorte"></param>
+        /// <param name="verticeEste"></param>
+        /// <param name="verticeSur"></param>
+        /// <param name="verticeOeste"></param>
+        /// <returns></returns>
+        private Punto CalcularNormal(Punto verticeCentro, Punto verticeNorte, Punto verticeEste, Punto verticeSur, Punto verticeOeste)
         {
             if (verticeCentro == null) throw new InvalidOperationException("Este método no puede ser invocado con el vertice central nulo");
 
             // Numeradas en sentido horario son 4
-            PuntoFlotante normalNorEste = null;
-            PuntoFlotante normalSurEste = null;
-            PuntoFlotante normalSurOeste = null;
-            PuntoFlotante normalNorOeste = null;
-            PuntoFlotante normalRetorno = null;
+            Punto normalNorEste = null;
+            Punto normalSurEste = null;
+            Punto normalSurOeste = null;
+            Punto normalNorOeste = null;
+            Punto normalRetorno = null;
 
             if (verticeNorte != null && verticeEste != null)
                 normalNorEste = (verticeEste - verticeCentro) * (verticeNorte - verticeCentro);
@@ -162,7 +170,7 @@ namespace Trochita3D.Core
             if (verticeNorte != null && verticeOeste != null)
                 normalNorOeste = (verticeNorte - verticeCentro) * (verticeOeste - verticeCentro);
 
-            normalRetorno = new PuntoFlotante(0, 0, 0);
+            normalRetorno = new Punto(0, 0, 0);
 
             if (normalNorEste != null)
                 normalRetorno = normalRetorno.SumarPunto(normalNorEste);
