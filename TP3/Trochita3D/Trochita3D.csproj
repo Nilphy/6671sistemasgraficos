@@ -61,6 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\BMPUtils.cs" />
+    <Compile Include="Core\WaterInitializer.cs" />
     <Compile Include="Core\TerrainInitializer.cs" />
     <Compile Include="Core\Seccion.cs" />
     <Compile Include="Core\SurfaceInitializer.cs" />
