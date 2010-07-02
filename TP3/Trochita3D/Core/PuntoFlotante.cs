@@ -69,6 +69,14 @@ namespace Trochita3D.Core
             this.X = x;
             this.Y = y;
             this.Z = z;
+
+            Punto origen = new Punto();
+
+            origen.X = 0;
+            origen.Y = 0;
+            origen.Z = 0;
+
+            this.OrigenCoordenadas = origen;
         }
 
         public int GetCuadrante()
