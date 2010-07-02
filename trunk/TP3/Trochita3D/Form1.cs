@@ -34,6 +34,7 @@ namespace TPAlgoritmos3D
 
         private SurfaceInitializer surfaceInitializer = new SurfaceInitializer();
         private TerrainInitializer terrainInitializer = new TerrainInitializer();
+        private WaterInitializer waterInitializer = new WaterInitializer();
 
         #region Variables asociadas a única fuente de luz de la escena 
 
@@ -224,6 +225,7 @@ namespace TPAlgoritmos3D
 
             surfaceInitializer.DrawSurface();
             terrainInitializer.DrawTerrain();
+            waterInitializer.DrawPlaneOfWater();
             
             /*
             for (int i = 0; i < arboles.Length; ++i)
