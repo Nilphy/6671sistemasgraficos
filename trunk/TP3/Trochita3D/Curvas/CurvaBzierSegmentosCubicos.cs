@@ -13,9 +13,9 @@ namespace Trochita3D.Curvas
         public static int CANTIDAD_PUNTOS_SEGMENTO = 4;
 
         // Tienen que venir ordenados!!
-        private IList<PuntoFlotante> puntosControl;
+        private IList<Punto> puntosControl;
 
-        public IList<PuntoFlotante> PuntosControl
+        public IList<Punto> PuntosControl
         {
             set
             {
@@ -36,9 +36,9 @@ namespace Trochita3D.Curvas
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        private IList<PuntoFlotante> CompletarPuntos(IList<PuntoFlotante> puntos)
+        private IList<Punto> CompletarPuntos(IList<Punto> puntos)
         {
-            IList<PuntoFlotante> retorno = new List<PuntoFlotante>();
+            IList<Punto> retorno = new List<Punto>();
             
             int numeroSegmento = 1;
             int cantidadSegmentos = puntos.Count / 4;
@@ -77,19 +77,19 @@ namespace Trochita3D.Curvas
             return retorno;
         }
 
-        public CurvaBzierSegmentosCubicos(IList<PuntoFlotante> puntosControl)
+        public CurvaBzierSegmentosCubicos(IList<Punto> puntosControl)
         {
             this.PuntosControl = puntosControl;
         }
 
-        public IList<PuntoFlotante> GetPuntosDiscretos(double deltaU)
+        public IList<Punto> GetPuntosDiscretos(double deltaU)
         {
-            IList<PuntoFlotante> puntosDiscretizados = new List<PuntoFlotante>();
+            IList<Punto> puntosDiscretizados = new List<Punto>();
             
             int numeroSegmento = 1;
             while (numeroSegmento <= this.GetCantidadSegmentos())
             {
-                IList<PuntoFlotante> puntosParteCurva = new List<PuntoFlotante>();
+                IList<Punto> puntosParteCurva = new List<Punto>();
                
                 for (int i = 0; i < CANTIDAD_PUNTOS_SEGMENTO; i++)
                 {
@@ -115,14 +115,14 @@ namespace Trochita3D.Curvas
         /// B(t) = p0*((1-t)^3) + 3*P1*t*((1-t)^2) + 3*p2*(t^2)*(1-t) + p3*t^3
         /// http://es.wikipedia.org/wiki/Curva_de_B%C3%A9zier
         /// </summary>       
-        private PuntoFlotante GetValorEnSegmento(IList<PuntoFlotante> puntosParteCurva, double u)
+        private Punto GetValorEnSegmento(IList<Punto> puntosParteCurva, double u)
         {
             if (puntosParteCurva.Count != CANTIDAD_PUNTOS_SEGMENTO) throw new InvalidOperationException("es una Bziel de " + CANTIDAD_PUNTOS_SEGMENTO + " puntos de control");
 
-            PuntoFlotante primerSumando = puntosParteCurva[0].MultiplicarEscalar(Math.Pow(1-u, 3));
-            PuntoFlotante segundoSumando = puntosParteCurva[1].MultiplicarEscalar(3).MultiplicarEscalar(u).MultiplicarEscalar(Math.Pow(1 - u, 2));
-            PuntoFlotante tercerSumando = puntosParteCurva[2].MultiplicarEscalar(3).MultiplicarEscalar(Math.Pow(u, 2)).MultiplicarEscalar(1 - u);
-            PuntoFlotante cuartoSumando = puntosParteCurva[3].MultiplicarEscalar(Math.Pow(u, 3));
+            Punto primerSumando = puntosParteCurva[0].MultiplicarEscalar(Math.Pow(1-u, 3));
+            Punto segundoSumando = puntosParteCurva[1].MultiplicarEscalar(3).MultiplicarEscalar(u).MultiplicarEscalar(Math.Pow(1 - u, 2));
+            Punto tercerSumando = puntosParteCurva[2].MultiplicarEscalar(3).MultiplicarEscalar(Math.Pow(u, 2)).MultiplicarEscalar(1 - u);
+            Punto cuartoSumando = puntosParteCurva[3].MultiplicarEscalar(Math.Pow(u, 3));
 
             return primerSumando.SumarPunto(segundoSumando.SumarPunto(tercerSumando.SumarPunto(cuartoSumando)));
         }

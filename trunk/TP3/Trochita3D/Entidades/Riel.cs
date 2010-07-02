@@ -14,23 +14,23 @@ namespace Trochita3D.Entidades
     public class Riel
     {
 
-        private IList<PuntoFlotante> puntosControl = new List<PuntoFlotante>();
+        private IList<Punto> puntosControl = new List<Punto>();
 
         public Riel()
         {
-            puntosControl.Add(new PuntoFlotante(0, -0.5, 0));
-            puntosControl.Add(new PuntoFlotante(0, 0.5, 0));
-            puntosControl.Add(new PuntoFlotante(0, 0.5, 0.3));
-            puntosControl.Add(new PuntoFlotante(0, 0.3, 0.3));
-            puntosControl.Add(new PuntoFlotante(0, 0.3, 0.65));
-            puntosControl.Add(new PuntoFlotante(0, 0.5, 0.65));
-            puntosControl.Add(new PuntoFlotante(0, 0.5, 1));
-            puntosControl.Add(new PuntoFlotante(0, -0.5, 1));
-            puntosControl.Add(new PuntoFlotante(0, -0.5, 0.65));
-            puntosControl.Add(new PuntoFlotante(0, -0.3, 0.65));
-            puntosControl.Add(new PuntoFlotante(0, -0.3, 0.3));
-            puntosControl.Add(new PuntoFlotante(0, -0.5, 0.3));
-            puntosControl.Add(new PuntoFlotante(0, -0.5, 0));
+            puntosControl.Add(new Punto(0, -0.5, 0));
+            puntosControl.Add(new Punto(0, 0.5, 0));
+            puntosControl.Add(new Punto(0, 0.5, 0.3));
+            puntosControl.Add(new Punto(0, 0.3, 0.3));
+            puntosControl.Add(new Punto(0, 0.3, 0.65));
+            puntosControl.Add(new Punto(0, 0.5, 0.65));
+            puntosControl.Add(new Punto(0, 0.5, 1));
+            puntosControl.Add(new Punto(0, -0.5, 1));
+            puntosControl.Add(new Punto(0, -0.5, 0.65));
+            puntosControl.Add(new Punto(0, -0.3, 0.65));
+            puntosControl.Add(new Punto(0, -0.3, 0.3));
+            puntosControl.Add(new Punto(0, -0.5, 0.3));
+            puntosControl.Add(new Punto(0, -0.5, 0));
         }
 
         /// <summary>
@@ -52,7 +52,7 @@ namespace Trochita3D.Entidades
 
             Gl.glColor3d(0.5, 0.5, 0.5);
 
-            foreach (PuntoFlotante punto in puntosControl)
+            foreach (Punto punto in puntosControl)
             {
                 Gl.glVertex3d(0, punto.Y, punto.Z);
             }

@@ -19,7 +19,7 @@ namespace Trochita3D.Core
         private IList<Seccion> seccionesTerraplen = new List<Seccion>();
         private IList<Seccion> seccionesRieles1 = new List<Seccion>();
         private IList<Seccion> seccionesRieles2 = new List<Seccion>();
-        private IList<PuntoFlotante> path;
+        private IList<Punto> path;
 
         private static int[] indicesTerraplen;
         private static int[] indicesRieles1;
@@ -50,14 +50,14 @@ namespace Trochita3D.Core
         /// <returns>
         /// Lista de vertices que corresponden a la curva que representa el trayecto.
         /// </returns>
-        private IList<PuntoFlotante> GetBsplineControlPoints(double du)
+        private IList<Punto> GetBsplineControlPoints(double du)
         {
-            IList<PuntoFlotante> ptsControl = new List<PuntoFlotante>();
+            IList<Punto> ptsControl = new List<Punto>();
 
-            ptsControl.Add(new PuntoFlotante(10, 10, 0));
-            ptsControl.Add(new PuntoFlotante(10, -10, 0));
-            ptsControl.Add(new PuntoFlotante(-10, -10, 0));
-            ptsControl.Add(new PuntoFlotante(-10, 10, 0));
+            ptsControl.Add(new Punto(10, 10, 0));
+            ptsControl.Add(new Punto(10, -10, 0));
+            ptsControl.Add(new Punto(-10, -10, 0));
+            ptsControl.Add(new Punto(-10, 10, 0));
 
             CurvaBsplineSegmentosCubicos path = new CurvaBsplineSegmentosCubicos(ptsControl);
 
@@ -74,9 +74,9 @@ namespace Trochita3D.Core
         private void BuildTerraplen()
         {
             Terraplen terraplen = new Terraplen();
-            PuntoFlotante puntoAnterior = path[path.Count - 1];
-            PuntoFlotante puntoActual;
-            PuntoFlotante vectorPuntoAnteriorActual;
+            Punto puntoAnterior = path[path.Count - 1];
+            Punto puntoActual;
+            Punto vectorPuntoAnteriorActual;
             Seccion seccion;
             seccion = terraplen.GetSeccion(CANT_PUNTOS_TERRAPLEN);
             double dx, dy, angulo;
@@ -110,9 +110,9 @@ namespace Trochita3D.Core
         {
             const double DIST_RIELES = 0.4;
             Riel riel = new Riel();
-            PuntoFlotante puntoAnterior = path[path.Count - 1];
-            PuntoFlotante puntoActual;
-            PuntoFlotante vectorPuntoAnteriorActual;
+            Punto puntoAnterior = path[path.Count - 1];
+            Punto puntoActual;
+            Punto vectorPuntoAnteriorActual;
             Seccion seccionRiel1;
             Seccion seccionRiel2;
             double dx, dy, angulo;
@@ -197,8 +197,6 @@ namespace Trochita3D.Core
         private void BuildSurfaceDataBuffers(IList<Seccion> secciones, IList<double> vertices, IList<int> indices, IList<double> normales)
         {
             Seccion seccion;
-            Seccion seccionSiguiente;
-            Seccion seccionAnterior;
             int indexCount = 0;
             vertices.Clear();
             indices.Clear();
@@ -222,7 +220,7 @@ namespace Trochita3D.Core
                     indexCount++;
 
                     // Normales
-                    PuntoFlotante normal = this.GetNormalForVertex(seccion, j);
+                    Punto normal = this.GetNormalForVertex(seccion, j);
                     normales.Add(normal.X);
                     normales.Add(normal.Y);
                     normales.Add(normal.Z);
@@ -284,9 +282,9 @@ namespace Trochita3D.Core
 
         #region Métodos Auxiliares
 
-        private PuntoFlotante GetNormalForVertex(Seccion seccion, int vertexPos)
+        private Punto GetNormalForVertex(Seccion seccion, int vertexPos)
         {
-            PuntoFlotante normalSeccion = (seccion.Vertices[1] - seccion.Vertices[0]) * (seccion.Vertices[2] - seccion.Vertices[1]);
+            Punto normalSeccion = (seccion.Vertices[1] - seccion.Vertices[0]) * (seccion.Vertices[2] - seccion.Vertices[1]);
 
             if (vertexPos == 0)
             {

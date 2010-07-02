@@ -5,15 +5,15 @@ using System.Text;
 
 namespace Trochita3D.Core
 {
-    public class PuntoFlotante : Punto
+    public class Punto 
     {
         private double x;
         private double y;
         private double z;
-
         private double normalX;
         private double normalY;
         private double normalZ;
+        private Punto origenCoordenadas;
         
         public double X
         {
@@ -25,14 +25,11 @@ namespace Trochita3D.Core
             set { this.y = value; }
             get { return this.y; }
         }
-
         public double Z
         {
             set { this.z = value; }
             get { return this.z; }
         }
-
-
         public double NormalX
         {
             set { this.normalX = value; }
@@ -43,14 +40,23 @@ namespace Trochita3D.Core
             set { this.normalY = value; }
             get { return this.normalY; }
         }
-
         public double NormalZ
         {
             set { this.normalZ = value; }
             get { return this.normalZ; }
         }
-        
-        public PuntoFlotante(double x, double y, double z, Punto origenCoordenadas)
+        public Punto OrigenCoordenadas
+        {
+            set { this.origenCoordenadas = value; }
+            get { return this.origenCoordenadas; }
+        }
+
+
+        public Punto()
+        {
+        }
+
+        public Punto(double x, double y, double z, Punto origenCoordenadas)
         {
             this.X = x;
             this.Y = y;
@@ -58,47 +64,37 @@ namespace Trochita3D.Core
             this.OrigenCoordenadas = origenCoordenadas;
         }
 
-        public PuntoFlotante(double x, double y, double z)
+        public Punto(double x, double y, double z)
         {
             this.X = x;
             this.Y = y;
             this.Z = z;
         }
 
-        public PuntoFlotante(PuntoFlotante punto)
+        public int GetCuadrante()
         {
-            this.X = punto.X;
-            this.Y = punto.Y;
-            this.Z = punto.Z;
-            this.NormalX = punto.NormalX;
-            this.NormalY = punto.NormalY;
-            this.NormalZ = punto.NormalZ;
-            this.OrigenCoordenadas = punto.OrigenCoordenadas;
-        }
+            if ((this.X - OrigenCoordenadas.X) >= 0 &&
+                (Y - OrigenCoordenadas.Y) >= 0)
+                return 1;
 
-        public override double GetXFlotante()
-        {
-            return this.X;
-        }
+            if ((this.X - OrigenCoordenadas.X) <= 0 &&
+                (Y - OrigenCoordenadas.Y) >= 0)
+                return 2;
 
-        public override double GetYFlotante()
-        {
-            return this.Y;
-        }
+            if ((this.X - OrigenCoordenadas.X) <= 0 &&
+                (this.Y - OrigenCoordenadas.Y) <= 0)
+                return 3;
 
-        public override int GetXEntero()
-        {
-            return (int)Math.Round(this.x, MidpointRounding.ToEven);
-        }
+            if ((this.X - OrigenCoordenadas.X) >= 0 &&
+                (this.Y - OrigenCoordenadas.Y) <= 0)
+                return 4;
 
-        public override int GetYEntero()
-        {
-            return (int)Math.Round(this.y, MidpointRounding.ToEven);
+            throw new InvalidProgramException("Está mál hecho el GetCuadrante");
         }
 
         #region Operadores
 
-        public static PuntoFlotante operator *(double escalar, PuntoFlotante punto)
+        public static Punto operator *(double escalar, Punto punto)
         {
             punto.X *= escalar;
             punto.Y *= escalar;
@@ -107,9 +103,9 @@ namespace Trochita3D.Core
         }
 
         // Producto vectorial, normalizado
-        public static PuntoFlotante operator *(PuntoFlotante punto1, PuntoFlotante punto2)
+        public static Punto operator *(Punto punto1, Punto punto2)
         {
-            PuntoFlotante punto = new PuntoFlotante(0, 0, 0);
+            Punto punto = new Punto(0, 0, 0);
 
             punto.X = punto1.Y * punto2.Z - punto1.Z * punto2.Y;
             punto.Y = punto1.Z * punto2.X - punto1.X * punto2.Z;
@@ -126,7 +122,7 @@ namespace Trochita3D.Core
             return punto;
         }
         
-        public static PuntoFlotante operator *(PuntoFlotante punto, double escalar)
+        public static Punto operator *(Punto punto, double escalar)
         {
             punto.X *= escalar;
             punto.Y *= escalar;
@@ -134,16 +130,16 @@ namespace Trochita3D.Core
             return punto;
         }
 
-        public static PuntoFlotante operator +(PuntoFlotante punto1, PuntoFlotante punto2)
+        public static Punto operator +(Punto punto1, Punto punto2)
         {
             if (punto1 == null) return punto2;
             if (punto2 == null) return punto1;
-            return new PuntoFlotante(punto1.X + punto2.X, punto1.Y + punto2.Y, punto1.Z + punto2.Z);
+            return new Punto(punto1.X + punto2.X, punto1.Y + punto2.Y, punto1.Z + punto2.Z);
         }
 
-        public static PuntoFlotante operator -(PuntoFlotante punto1, PuntoFlotante punto2)
+        public static Punto operator -(Punto punto1, Punto punto2)
         {
-            return new PuntoFlotante(punto1.X - punto2.X, punto1.Y - punto2.Y, punto1.Z - punto2.Z);
+            return new Punto(punto1.X - punto2.X, punto1.Y - punto2.Y, punto1.Z - punto2.Z);
         }
 
         #endregion
@@ -153,9 +149,9 @@ namespace Trochita3D.Core
         /// </summary>
         /// <param name="p"></param>
         /// <returns></returns> 
-        public PuntoFlotante MultiplicarEscalar(double p)
+        public Punto MultiplicarEscalar(double p)
         {
-            return new PuntoFlotante((double)(this.GetXFlotante() * p), (double)(this.GetYFlotante() *p), (double)(this.Z *p));
+            return new Punto((double)(this.X * p), (double)(this.Y *p), (double)(this.Z *p));
         }
         
         /// <summary>
@@ -163,9 +159,9 @@ namespace Trochita3D.Core
         /// </summary>
         /// <param name="punto"></param>
         /// <returns></returns>
-        public PuntoFlotante SumarPunto(PuntoFlotante punto)
+        public Punto SumarPunto(Punto punto)
         {
-            return new PuntoFlotante(this.GetXFlotante() + punto.GetXFlotante(), this.GetYFlotante() + punto.GetYFlotante(), this.Z + punto.Z);
+            return new Punto(this.X + punto.X, this.Y + punto.Y, this.Z + punto.Z);
         }
 
         public void Normalizar()
@@ -202,9 +198,24 @@ namespace Trochita3D.Core
             this.y = p;
         }
 
-        public double ProductoEscalar(PuntoFlotante punto)
+        public double ProductoEscalar(Punto punto)
         {
             return (this.X * punto.X) + (this.Y * punto.Y) + (this.Z * punto.Z);
+        }
+
+        internal Punto Clone()
+        {
+            Punto puntoNuevo = new Punto();
+
+            puntoNuevo.NormalX = this.NormalX;
+            puntoNuevo.NormalY = this.NormalY;
+            puntoNuevo.NormalZ = this.NormalZ;
+            puntoNuevo.OrigenCoordenadas = this.OrigenCoordenadas;
+            puntoNuevo.X = this.X;
+            puntoNuevo.Y = this.Y;
+            puntoNuevo.Z = this.Z;
+
+            return puntoNuevo;
         }
     }
 }

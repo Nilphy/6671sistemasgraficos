@@ -47,9 +47,6 @@ namespace TPAlgoritmos3D
         #endregion
         #region Variables internas al proceso de generación de la superficie
 
-        private float[] surface_buffer = null;
-        private float[] normals_buffer = null;
-        private int curve_points = 0;
         private int dl_handle;
 
         #endregion 
@@ -95,17 +92,17 @@ namespace TPAlgoritmos3D
         #endregion
 
         Arbol[] arboles = Arbol.GenerarArbolesAleatorios(10);
-        PuntoFlotante[] posicionArboles = new PuntoFlotante[10] {
-            new PuntoFlotante(0, 0, 0),
-            new PuntoFlotante(6, 6, 0),
-            new PuntoFlotante(-4, -4, 0),
-            new PuntoFlotante(6, 12, 0),
-            new PuntoFlotante(-10, 4, 0),
-            new PuntoFlotante(8, 15, 0),
-            new PuntoFlotante(-15, 7, 0),
-            new PuntoFlotante(1, -10, 0),
-            new PuntoFlotante(3, -15, 0),
-            new PuntoFlotante(15, 15, 0)
+        Punto[] posicionArboles = new Punto[10] {
+            new Punto(0, 0, 0),
+            new Punto(6, 6, 0),
+            new Punto(-4, -4, 0),
+            new Punto(6, 12, 0),
+            new Punto(-10, 4, 0),
+            new Punto(8, 15, 0),
+            new Punto(-15, 7, 0),
+            new Punto(1, -10, 0),
+            new Punto(3, -15, 0),
+            new Punto(15, 15, 0)
         };
 
         #endregion
@@ -232,7 +229,7 @@ namespace TPAlgoritmos3D
             for (int i = 0; i < arboles.Length; ++i)
             {
                 Gl.glPushMatrix();
-                PuntoFlotante posicion = posicionArboles[i];
+                Punto posicion = posicionArboles[i];
                 Gl.glTranslated(posicion.X, posicion.Y, posicion.Z);
                 arboles[i].Dibujar();
                 Gl.glPopMatrix();

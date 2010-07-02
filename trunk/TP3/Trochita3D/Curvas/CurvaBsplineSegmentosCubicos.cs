@@ -13,10 +13,10 @@ namespace Trochita3D.Curvas
         public static int CANTIDAD_PUNTOS_SEGMENTO = 4;
 
         // Tienen que venir ordenados!! y con el del medio unido
-        private IList<PuntoFlotante> puntosControl;
+        private IList<Punto> puntosControl;
 
         // Acá se completan los puntos, usar siempre la propiedad!!!
-        public IList<PuntoFlotante> PuntosControl
+        public IList<Punto> PuntosControl
         {
             set
             {
@@ -28,19 +28,19 @@ namespace Trochita3D.Curvas
             }
         }
         
-        public CurvaBsplineSegmentosCubicos(IList<PuntoFlotante> puntosControl)
+        public CurvaBsplineSegmentosCubicos(IList<Punto> puntosControl)
         {
             this.PuntosControl = puntosControl;
         }
 
-        public IList<PuntoFlotante> GetPuntosDiscretos(double deltaU)
+        public IList<Punto> GetPuntosDiscretos(double deltaU)
         {
-            IList<PuntoFlotante> puntosDiscretizados = new List<PuntoFlotante>();
+            IList<Punto> puntosDiscretizados = new List<Punto>();
             
             int numeroSegmento = 1;
             while (numeroSegmento <= this.GetCantidadSegmentos())
             {
-                IList<PuntoFlotante> puntosParteCurva = new List<PuntoFlotante>();
+                IList<Punto> puntosParteCurva = new List<Punto>();
                
                 for (int i = 0; i < CANTIDAD_PUNTOS_SEGMENTO; i++)
                 {
@@ -67,7 +67,7 @@ namespace Trochita3D.Curvas
         /// b-2 = 1/6 * (1 - 3*u - 3*u^2 - u^3)
         /// ... me aburrí
         /// </summary>       
-        private PuntoFlotante GetValorEnSegmento(IList<PuntoFlotante> puntosParteCurva, double u)
+        private Punto GetValorEnSegmento(IList<Punto> puntosParteCurva, double u)
         {
             if (puntosParteCurva.Count != CANTIDAD_PUNTOS_SEGMENTO) throw new InvalidOperationException("es una Bziel de " + CANTIDAD_PUNTOS_SEGMENTO + " puntos de control");
 
@@ -103,12 +103,12 @@ namespace Trochita3D.Curvas
         /// </summary>
         /// <param name="puntos"></param>
         /// <returns></returns>
-        private IList<PuntoFlotante> CompletarPuntos(IList<PuntoFlotante> puntos)
+        private IList<Punto> CompletarPuntos(IList<Punto> puntos)
         {
-            IList<PuntoFlotante> retorno = new List<PuntoFlotante>();
-            IList<PuntoFlotante> copiaPuntos = new List<PuntoFlotante>();
+            IList<Punto> retorno = new List<Punto>();
+            IList<Punto> copiaPuntos = new List<Punto>();
 
-            foreach (PuntoFlotante punto in puntos)
+            foreach (Punto punto in puntos)
             {
                 copiaPuntos.Add(punto);
             }

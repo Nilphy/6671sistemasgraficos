@@ -13,30 +13,30 @@ namespace Trochita3D.Core
     public class Seccion
     {
 
-        public IList<PuntoFlotante> Vertices { get; set; }
+        public IList<Punto> Vertices { get; set; }
         public double Angulo { get; set; }
 
         public Seccion()
         {
             this.Angulo = 0;
-            this.Vertices = new List<PuntoFlotante>();
+            this.Vertices = new List<Punto>();
         }
 
-        public Seccion(IList<PuntoFlotante> puntos)
+        public Seccion(IList<Punto> puntos)
         {
             this.Angulo = 0;
-            this.Vertices = new List<PuntoFlotante>();
+            this.Vertices = new List<Punto>();
 
-            foreach (PuntoFlotante punto in puntos)
+            foreach (Punto punto in puntos)
             {
-                Vertices.Add(new PuntoFlotante(punto.X, punto.Y, punto.Z));
+                Vertices.Add(new Punto(punto.X, punto.Y, punto.Z));
             }
         }
 
         public void Rotar(double angulo)
         {
             this.Angulo = ((this.Angulo + angulo) % (2 * Math.PI));
-            foreach (PuntoFlotante punto in Vertices)
+            foreach (Punto punto in Vertices)
             {
                 double x = punto.X;
                 double y = punto.Y;
@@ -55,12 +55,12 @@ namespace Trochita3D.Core
             double norm2 = Math.Sqrt(Math.Pow(Vertices[Vertices.Count - 1].X, 2) + (Math.Pow(Vertices[Vertices.Count - 1].Y, 2)));
 
             if (norm2 < norm1)
-                Vertices = Vertices.Reverse<PuntoFlotante>().ToList<PuntoFlotante>();
+                Vertices = Vertices.Reverse<Punto>().ToList<Punto>();
         }
 
         public void Trasladar(double dx, double dy, double dz)
         {
-            foreach (PuntoFlotante punto in Vertices)
+            foreach (Punto punto in Vertices)
             {
                 punto.X += dx;
                 punto.Y += dy;
@@ -70,7 +70,7 @@ namespace Trochita3D.Core
 
         public void Escalar(double ex, double ey, double ez)
         {
-            foreach (PuntoFlotante punto in Vertices)
+            foreach (Punto punto in Vertices)
             {
                 punto.X *= ex;
                 punto.Y *= ey;
@@ -80,7 +80,7 @@ namespace Trochita3D.Core
 
         public void InvertirVertices()
         {
-            Vertices = Vertices.Reverse<PuntoFlotante>().ToList<PuntoFlotante>();
+            Vertices = Vertices.Reverse<Punto>().ToList<Punto>();
         }
     }
 }
