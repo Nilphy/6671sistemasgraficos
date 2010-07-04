@@ -61,13 +61,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\BMPUtils.cs" />
+    <Compile Include="Core\Train.cs" />
     <Compile Include="Core\WaterInitializer.cs" />
     <Compile Include="Core\TerrainInitializer.cs" />
     <Compile Include="Core\Seccion.cs" />
     <Compile Include="Core\SurfaceInitializer.cs" />
     <Compile Include="Curvas\CurvaBsplineSegmentosCubicos.cs" />
     <Compile Include="Curvas\CurvaBzierSegmentosCubicos.cs" />
-    <Compile Include="Core\PuntoFlotante.cs" />
+    <Compile Include="Core\Punto.cs" />
     <Compile Include="Entidades\Arbol.cs" />
     <Compile Include="Entidades\Riel.cs" />
     <Compile Include="Entidades\Terraplen.cs" />
