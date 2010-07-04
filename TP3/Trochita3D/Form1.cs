@@ -35,6 +35,7 @@ namespace TPAlgoritmos3D
         private SurfaceInitializer surfaceInitializer = new SurfaceInitializer();
         private TerrainInitializer terrainInitializer = new TerrainInitializer();
         private WaterInitializer waterInitializer = new WaterInitializer();
+        private Train train = new Train();
 
         #region Variables asociadas a única fuente de luz de la escena 
 
@@ -226,7 +227,8 @@ namespace TPAlgoritmos3D
             surfaceInitializer.DrawSurface();
             terrainInitializer.DrawTerrain();
             waterInitializer.DrawPlaneOfWater();
-            
+            //train.Draw();
+
             /*
             for (int i = 0; i < arboles.Length; ++i)
             {
@@ -242,10 +244,10 @@ namespace TPAlgoritmos3D
         {
             glControl.Refresh();
             return;
-            this.Set3DEnv();
+            /*this.Set3DEnv();
             Gl.glMatrixMode(Gl.GL_MODELVIEW);
             Gl.glLoadIdentity();
-            Glu.gluLookAt(eye[0], eye[1], eye[2], at[0], at[1], at[2], up[0], up[1], up[2]);
+            Glu.gluLookAt(eye[0], eye[1], eye[2], at[0], at[1], at[2], up[0], up[1], up[2]);*/
         }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
@@ -360,7 +362,7 @@ namespace TPAlgoritmos3D
         }
 
         #endregion
-        #region Dibujado de Viewports (marcos y axis)
+        #region Axis y Grid
 
         private void DrawAxis()
         {
@@ -420,6 +422,5 @@ namespace TPAlgoritmos3D
         }
 
         #endregion
-
     }
 }

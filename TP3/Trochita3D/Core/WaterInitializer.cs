@@ -35,7 +35,6 @@ namespace Trochita3D.Core
         {
             IList<double> vertex = new List<double>();
             Punto[][] matriz = new Punto[2][];
-            int k = 0;
 
             for (int y = 0; y < CANTIDAD_PUNTOS_POR_EJE_X_Y; y++)
             {
@@ -76,7 +75,7 @@ namespace Trochita3D.Core
                     if (j + 1 < CANTIDAD_PUNTOS_POR_EJE_X_Y - 1) puntoEste = matriz[i][j + 1];
                     if (j - 1 > 0) puntoOeste = matriz[i][j - 1];
 
-                    normal = this.CalcularNormal(matriz[i][j], puntoNorte, puntoEste, puntoSur, puntoOeste);
+                    normal = Punto.CalcularNormal(matriz[i][j], puntoNorte, puntoEste, puntoSur, puntoOeste);
                     normals.Add(normal.X);
                     normals.Add(normal.Y);
                     normals.Add(normal.Z);
@@ -124,56 +123,6 @@ namespace Trochita3D.Core
             Gl.glDisable(Gl.GL_LIGHTING);
 
             Gl.glPopMatrix();
-        }
-
-        /// <summary>
-        /// Promedia las normales calculadas con todos los puntos de alrededor
-        /// </summary>
-        /// <param name="verticeCentro"></param>
-        /// <param name="verticeNorte"></param>
-        /// <param name="verticeEste"></param>
-        /// <param name="verticeSur"></param>
-        /// <param name="verticeOeste"></param>
-        /// <returns></returns>
-        private Punto CalcularNormal(Punto verticeCentro, Punto verticeNorte, Punto verticeEste, Punto verticeSur, Punto verticeOeste)
-        {
-            if (verticeCentro == null) throw new InvalidOperationException("Este método no puede ser invocado con el vertice central nulo");
-
-            // Numeradas en sentido horario son 4
-            Punto normalNorEste = null;
-            Punto normalSurEste = null;
-            Punto normalSurOeste = null;
-            Punto normalNorOeste = null;
-            Punto normalRetorno = null;
-
-            if (verticeNorte != null && verticeEste != null)
-                normalNorEste = (verticeEste - verticeCentro) * (verticeNorte - verticeCentro);
-            
-            
-            if (verticeSur != null && verticeEste != null)
-                normalSurEste = (verticeSur - verticeCentro) * (verticeEste - verticeCentro);
-
-            if (verticeSur != null && verticeOeste != null)
-                normalSurOeste = (verticeOeste - verticeCentro) * (verticeSur - verticeCentro);
-
-            if (verticeNorte != null && verticeOeste != null)
-                normalNorOeste = (verticeNorte - verticeCentro) * (verticeOeste - verticeCentro);
-
-            normalRetorno = new Punto(0, 0, 0);
-
-            if (normalNorEste != null)
-                normalRetorno = normalRetorno.SumarPunto(normalNorEste);
-
-            if (normalNorOeste != null)
-                normalRetorno = normalRetorno.SumarPunto(normalNorOeste);
-
-            if (normalSurEste != null)
-                normalRetorno = normalRetorno.SumarPunto(normalSurEste);
-
-            if (normalSurOeste != null)
-                normalRetorno = normalRetorno.SumarPunto(normalSurOeste);
-
-            return normalRetorno;
         }
     }
 }
