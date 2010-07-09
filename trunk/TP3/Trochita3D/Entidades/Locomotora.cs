@@ -35,6 +35,10 @@ namespace Trochita3D.Core
         private static double RADIO_AGARRADOR = RADIO_TROMPA / 5d;
         private static double LARGO_AGARRADOR = 1;
 
+        // Techo
+        private static double ANCHO_TECHO = ANCHO_RECTANGULO + 0.5;
+        private static double LARGO_TECHO = LARGO_RECTANULO + 0.5;
+        private static double ALTO_TECHO = 0.6;
 
         #endregion
 
@@ -62,7 +66,7 @@ namespace Trochita3D.Core
         {
             this.PosicionLocomotora = new Punto(0, 0, 0);
 
-            //rectanguloTechoConductor();
+            rectanguloTechoConductor = new Cuboide(ANCHO_TECHO, LARGO_TECHO, ALTO_TECHO, 32, 32, 32, this.PosicionLocomotora.SumarPunto(new Punto(-ANCHO_TECHO/2d, -0.25, ALTO_RECTANGULO)));
             rectanguloBase = new Cuboide(ANCHO_BASE, LARGO_BASE, ALTO_BASE, 32, 32, 32, this.PosicionLocomotora.SumarPunto(new Punto(-ANCHO_BASE / 2d, 0, -ALTO_BASE)));
             rectanguloConductor = new Cuboide(ANCHO_RECTANGULO, LARGO_RECTANULO, ALTO_RECTANGULO, 32, 32, 32, this.PosicionLocomotora.SumarPunto(new Punto(-ANCHO_RECTANGULO / 2d, 0, 0)));
             rectanguloParagolpe = new Cuboide(ANCHO_PARAGOLPE, LARGO_PARAGOLPE, ALTO_PARAGOLPE, 32, 32, 32, this.PosicionLocomotora.SumarPunto(new Punto(-ANCHO_PARAGOLPE/2d, LARGO_BASE, - ALTO_PARAGOLPE)));
@@ -73,7 +77,7 @@ namespace Trochita3D.Core
         public void Draw()
         {
             // Techo del conductor
-            //this.rectanguloTechoConductor.Draw();
+            this.rectanguloTechoConductor.Draw();
 
             // Cuadrado del conductor
             rectanguloConductor.Draw();
