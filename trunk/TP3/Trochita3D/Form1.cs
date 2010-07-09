@@ -87,7 +87,7 @@ namespace TPAlgoritmos3D
         #endregion
         #region Posición defecto de la cámara
 
-        private float[] eye = new float[3] { 17.0f, 0.0f, 25.0f };
+        private float[] eye = new float[3] { 15.0f, 0.0f, 10.0f };
         private float[] at = new float[3] { 0.0f, 0.0f, 0.0f };
         private float[] up = new float[3] { 0.0f, 0.0f, 1.0f };
 
@@ -224,10 +224,10 @@ namespace TPAlgoritmos3D
             Gl.glEnable(Gl.GL_NORMALIZE);
             Gl.glEnable(Gl.GL_AUTO_NORMAL);
 
-            surfaceInitializer.DrawSurface();
-            terrainInitializer.DrawTerrain();
-            waterInitializer.DrawPlaneOfWater();
-            //train.Draw();
+            //surfaceInitializer.DrawSurface();
+            //terrainInitializer.DrawTerrain();
+            //waterInitializer.DrawPlaneOfWater();
+            train.Draw();
 
             /*
             for (int i = 0; i < arboles.Length; ++i)
