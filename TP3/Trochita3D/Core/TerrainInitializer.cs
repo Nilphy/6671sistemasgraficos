@@ -87,7 +87,7 @@ namespace Trochita3D.Core
                     if (j + 1 < CANTIDAD_PIXELES_ANCHO_IMAGEN - 1) puntoEste = matriz[i][j + 1];
                     if (j - 1 > 0) puntoOeste = matriz[i][j - 1];
 
-                    normal = Punto.CalcularNormal(matriz[i][j], puntoNorte, puntoEste, puntoSur, puntoOeste);
+                    normal = Punto.CalcularNormal(matriz[i][j], puntoNorte, puntoEste, puntoSur, puntoOeste, false);
                     normals.Add(normal.X);
                     normals.Add(normal.Y);
                     normals.Add(normal.Z);

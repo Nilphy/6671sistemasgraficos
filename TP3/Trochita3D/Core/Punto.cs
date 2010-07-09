@@ -230,7 +230,7 @@ namespace Trochita3D.Core
         /// <param name="verticeSur"></param>
         /// <param name="verticeOeste"></param>
         /// <returns></returns>
-        public static Punto CalcularNormal(Punto verticeCentro, Punto verticeNorte, Punto verticeEste, Punto verticeSur, Punto verticeOeste)
+        public static Punto CalcularNormal(Punto verticeCentro, Punto verticeNorte, Punto verticeEste, Punto verticeSur, Punto verticeOeste, Boolean invertirSentido)
         {
             if (verticeCentro == null) throw new InvalidOperationException("Este método no puede ser invocado con el vertice central nulo");
 
@@ -242,17 +242,28 @@ namespace Trochita3D.Core
             Punto normalRetorno = null;
 
             if (verticeNorte != null && verticeEste != null)
-                normalNorEste = (verticeEste - verticeCentro) * (verticeNorte - verticeCentro);
-
+            {
+                if (invertirSentido) normalNorEste = (verticeNorte - verticeCentro) * (verticeEste - verticeCentro);
+                else normalNorEste = (verticeEste - verticeCentro) * (verticeNorte - verticeCentro);
+            }
 
             if (verticeSur != null && verticeEste != null)
-                normalSurEste = (verticeSur - verticeCentro) * (verticeEste - verticeCentro);
+            {
+                if (invertirSentido) normalSurEste = (verticeEste - verticeCentro) * (verticeSur - verticeCentro);
+                else normalSurEste = (verticeSur - verticeCentro) * (verticeEste - verticeCentro);
+            }
 
             if (verticeSur != null && verticeOeste != null)
-                normalSurOeste = (verticeOeste - verticeCentro) * (verticeSur - verticeCentro);
+            {
+                if (invertirSentido) normalSurOeste = (verticeSur - verticeCentro) * (verticeOeste - verticeCentro);
+                else normalSurOeste = (verticeOeste - verticeCentro) * (verticeSur - verticeCentro);
+            }
 
             if (verticeNorte != null && verticeOeste != null)
-                normalNorOeste = (verticeNorte - verticeCentro) * (verticeOeste - verticeCentro);
+            {
+                if (invertirSentido) normalNorOeste = (verticeOeste - verticeCentro) * (verticeNorte - verticeCentro);
+                else normalNorOeste = (verticeNorte - verticeCentro) * (verticeOeste - verticeCentro);
+            }
 
             normalRetorno = new Punto(0, 0, 0);
 
