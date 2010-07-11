@@ -63,6 +63,8 @@
   <ItemGroup>
     <Compile Include="Core\BMPUtils.cs" />
     <Compile Include="Core\CaraCuboide.cs" />
+    <Compile Include="Core\CaraFigura.cs" />
+    <Compile Include="Core\CaraGuardabarro.cs" />
     <Compile Include="Core\Figura.cs" />
     <Compile Include="Entidades\GuardabarroTren.cs" />
     <Compile Include="Core\Cuboide.cs" />
@@ -77,6 +79,7 @@
     <Compile Include="Core\Punto.cs" />
     <Compile Include="Entidades\Arbol.cs" />
     <Compile Include="Entidades\Riel.cs" />
+    <Compile Include="Entidades\Rueda.cs" />
     <Compile Include="Entidades\Terraplen.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
