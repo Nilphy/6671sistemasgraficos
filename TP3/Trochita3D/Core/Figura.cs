@@ -14,6 +14,10 @@ namespace Trochita3D.Core
         public int CantidadDivisionesAncho { set; get; }
         public int CantidadDivisionesAlto { set; get; }
         public int CantidadDivisionesLargo { set; get; }
+        public float[] Luz { set; get; }
+        public float[] LuzAmbiente { set; get; }
+        public float[] LuzBrillo { set; get; }
+        public int Shininess { set; get; }
 
         // Calculan la distancia entre dos vértices dada la cantidad de divisiones
         public double PasoX
@@ -38,24 +42,9 @@ namespace Trochita3D.Core
             }
         }
 
-        private IList<CaraFigura> caras;
+        protected IList<CaraFigura> caras;
 
-        public void Generar()
-        {
-            caras = new List<CaraFigura>();
-
-            caras.Add(new CaraFigura(this, OrientacionesCara.Abajo, 0));
-            caras.Add(new CaraFigura(this, OrientacionesCara.Adelante, 1));
-            caras.Add(new CaraFigura(this, OrientacionesCara.Arriba, 2));
-            caras.Add(new CaraFigura(this, OrientacionesCara.Atraz, 3));
-            caras.Add(new CaraFigura(this, OrientacionesCara.Derecha, 4));
-            caras.Add(new CaraFigura(this, OrientacionesCara.Izquierda, 5));
-
-            foreach (CaraFigura cara in caras)
-            {
-                cara.Generar();
-            }
-        }
+        public abstract void Generar();
 
         public void Draw()
         {

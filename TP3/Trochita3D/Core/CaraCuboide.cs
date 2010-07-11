@@ -6,176 +6,14 @@ using Tao.OpenGl;
 
 namespace Trochita3D.Core
 {
-    public class CaraFigura
+    public class CaraCuboide : CaraFigura
     {
-        #region atributos y propiedades
-
-        public Figura Figura { set; get; }
-        public OrientacionesCara Orientacion { set; get; }
-        public int Numero { set; get; }
-
-        private double[] pVertices;
-        public double[] Vertices
-        {
-            get
-            {
-                if (recalcularIndices)
-                {
-                    pVertices = new double[vertices.Count * 3];
-                    int i = 0;
-
-                    foreach (Punto vertice in vertices)
-                    {
-                        pVertices[i++] = vertice.X;
-                        pVertices[i++] = vertice.Y;
-                        pVertices[i++] = vertice.Z;
-                    }
-                }
-
-                return pVertices;
-            }
-        }
-        private IList<Punto> vertices;
-
-        private double[] pNormales;
-        public double[] Normales
-        {
-            get
-            {
-                if (recalcularIndices)
-                {
-                    pNormales = new Double[normales.Count * 3];
-                    int i = 0;
-
-                    foreach (Punto normal in normales)
-                    {
-                        pNormales[i++] = normal.X;
-                        pNormales[i++] = normal.Y;
-                        pNormales[i++] = normal.Z;
-                    }
-                }
-
-                return pNormales;
-            }
-        }
-        private IList<Punto> normales;
-
-        private int[] pIndices;
-        public int[] Indices 
-        { 
-            get 
-            {
-                if (recalcularIndices) pIndices = this.indices.ToArray<int>();
-                return pIndices;
-            } 
-        }
-        private IList<int> indices;
-
-        // Para cálculos
-        private double xInicial;
-        private double xFinal;
-        private double yInicial;
-        private double yFinal;
-        private double zInicial;
-        private double zFinal;
-
-        // Calculan la distancia entre dos vértices dada la cantidad de divisiones
-        private double PasoX
-        {
-            get
-            {
-                return ((xFinal - xInicial) / Figura.CantidadDivisionesAncho) > 0 ? ((xFinal - xInicial) / Figura.CantidadDivisionesAncho) : -((xFinal - xInicial) / Figura.CantidadDivisionesAncho);
-            }
-        }
-        private double PasoY
-        {
-            get
-            {
-                return ((yFinal - yInicial) / Figura.CantidadDivisionesLargo) > 0 ? ((yFinal - yInicial) / Figura.CantidadDivisionesLargo) : -((yFinal - yInicial) / Figura.CantidadDivisionesLargo);
-            }
-        }
-        private double PasoZ
-        {
-            get
-            {
-                return ((zFinal - zInicial) / Figura.CantidadDivisionesAlto) > 0 ? ((zFinal - zInicial) / Figura.CantidadDivisionesAlto) : -((zFinal - zInicial) / Figura.CantidadDivisionesAlto);
-            }
-        }
-
-        private int CantidadPixelesAncho
-        {
-            get
-            {
-                int cantidadPixelesAncho = 0;
-
-                if (this.Orientacion.Equals(OrientacionesCara.Abajo) || this.Orientacion.Equals(OrientacionesCara.Arriba))
-                    cantidadPixelesAncho = Figura.CantidadDivisionesLargo;
-                else if (this.Orientacion.Equals(OrientacionesCara.Derecha) || this.Orientacion.Equals(OrientacionesCara.Izquierda))
-                    cantidadPixelesAncho = Figura.CantidadDivisionesAncho;
-                else
-                    cantidadPixelesAncho = Figura.CantidadDivisionesLargo;
-
-                return cantidadPixelesAncho + 1;
-            }
-        }
-        private int CantidadPixelesAlto
-        {
-            get
-            {
-                if (this.Orientacion.Equals(OrientacionesCara.Abajo) || this.Orientacion.Equals(OrientacionesCara.Arriba))
-                    return Figura.CantidadDivisionesAncho + 1;                
-                else
-                    return Figura.CantidadDivisionesAlto + 1;
-            }
-        }
-
-        // Cada vez que se vuelve a generar la cara cuboide se deben recalcular los arrais 
-        private Boolean recalcularIndices;
-
-        #endregion
-               
-        public CaraFigura(Figura figura, OrientacionesCara orientacion, int numero)
-        {
-            this.Figura = figura;
-            this.Orientacion = orientacion;
-            this.Numero = numero;
-        }
-
-        public void Draw()
-        {
-            Gl.glPushMatrix();
-
-            Gl.glEnable(Gl.GL_LIGHTING);
-
-            Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_AMBIENT, new float[] { 0.20f, 0.20f, 0.35f, 1 });
-            Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_DIFFUSE, new float[] { 0.2f, 0.2f, 0.3f, 1 });
-            Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_SPECULAR, new float[] { 0.5f, 0.5f, 0.5f, 1 });
-
-            Gl.glVertexPointer(3, Gl.GL_DOUBLE, 3 * sizeof(double), this.Vertices);
-            Gl.glNormalPointer(Gl.GL_DOUBLE, 3 * sizeof(double), this.Normales);
-
-            Gl.glDrawElements(Gl.GL_QUADS, this.Indices.Length, Gl.GL_UNSIGNED_INT, this.Indices);
-            Gl.glDisable(Gl.GL_LIGHTING);
-
-            Gl.glPopMatrix();
-        }
+        public CaraCuboide(Figura figura, OrientacionesCara orientacion, int numero, float[] luz, float[] luzBrillo, float[] luzAmbiente, int shininess) 
+            : base(figura, orientacion, numero, luzAmbiente, luzBrillo, luz, shininess) { }
 
         #region Generadores
 
-        /// <summary>
-        /// No está en el constructor para que se controle cuando lo quiero generar
-        /// </summary>
-        public void Generar()
-        {
-            this.recalcularIndices = true;
- 
-            this.CalcularExtremos();
-            this.GenerarVertices();
-            this.GenerarIndices();
-            this.GenerarNormales();
-        }
-
-        private void GenerarNormales()
+        protected override void GenerarNormales()
         {
             normales = new List<Punto>();
             Boolean invertirNormal = false;
@@ -247,7 +85,7 @@ namespace Trochita3D.Core
             }
         }
 
-        private void GenerarIndices()
+        protected override void GenerarIndices()
         {
             this.indices = new List<int>();
 
@@ -280,7 +118,7 @@ namespace Trochita3D.Core
             }
         }
 
-        private void GenerarVertices()
+        protected override void GenerarVertices()
         {
             this.vertices = new List<Punto>();
 
@@ -299,10 +137,35 @@ namespace Trochita3D.Core
         #endregion
         #region Utilitarios
 
-        /// <summary>
-        /// Dadas las dimensiones del cuboide calcula los extremos de los rangos de las coordenadas del cubo
-        /// </summary>
-        private void CalcularExtremos()
+        protected override Punto CompletarPunto(Punto puntoCentro)
+        {
+            if (Orientacion.Equals(OrientacionesCara.Abajo))
+            {
+                return puntoCentro.SumarPunto(new Punto(0, 0, Figura.PasoZ));
+            }
+            else if (Orientacion.Equals(OrientacionesCara.Adelante))
+            {
+                return puntoCentro.SumarPunto(new Punto(-Figura.PasoX, 0, 0));
+            }
+            else if (Orientacion.Equals(OrientacionesCara.Arriba))
+            {
+                return puntoCentro.SumarPunto(new Punto(0, 0, -Figura.PasoZ));
+            }
+            else if (Orientacion.Equals(OrientacionesCara.Atraz))
+            {
+                return puntoCentro.SumarPunto(new Punto(Figura.PasoX, 0, 0));
+            }
+            else if (Orientacion.Equals(OrientacionesCara.Derecha))
+            {
+                return puntoCentro.SumarPunto(new Punto(0, -Figura.PasoY, 0));
+            }
+            else //if (Orientacion.Equals(OrientacionesCara.Izquierda))
+            {
+                return puntoCentro.SumarPunto(new Punto(0, Figura.PasoY, 0));
+            }
+        }
+
+        protected override void CalcularExtremos()
         {
             if (Orientacion.Equals(OrientacionesCara.Abajo))
             {
@@ -365,34 +228,6 @@ namespace Trochita3D.Core
             yFinal += Figura.Posicion.Y;
             zInicial += Figura.Posicion.Z;
             zFinal += Figura.Posicion.Z;
-        }
-
-        private Punto CompletarPunto(Punto puntoCentro)
-        {
-            if (Orientacion.Equals(OrientacionesCara.Abajo))
-            {
-                return puntoCentro.SumarPunto(new Punto(0, 0, Figura.PasoZ));
-            }
-            else if (Orientacion.Equals(OrientacionesCara.Adelante))
-            {
-                return puntoCentro.SumarPunto(new Punto(-Figura.PasoX, 0, 0));
-            }
-            else if (Orientacion.Equals(OrientacionesCara.Arriba))
-            {
-                return puntoCentro.SumarPunto(new Punto(0, 0, -Figura.PasoZ));
-            }
-            else if (Orientacion.Equals(OrientacionesCara.Atraz))
-            {
-                return puntoCentro.SumarPunto(new Punto(Figura.PasoX, 0, 0));
-            }
-            else if (Orientacion.Equals(OrientacionesCara.Derecha))
-            {
-                return puntoCentro.SumarPunto(new Punto(0, -Figura.PasoY, 0));
-            }
-            else //if (Orientacion.Equals(OrientacionesCara.Izquierda))
-            {
-                return puntoCentro.SumarPunto(new Punto(0, Figura.PasoY, 0));
-            }
         }
 
         #endregion

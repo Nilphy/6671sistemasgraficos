@@ -23,6 +23,15 @@ namespace TPAlgoritmos3D
     {
         #region Atributos y Propiedades
 
+        #region Luces del tren
+
+        private static float[] TREN_LUZ = new float[] { 0.2f, 0.25f, 0.3f, 1 };
+        private static float[] TREN_LUZ_AMBIENTE = new float[] { 0.2f, 0.25f, 0.3f, 1 };
+        private static float[] TREN_LUZ_BRILLO = new float[] { 0.2f, 0.2f, 0.2f, 1 };
+        private static int TREN_SHININESS = 180;
+
+        #endregion
+
         /// <summary>
         /// Constante global que indica el tamaño del paso de tiempo en la simulación 
         /// </summary>
@@ -35,7 +44,7 @@ namespace TPAlgoritmos3D
         private SurfaceInitializer surfaceInitializer = new SurfaceInitializer();
         private TerrainInitializer terrainInitializer = new TerrainInitializer();
         private WaterInitializer waterInitializer = new WaterInitializer();
-        private Train train = new Train();
+        private Train Tren = new Train(TREN_LUZ_AMBIENTE, TREN_LUZ_BRILLO, TREN_LUZ, TREN_SHININESS);
 
         #region Variables asociadas a única fuente de luz de la escena 
 
@@ -227,7 +236,9 @@ namespace TPAlgoritmos3D
             //surfaceInitializer.DrawSurface();
             //terrainInitializer.DrawTerrain();
             //waterInitializer.DrawPlaneOfWater();
-            train.Draw();
+            Tren.AnguloRotacion = 90;
+            Tren.Posicion = new Punto(2, 2, 2);
+            Tren.Draw();
 
             /*
             for (int i = 0; i < arboles.Length; ++i)
