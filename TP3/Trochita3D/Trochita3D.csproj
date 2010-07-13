@@ -61,7 +61,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controlador.cs" />
     <Compile Include="Core\BMPUtils.cs" />
+    <Compile Include="Core\Camara.cs" />
     <Compile Include="Core\CaraCuboide.cs" />
     <Compile Include="Core\CaraFigura.cs" />
     <Compile Include="Core\CaraGuardabarro.cs" />
@@ -81,6 +83,7 @@
     <Compile Include="Entidades\Riel.cs" />
     <Compile Include="Entidades\Rueda.cs" />
     <Compile Include="Entidades\Terraplen.cs" />
+    <Compile Include="Escena.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>

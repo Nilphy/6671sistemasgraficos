@@ -281,5 +281,17 @@ namespace Trochita3D.Core
 
             return normalRetorno;
         }
+
+        public void RotarProyeccionXY(double angulo)
+        {
+            this.Z = 0;
+            double xAux;
+            double yAux;
+            xAux = Math.Cos(angulo) * this.X - Math.Sin(angulo) * this.Y;
+            yAux = Math.Sin(angulo) * this.X + Math.Cos(angulo) * this.Y;
+
+            this.X = xAux;
+            this.Y = yAux;
+        }
     }
 }
