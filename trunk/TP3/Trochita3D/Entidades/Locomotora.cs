@@ -103,8 +103,8 @@ namespace Trochita3D.Core
         public void Draw()
         {
             Gl.glMatrixMode(Gl.GL_MODELVIEW);
-            Gl.glTranslated(this.Posicion.X, this.Posicion.Y, this.Posicion.Z);
-            Gl.glRotated(this.AnguloRotacion, 0, 0, 1);
+            if (this.Posicion != null) Gl.glTranslated(this.Posicion.X, this.Posicion.Y, this.Posicion.Z);
+            if (this.AnguloRotacion != 0) Gl.glRotated(this.AnguloRotacion, 0, 0, 1);
 
             // Techo del conductor
             this.rectanguloTechoConductor.Draw();

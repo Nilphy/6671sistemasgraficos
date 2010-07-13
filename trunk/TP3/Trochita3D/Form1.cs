@@ -15,6 +15,7 @@ using Tao.FreeGlut;
 using Trochita3D.Core;
 using Trochita3D.Curvas;
 using Trochita3D.Entidades;
+using Trochita3D;
 
 
 namespace TPAlgoritmos3D
@@ -23,45 +24,11 @@ namespace TPAlgoritmos3D
     {
         #region Atributos y Propiedades
 
-        #region Luces del tren
+        Controlador controlador = new Controlador();
 
-        private static float[] TREN_LUZ = new float[] { 0.2f, 0.25f, 0.3f, 1 };
-        private static float[] TREN_LUZ_AMBIENTE = new float[] { 0.2f, 0.25f, 0.3f, 1 };
-        private static float[] TREN_LUZ_BRILLO = new float[] { 0.2f, 0.2f, 0.2f, 1 };
-        private static int TREN_SHININESS = 180;
-
-        #endregion
-
-        /// <summary>
-        /// Constante global que indica el tamaño del paso de tiempo en la simulación 
-        /// </summary>
-        private const int DELTA_TIEMPO = 5;
-        private Timer timer;
-        
-        private bool view_grid = true;
-        private bool view_axis = true;
-
-        private SurfaceInitializer surfaceInitializer = new SurfaceInitializer();
-        private TerrainInitializer terrainInitializer = new TerrainInitializer();
-        private WaterInitializer waterInitializer = new WaterInitializer();
-        private Train Tren = new Train(TREN_LUZ_AMBIENTE, TREN_LUZ_BRILLO, TREN_LUZ, TREN_SHININESS);
-
-        #region Variables asociadas a única fuente de luz de la escena 
-
-        private float[] light_color = new float[4] { 0.80f, 0.80f, 0.80f, 1.0f };
-        private float[] light_position = new float[4] { 7.0f, 7.0f, 10.0f, 0.0f };
-        private float[] light_ambient = new float[4] { 0.05f, 0.05f, 0.05f, 1.0f };
-
-        private float[] secondary_light_color = new float[4] { 0.20f, 0.20f, 0.20f, 1.0f };
-        private float[] secondary_light_ambient = new float[4] { 0.05f, 0.05f, 0.05f, 1.0f };
-
-        #endregion
-        #region Variables internas al proceso de generación de la superficie
+        #region ids de display lists
 
         private int dl_handle;
-
-        #endregion 
-        #region Mugre de constantes de configuración de la pantalla
 
         public int DL_AXIS
         {
@@ -71,16 +38,6 @@ namespace TPAlgoritmos3D
         public int DL_GRID
         {
             get { return (dl_handle + 1); }
-        }
-
-        public int DL_AXIS2D_TOP
-        {
-            get { return (dl_handle + 2); }
-        }
-
-        public int DL_AXIS2D_HEIGHT
-        {
-            get { return (dl_handle + 3); }
         }
 
         public int W_WIDTH
@@ -94,27 +51,6 @@ namespace TPAlgoritmos3D
         }
 
         #endregion
-        #region Posición defecto de la cámara
-
-        private float[] eye = new float[3] { 15.0f, 0.0f, 10.0f };
-        private float[] at = new float[3] { 0.0f, 0.0f, 0.0f };
-        private float[] up = new float[3] { 0.0f, 0.0f, 1.0f };
-
-        #endregion
-
-        Arbol[] arboles = Arbol.GenerarArbolesAleatorios(10);
-        Punto[] posicionArboles = new Punto[10] {
-            new Punto(0, 0, 0),
-            new Punto(6, 6, 0),
-            new Punto(-4, -4, 0),
-            new Punto(6, 12, 0),
-            new Punto(-10, 4, 0),
-            new Punto(8, 15, 0),
-            new Punto(-15, 7, 0),
-            new Punto(1, -10, 0),
-            new Punto(3, -15, 0),
-            new Punto(15, 15, 0)
-        };
 
         #endregion
 
@@ -129,7 +65,7 @@ namespace TPAlgoritmos3D
             Init();
 
             // Se configura el Timer para la simulación.
-            InitTimerSimulacion();
+            controlador.InicializarTimer(TimerEventProcessor);
         }
 
         #region Inicialización
@@ -145,11 +81,9 @@ namespace TPAlgoritmos3D
             Gl.glShadeModel(Gl.GL_SMOOTH);
             Gl.glEnable(Gl.GL_DEPTH_TEST);
 
-            // Inicialización de iluminación
-            this.InitializeLighting();
-
-            // Inicialización de escena
-            this.InitializeScene();
+            // Crea objetos e inicializa luces 
+            // TODO poner la creación de objetos en display lists
+            controlador.Escena.Inicializar();
 
             // Generación de las Display Lists
             Gl.glNewList(DL_AXIS, Gl.GL_COMPILE);
@@ -158,57 +92,6 @@ namespace TPAlgoritmos3D
             Gl.glNewList(DL_GRID, Gl.GL_COMPILE);
             DrawXYGrid();
             Gl.glEndList();
-        }
-
-        private void InitializeScene()
-        {
-            this.surfaceInitializer = new SurfaceInitializer();
-            this.surfaceInitializer.BuildSurface();
-        }
-
-        /// <summary>
-        /// Inicialización de la iluminación de la escena.
-        /// </summary>
-        private void InitializeLighting()
-        {
-            // Fuente de luz principal
-            Gl.glLightfv(Gl.GL_LIGHT0, Gl.GL_DIFFUSE, light_color);
-            Gl.glLightfv(Gl.GL_LIGHT0, Gl.GL_AMBIENT, light_ambient);
-            Gl.glLightfv(Gl.GL_LIGHT0, Gl.GL_POSITION, light_position);
-            Gl.glEnable(Gl.GL_LIGHT0);
-
-            // Fuentes de luz secundarias
-            Gl.glLightfv(Gl.GL_LIGHT1, Gl.GL_DIFFUSE, secondary_light_color);
-            Gl.glLightfv(Gl.GL_LIGHT1, Gl.GL_AMBIENT, secondary_light_ambient);
-            Gl.glLightfv(Gl.GL_LIGHT1, Gl.GL_POSITION, new float[4] { -10.0f, -10.0f, 1.0f, 0.0f });
-            Gl.glEnable(Gl.GL_LIGHT1);
-
-            Gl.glLightfv(Gl.GL_LIGHT2, Gl.GL_DIFFUSE, secondary_light_color);
-            Gl.glLightfv(Gl.GL_LIGHT2, Gl.GL_AMBIENT, secondary_light_ambient);
-            Gl.glLightfv(Gl.GL_LIGHT2, Gl.GL_POSITION, new float[4] { -10.0f, 10.0f, 1.0f, 0.0f });
-            Gl.glEnable(Gl.GL_LIGHT2);
-
-            Gl.glLightfv(Gl.GL_LIGHT3, Gl.GL_DIFFUSE, secondary_light_color);
-            Gl.glLightfv(Gl.GL_LIGHT3, Gl.GL_AMBIENT, secondary_light_ambient);
-            Gl.glLightfv(Gl.GL_LIGHT3, Gl.GL_POSITION, new float[4] { 10.0f, -10.0f, 1.0f, 0.0f });
-            Gl.glEnable(Gl.GL_LIGHT3);
-
-            Gl.glLightfv(Gl.GL_LIGHT4, Gl.GL_DIFFUSE, secondary_light_color);
-            Gl.glLightfv(Gl.GL_LIGHT4, Gl.GL_AMBIENT, secondary_light_ambient);
-            Gl.glLightfv(Gl.GL_LIGHT4, Gl.GL_POSITION, new float[4] { 10.0f, 10.0f, 1.0f, 0.0f });
-            Gl.glEnable(Gl.GL_LIGHT4);
-
-            Gl.glEnable(Gl.GL_LIGHTING);
-        }
-
-        /// <summary>
-        /// Crea el Timer para realizar la simulación física del modelo.
-        /// </summary>
-        private void InitTimerSimulacion()
-        {
-            this.timer = new Timer();
-            timer.Tick += new EventHandler(TimerEventProcessor);
-            timer.Interval = DELTA_TIEMPO;
         }
 
         #endregion
@@ -223,42 +106,23 @@ namespace TPAlgoritmos3D
             Gl.glMatrixMode(Gl.GL_MODELVIEW);
             Gl.glLoadIdentity();
 
-            Glu.gluLookAt(eye[0], eye[1], eye[2], at[0], at[1], at[2], up[0], up[1], up[2]);
+            Glu.gluLookAt(controlador.Camara.eye[0], controlador.Camara.eye[1], controlador.Camara.eye[2], controlador.Camara.at[0], controlador.Camara.at[1], controlador.Camara.at[2], controlador.Camara.up[0], controlador.Camara.up[1], controlador.Camara.up[2]);
             
             // Si corresponde se dibujan los ejes
-            if (view_axis) Gl.glCallList(DL_AXIS);
+            if (controlador.view_axis) Gl.glCallList(DL_AXIS);
             // Se corresponde se dibuja la grilla
-            if (view_grid) Gl.glCallList(DL_GRID);
+            if (controlador.view_grid) Gl.glCallList(DL_GRID);
 
             Gl.glEnable(Gl.GL_NORMALIZE);
             Gl.glEnable(Gl.GL_AUTO_NORMAL);
 
-            //surfaceInitializer.DrawSurface();
-            //terrainInitializer.DrawTerrain();
-            //waterInitializer.DrawPlaneOfWater();
-            Tren.AnguloRotacion = 90;
-            Tren.Posicion = new Punto(2, 2, 2);
-            Tren.Draw();
-
-            /*
-            for (int i = 0; i < arboles.Length; ++i)
-            {
-                Gl.glPushMatrix();
-                Punto posicion = posicionArboles[i];
-                Gl.glTranslated(posicion.X, posicion.Y, posicion.Z);
-                arboles[i].Dibujar();
-                Gl.glPopMatrix();
-            } */
+            controlador.Escena.Dibujar();
         }
 
         protected void RefreshEye() 
         {
             glControl.Refresh();
             return;
-            /*this.Set3DEnv();
-            Gl.glMatrixMode(Gl.GL_MODELVIEW);
-            Gl.glLoadIdentity();
-            Glu.gluLookAt(eye[0], eye[1], eye[2], at[0], at[1], at[2], up[0], up[1], up[2]);*/
         }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
@@ -267,41 +131,25 @@ namespace TPAlgoritmos3D
             {
                 case Keys.Up:
                     {
-                        eye[0]--;
-                        //at[0]--;
+                        controlador.Camara.AvanzarAdelante();
                         this.RefreshEye();
                         break;
                     }
                 case Keys.Down:
                     {
-                        eye[0]++;
-                        //at[0]++;
+                        controlador.Camara.AvanzarAtraz();
                         this.RefreshEye();
                         break;
                     }
                 case Keys.Left:
                     {
-                        eye[1]--;
-                        //at[1]--;
+                        controlador.Camara.AvanzarIzquierda();
                         this.RefreshEye();
                         break;
                     }
                 case Keys.Right:
                     {
-                        eye[1]++;
-                        //at[1]++;
-                        this.RefreshEye();
-                        break;
-                    }
-                case Keys.Add:
-                    {
-                        eye[2]--;
-                        this.RefreshEye();
-                        break;
-                    }
-                case Keys.Subtract:
-                    {
-                        eye[2]++;
+                        controlador.Camara.AvanzarDerecha();
                         this.RefreshEye();
                         break;
                     }
@@ -335,11 +183,11 @@ namespace TPAlgoritmos3D
                     Application.Exit();
                     break;
                 case 'g':
-                    view_grid = !view_grid;
+                    controlador.view_grid = !controlador.view_grid;
                     glControl.Refresh();
                     break;
                 case 'a':
-                    view_axis = !view_axis;
+                    controlador.view_axis = !controlador.view_axis;
                     glControl.Refresh();
                     break;
                 case 'w':
@@ -353,11 +201,6 @@ namespace TPAlgoritmos3D
                 default:
                     break;
             }
-        }
-
-        private void glControl_MouseClick(object sender, MouseEventArgs e)
-        {
-
         }
 
         /// <summary>
