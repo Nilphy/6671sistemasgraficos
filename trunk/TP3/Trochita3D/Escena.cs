@@ -10,12 +10,16 @@ namespace Trochita3D
 {
     public class Escena
     {
-        #region Luces del tren
+        #region Constantes del tren
 
         private static float[] TREN_LUZ = new float[] { 0.2f, 0.25f, 0.3f, 1 };
         private static float[] TREN_LUZ_AMBIENTE = new float[] { 0.2f, 0.25f, 0.3f, 1 };
         private static float[] TREN_LUZ_BRILLO = new float[] { 0.2f, 0.2f, 0.2f, 1 };
         private static int TREN_SHININESS = 180;
+
+        private static double VELOCIDAD_TREN = 5000;
+        private static double tiempo = 0;
+
 
         #endregion
 
@@ -54,7 +58,8 @@ namespace Trochita3D
         {
             this.surfaceInitializer = new SurfaceInitializer();
             this.surfaceInitializer.BuildSurface();
-            
+            Tren.Posicion = this.surfaceInitializer.GetPositionByDistancia(0);
+
             this.InicializarLuces();
         }
 
@@ -95,11 +100,11 @@ namespace Trochita3D
 
         public void Dibujar()
         {
-            //surfaceInitializer.DrawSurface();
-            //terrainInitializer.DrawTerrain();
-            //waterInitializer.DrawPlaneOfWater();
+            surfaceInitializer.DrawSurface();
+            terrainInitializer.DrawTerrain();
+            waterInitializer.DrawPlaneOfWater();
             Tren.Draw();
-            /*
+            
             for (int i = 0; i < arboles.Length; ++i)
             {
                 Gl.glPushMatrix();
@@ -108,7 +113,17 @@ namespace Trochita3D
                 arboles[i].Dibujar();
                 Gl.glPopMatrix();
             } 
-             * */
+        }
+
+        public void Simular(double deltaTiempo)
+        {
+            // Falta actualizar el ángulo de rotación de la rueda.
+            tiempo += deltaTiempo;
+            double distancia = VELOCIDAD_TREN * tiempo;
+
+            Punto posicion = surfaceInitializer.GetPositionByDistancia(distancia);
+
+            Tren.Posicion = posicion;
         }
     }
 }

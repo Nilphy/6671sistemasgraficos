@@ -7,7 +7,7 @@ namespace Trochita3D.Core
 {
     public class Camara
     {
-        public float[] eye = new float[3] { 10.0f, 10.0f, 5.0f };
+        public float[] eye = new float[3] { 50.0f, 50.0f, 20.0f };
         public float[] at = new float[3] { 0.0f, 0.0f, 0.0f };
         public float[] up = new float[3] { 0.0f, 0.0f, 1.0f };
 

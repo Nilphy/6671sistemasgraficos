@@ -11,8 +11,8 @@ namespace Trochita3D.Core
     public class WaterInitializer
     {
         private static float ALTURA_PLANO_AGUA = 0.5f;
-        private static double X_MAX = 30;
-        private static double Y_MAX = 30;
+        private static double X_MAX = 80;
+        private static double Y_MAX = 80;
         private static int CANTIDAD_PUNTOS_POR_EJE_X_Y = 2;
 
         private static int[] indices;

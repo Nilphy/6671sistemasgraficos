@@ -13,13 +13,14 @@ namespace Trochita3D.Core
     /// </summary>
     public class SurfaceInitializer
     {
-        private const double DELTA_U = 0.05;
+        private const double DELTA_U = 0.0005;
         private const int CANT_PUNTOS_TERRAPLEN = 10;
 
         private IList<Seccion> seccionesTerraplen = new List<Seccion>();
         private IList<Seccion> seccionesRieles1 = new List<Seccion>();
         private IList<Seccion> seccionesRieles2 = new List<Seccion>();
         private IList<Punto> path;
+        private IList<double> distanciaAcumuladaPorPuntoPath;
 
         private static int[] indicesTerraplen;
         private static int[] indicesRieles1;
@@ -54,10 +55,10 @@ namespace Trochita3D.Core
         {
             IList<Punto> ptsControl = new List<Punto>();
 
-            ptsControl.Add(new Punto(10, 10, 0));
-            ptsControl.Add(new Punto(10, -10, 0));
-            ptsControl.Add(new Punto(-10, -10, 0));
-            ptsControl.Add(new Punto(-10, 10, 0));
+            ptsControl.Add(new Punto(30, 30, 0));
+            ptsControl.Add(new Punto(30, -30, 0));
+            ptsControl.Add(new Punto(-30, -30, 0));
+            ptsControl.Add(new Punto(-30, 30, 0));
 
             CurvaBsplineSegmentosCubicos path = new CurvaBsplineSegmentosCubicos(ptsControl);
 
@@ -73,6 +74,7 @@ namespace Trochita3D.Core
         /// </summary>
         private void BuildTerraplen()
         {
+            distanciaAcumuladaPorPuntoPath = new List<double>();
             Terraplen terraplen = new Terraplen();
             Punto puntoAnterior = path[path.Count - 1];
             Punto puntoActual;
@@ -97,6 +99,12 @@ namespace Trochita3D.Core
                 seccion.Rotar(angulo);
                 seccion.Trasladar(puntoActual.X, puntoActual.Y, puntoActual.Z);
                 seccionesTerraplen.Add(seccion);
+
+                if (i == 0)
+                    distanciaAcumuladaPorPuntoPath.Add(0d);
+                else
+                    distanciaAcumuladaPorPuntoPath.Add(puntoAnterior.CalcularDistancia(puntoActual) + distanciaAcumuladaPorPuntoPath[i-1]);
+
                 puntoAnterior = puntoActual;
             }
         }
@@ -320,5 +328,20 @@ namespace Trochita3D.Core
             Gl.glEnable(Gl.GL_LIGHTING);
         }
 
+
+        public Punto GetPositionByDistancia(double distancia)
+        {
+            double distanciaDesdeElComienzoDeLaVuelta = distancia % distanciaAcumuladaPorPuntoPath[distanciaAcumuladaPorPuntoPath.Count - 1];
+
+            for (int i = 0; i < path.Count; i++)
+            {
+                if (distanciaDesdeElComienzoDeLaVuelta <= distanciaAcumuladaPorPuntoPath[i])
+                {
+                    return path[i];
+                }
+            }
+
+            throw new InvalidProgramException("No se encontró el punto donde supera la distancia");
+        }
     }
 }

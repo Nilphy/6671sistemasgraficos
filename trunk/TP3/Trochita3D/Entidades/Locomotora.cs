@@ -13,6 +13,8 @@ namespace Trochita3D.Core
 
         #region Medidas
 
+        private static double ALTO_VIAS = 2.4d;
+
         // Rectángulo conductor
         private static double ANCHO_RECTANGULO = 3d;
         private static double LARGO_RECTANULO = 3d;
@@ -103,6 +105,8 @@ namespace Trochita3D.Core
         public void Draw()
         {
             Gl.glMatrixMode(Gl.GL_MODELVIEW);
+            Gl.glPushMatrix();
+            Gl.glTranslated(0, 0, ALTO_BASE + (RADIO_EXTERNO_RUEDAS * 2d) + ALTO_VIAS);
             if (this.Posicion != null) Gl.glTranslated(this.Posicion.X, this.Posicion.Y, this.Posicion.Z);
             if (this.AnguloRotacion != 0) Gl.glRotated(this.AnguloRotacion, 0, 0, 1);
 
@@ -129,6 +133,7 @@ namespace Trochita3D.Core
 
             // Triangulo de adelante
             this.guardabarroTren.Draw();
+            Gl.glPopMatrix();
         }
 
         private void DrawRuedas()
