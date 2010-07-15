@@ -293,5 +293,17 @@ namespace Trochita3D.Core
             this.X = xAux;
             this.Y = yAux;
         }
+
+        public Punto RestarPunto(Punto punto)
+        {
+            return new Punto(this.X - punto.X, this.Y - punto.Y, this.Z - punto.Z);
+        }
+
+        public double CalcularDistancia(Punto punto)
+        {
+            Punto vectorEnOrigen = this.RestarPunto(punto);
+
+            return vectorEnOrigen.Modulo();
+        }
     }
 }

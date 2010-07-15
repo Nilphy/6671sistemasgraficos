@@ -14,8 +14,8 @@ namespace Trochita3D.Core
     public class TerrainInitializer
     {
         private static int ALTURA_MAXIMA = 2;
-        private static double X_MAX = 30;
-        private static double Y_MAX = 30;
+        private static double X_MAX = 80;
+        private static double Y_MAX = 80;
         private static int CANTIDAD_PIXELES_ANCHO_IMAGEN = 512;
         private static int CANTIDAD_PIXELES_ALTO_IMAGEN = 384;
 

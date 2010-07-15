@@ -26,6 +26,12 @@ namespace TPAlgoritmos3D
 
         Controlador controlador = new Controlador();
 
+        public int DELTA_TIEMPO = 1;
+        public Double PASO_TIEMPO = 0.001;
+        private Timer timer;
+
+        private int MAXIMA_COORDENADA = 100;
+
         #region ids de display lists
 
         private int dl_handle;
@@ -63,9 +69,6 @@ namespace TPAlgoritmos3D
 
             // Se inicializan los componentes de la escena en OpenGL.
             Init();
-
-            // Se configura el Timer para la simulación.
-            controlador.InicializarTimer(TimerEventProcessor);
         }
 
         #region Inicialización
@@ -85,6 +88,9 @@ namespace TPAlgoritmos3D
             // TODO poner la creación de objetos en display lists
             controlador.Escena.Inicializar();
 
+            // Se configura el Timer para la simulación.
+            this.InicializarTimer(TimerEventProcessor);
+
             // Generación de las Display Lists
             Gl.glNewList(DL_AXIS, Gl.GL_COMPILE);
             DrawAxis();
@@ -92,6 +98,14 @@ namespace TPAlgoritmos3D
             Gl.glNewList(DL_GRID, Gl.GL_COMPILE);
             DrawXYGrid();
             Gl.glEndList();
+        }
+
+        public void InicializarTimer(EventHandler TimerEventProcessor)
+        {
+            this.timer = new Timer();
+            timer.Tick += new EventHandler(TimerEventProcessor);
+            timer.Interval = DELTA_TIEMPO;
+            timer.Start();
         }
 
         #endregion
@@ -211,6 +225,7 @@ namespace TPAlgoritmos3D
         /// <param name="myEventArgs"></param>
         private void TimerEventProcessor(Object myObject, EventArgs myEventArgs)
         {
+            controlador.Escena.Simular(this.PASO_TIEMPO);
             glControl.Refresh();
             glControl.Invalidate();
         }
@@ -253,12 +268,12 @@ namespace TPAlgoritmos3D
             Gl.glDisable(Gl.GL_LIGHTING);
             Gl.glColor3d(0.15d, 0.1d, 0.1d);
             Gl.glBegin(Gl.GL_LINES);
-            for (i = -20; i < 21; i++)
+            for (i = -MAXIMA_COORDENADA; i < MAXIMA_COORDENADA+1; i++)
             {
-                Gl.glVertex3d(i, -20, 0);
-                Gl.glVertex3d(i, 20, 0);
-                Gl.glVertex3d(-20, i, 0);
-                Gl.glVertex3d(20, i, 0);
+                Gl.glVertex3d(i, -MAXIMA_COORDENADA, 0);
+                Gl.glVertex3d(i, MAXIMA_COORDENADA, 0);
+                Gl.glVertex3d(-MAXIMA_COORDENADA, i, 0);
+                Gl.glVertex3d(MAXIMA_COORDENADA, i, 0);
             }
             Gl.glEnd();
             Gl.glEnable(Gl.GL_LIGHTING);
