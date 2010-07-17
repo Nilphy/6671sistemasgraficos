@@ -29,6 +29,7 @@ namespace TPAlgoritmos3D
         public int DELTA_TIEMPO = 1;
         public Double PASO_TIEMPO = 0.001;
         private Timer timer;
+        int xanterior = 0;
 
         private int MAXIMA_COORDENADA = 100;
 
@@ -66,7 +67,7 @@ namespace TPAlgoritmos3D
             // Se inicializan los controles de la ventana
             InitializeComponent();
             glControl.InitializeContexts();
-
+            
             // Se inicializan los componentes de la escena en OpenGL.
             Init();
         }
@@ -78,6 +79,9 @@ namespace TPAlgoritmos3D
         /// </summary>
         private void Init()
         {
+            // Capturar movimiento del mouse
+            this.glControl.MouseDown += new MouseEventHandler(this.glControl_MouseDown);
+
             dl_handle = Gl.glGenLists(2);
 
             Gl.glClearColor(0.02f, 0.02f, 0.04f, 0.0f);
@@ -120,7 +124,8 @@ namespace TPAlgoritmos3D
             Gl.glMatrixMode(Gl.GL_MODELVIEW);
             Gl.glLoadIdentity();
 
-            Glu.gluLookAt(controlador.Camara.eye[0], controlador.Camara.eye[1], controlador.Camara.eye[2], controlador.Camara.at[0], controlador.Camara.at[1], controlador.Camara.at[2], controlador.Camara.up[0], controlador.Camara.up[1], controlador.Camara.up[2]);
+            //Glu.gluLookAt(controlador.Camara.eye[0], controlador.Camara.eye[1], controlador.Camara.eye[2], controlador.Camara.at[0], controlador.Camara.at[1], controlador.Camara.at[2], controlador.Camara.up[0], controlador.Camara.up[1], controlador.Camara.up[2]);
+            Glu.gluLookAt(controlador.Camara.Eye.X, controlador.Camara.Eye.Y, controlador.Camara.Eye.Z, controlador.Camara.At.X, controlador.Camara.At.Y, controlador.Camara.At.Z, controlador.Camara.Up.X, controlador.Camara.Up.Y, controlador.Camara.Up.Z);
             
             // Si corresponde se dibujan los ejes
             if (controlador.view_axis) Gl.glCallList(DL_AXIS);
@@ -145,26 +150,32 @@ namespace TPAlgoritmos3D
             {
                 case Keys.Up:
                     {
-                        controlador.Camara.AvanzarAdelante();
-                        this.RefreshEye();
+                        controlador.Camara.MoveCamera(1);
                         break;
                     }
                 case Keys.Down:
                     {
-                        controlador.Camara.AvanzarAtraz();
-                        this.RefreshEye();
+                        controlador.Camara.MoveCamera(-1);
                         break;
                     }
                 case Keys.Left:
                     {
-                        controlador.Camara.AvanzarIzquierda();
-                        this.RefreshEye();
+                        controlador.Camara.SlideCamera(0, -1);
                         break;
                     }
                 case Keys.Right:
                     {
-                        controlador.Camara.AvanzarDerecha();
-                        this.RefreshEye();
+                        controlador.Camara.SlideCamera(0, 1);
+                        break;
+                    }
+                case Keys.Add:
+                    {
+                        controlador.Camara.SlideCamera(1, 0);
+                        break;
+                    }
+                case Keys.Subtract:
+                    {
+                        controlador.Camara.SlideCamera(-1, 0);
                         break;
                     }
                 default: break;
@@ -214,6 +225,20 @@ namespace TPAlgoritmos3D
                     break;
                 default:
                     break;
+            }
+        }
+
+        private void glControl_MouseDown(object sender, MouseEventArgs e)
+        {
+            
+            switch (e.Button)
+            {
+                case MouseButtons.Left:
+                    {
+                        System.Console.Out.WriteLine("X: " + e.X + " - Y: " + e.Y);
+                        controlador.Camara.RotateCamera(Math.PI / 8, 0);
+                        break;
+                    }
             }
         }
 
@@ -291,5 +316,6 @@ namespace TPAlgoritmos3D
         }
 
         #endregion
+        
     }
 }
