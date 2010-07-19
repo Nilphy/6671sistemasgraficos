@@ -38,31 +38,21 @@ namespace Trochita3D.Core
             At.X = Eye.X + (double)(radius * Math.Cos(vRadians) * Math.Cos(hRadians));
             At.Y = Eye.Y + (double)(radius * Math.Cos(vRadians) * Math.Sin(hRadians));
             At.Z = Eye.Z + (double)(radius * Math.Sin(vRadians));
-            /*
-            At.Y = Eye.Y + (double)(radius * Math.Sin(vRadians));
-            At.X = Eye.X + (double)(radius * Math.Cos(vRadians) * Math.Cos(hRadians));
-            At.Z = Eye.Z + (double)(radius * Math.Cos(vRadians) * Math.Sin(hRadians));
-            */
-            /*
-            Up.X = Eye.X - At.X;
-            Up.Z = Math.Abs(Eye.Z + (double)(radius * Math.Sin(vRadians + Math.PI / 2)));
-            Up.Y = Eye.Y - At.Y;
-            */
         }
 
         public void MoveCamera(float d)
         {
-            Eye.Y += d * moveDist * (float)Math.Sin(vRadians);
             Eye.X += d * moveDist * (float)(Math.Cos(vRadians) * Math.Cos(hRadians));
-            Eye.Z += d * moveDist * (float)(Math.Cos(vRadians) * Math.Sin(hRadians));
+            Eye.Y += d * moveDist * (float)(Math.Cos(vRadians) * Math.Sin(hRadians));
+            Eye.Z += d * moveDist * (float)Math.Sin(vRadians);
             RotateCamera(0, 0);
         }
 
         public void SlideCamera(float h, float v)
         {
-            Eye.Y += v * moveDist;
             Eye.X += h * moveDist * (float)Math.Cos(hRadians + Math.PI / 2);
-            Eye.Z += h * moveDist * (float)Math.Sin(hRadians + Math.PI / 2);
+            Eye.Y += h * moveDist * (float)Math.Sin(hRadians + Math.PI / 2);
+            Eye.Z += v * moveDist;
             RotateCamera(0, 0);
         }
 

@@ -278,19 +278,32 @@ namespace Trochita3D.Core
         /// </summary>
         private void DrawRieles()
         {
+            // Silver
+            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_AMBIENT, new float[] { 0.19225f, 0.19225f, 0.19225f, 1.0f });
+            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_DIFFUSE, new float[] { 0.50754f, 0.50754f, 0.50754f, 1.0f });
+            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_SPECULAR, new float[] { 0.508273f, 0.508273f, 0.508273f, 1.0f });
+            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_SHININESS, new float[] { 51.2f });
+
+            // Polished Silver
+            /*
+            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_AMBIENT, new float[] { 0.23125f, 0.23125f, 0.23125f, 1.0f });
+            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_DIFFUSE, new float[] { 0.2775f, 0.2775f, 0.2775f, 1.0f });
+            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_SPECULAR, new float[] { 0.773911f, 0.773911f, 0.773911f, 1.0f });
+            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_SHININESS, new float[] { 0.896f });
+            */
+
+            // Chrome
+            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_AMBIENT, new float[] { 0.25f, 0.25f, 0.25f, 1.0f });
+            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_DIFFUSE, new float[] { 0.4f, 0.4f, 0.4f, 1.0f });
+            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_SPECULAR, new float[] { 0.774597f, 0.774597f, 0.774597f, 1.0f });
+            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_SHININESS, new float[] { 76.8f });
+
             Gl.glVertexPointer(3, Gl.GL_DOUBLE, 3 * sizeof(double), verticesRieles1);
             Gl.glNormalPointer(Gl.GL_DOUBLE, 3 * sizeof(double), normalesRieles1);
-            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_AMBIENT, new float[] { 0.25f, 0.25f, 0.25f, 1.0f });
-            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_DIFFUSE, new float[] { 0.7f, 0.7f, 0.7f, 1 });
-            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_SPECULAR, new float[] { 1, 1, 1, 1 });
-            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_SHININESS, new float[] { 1.75f });
             Gl.glDrawElements(Gl.GL_QUAD_STRIP, indicesRieles1.Length, Gl.GL_UNSIGNED_INT, indicesRieles1);
 
             Gl.glVertexPointer(3, Gl.GL_DOUBLE, 3 * sizeof(double), verticesRieles2);
             Gl.glNormalPointer(Gl.GL_DOUBLE, 3 * sizeof(double), normalesRieles2);
-            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_AMBIENT, new float[] { 0.25f, 0.25f, 0.25f, 1.0f });
-            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_DIFFUSE, new float[] { 0.7f, 0.7f, 0.7f, 1 });
-            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_SPECULAR, new float[] { 0, 0, 0, 1 });
             Gl.glDrawElements(Gl.GL_QUAD_STRIP, indicesRieles2.Length, Gl.GL_UNSIGNED_INT, indicesRieles2);
         }
 
