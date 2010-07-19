@@ -16,6 +16,7 @@ using Trochita3D.Core;
 using Trochita3D.Curvas;
 using Trochita3D.Entidades;
 using Trochita3D;
+using Common.Utils;
 
 
 namespace TPAlgoritmos3D
@@ -26,12 +27,14 @@ namespace TPAlgoritmos3D
 
         Controlador controlador = new Controlador();
 
-        public int DELTA_TIEMPO = 1;
+        public int DELTA_TIEMPO = 15;
         public Double PASO_TIEMPO = 0.001;
         private Timer timer;
-        int xanterior = 0;
 
         private int MAXIMA_COORDENADA = 100;
+        private bool mousing = false;
+        private Point ptLastMousePosit = new Point();
+        private Point ptCurrentMousePosit = new Point();
 
         #region ids de display lists
 
@@ -80,7 +83,9 @@ namespace TPAlgoritmos3D
         private void Init()
         {
             // Capturar movimiento del mouse
-            this.glControl.MouseDown += new MouseEventHandler(this.glControl_MouseDown);
+            //Cursor.Hide();
+            this.glControl.MouseDown += new MouseEventHandler(this.glControl_OnMouseDown);
+            this.glControl.MouseUp += new MouseEventHandler(this.glControl_OnMouseUp);
 
             dl_handle = Gl.glGenLists(2);
 
@@ -124,7 +129,20 @@ namespace TPAlgoritmos3D
             Gl.glMatrixMode(Gl.GL_MODELVIEW);
             Gl.glLoadIdentity();
 
-            //Glu.gluLookAt(controlador.Camara.eye[0], controlador.Camara.eye[1], controlador.Camara.eye[2], controlador.Camara.at[0], controlador.Camara.at[1], controlador.Camara.at[2], controlador.Camara.up[0], controlador.Camara.up[1], controlador.Camara.up[2]);
+            ptCurrentMousePosit.X = Cursor.Position.X;
+            ptCurrentMousePosit.Y = Cursor.Position.Y;
+
+            if (mousing)
+            {
+                int nXDiff = (ptLastMousePosit.X - ptCurrentMousePosit.X);
+                int nYDiff = (ptLastMousePosit.Y - ptCurrentMousePosit.Y);
+
+                controlador.Camara.RotateCamera(MathUtils.DegreeToRadian((double)nXDiff / 3d), MathUtils.DegreeToRadian((double)nYDiff / 3d));
+            }
+
+            ptLastMousePosit.X = ptCurrentMousePosit.X;
+            ptLastMousePosit.Y = ptCurrentMousePosit.Y;
+
             Glu.gluLookAt(controlador.Camara.Eye.X, controlador.Camara.Eye.Y, controlador.Camara.Eye.Z, controlador.Camara.At.X, controlador.Camara.At.Y, controlador.Camara.At.Z, controlador.Camara.Up.X, controlador.Camara.Up.Y, controlador.Camara.Up.Z);
             
             // Si corresponde se dibujan los ejes
@@ -133,7 +151,6 @@ namespace TPAlgoritmos3D
             if (controlador.view_grid) Gl.glCallList(DL_GRID);
 
             Gl.glEnable(Gl.GL_NORMALIZE);
-            Gl.glEnable(Gl.GL_AUTO_NORMAL);
 
             controlador.Escena.Dibujar();
         }
@@ -160,22 +177,22 @@ namespace TPAlgoritmos3D
                     }
                 case Keys.Left:
                     {
-                        controlador.Camara.SlideCamera(0, -1);
+                        controlador.Camara.SlideCamera(0, 1);
                         break;
                     }
                 case Keys.Right:
                     {
-                        controlador.Camara.SlideCamera(0, 1);
+                        controlador.Camara.SlideCamera(0, -1);
                         break;
                     }
                 case Keys.Add:
                     {
-                        controlador.Camara.SlideCamera(1, 0);
+                        controlador.Camara.SlideCamera(-1, 0);
                         break;
                     }
                 case Keys.Subtract:
                     {
-                        controlador.Camara.SlideCamera(-1, 0);
+                        controlador.Camara.SlideCamera(1, 0);
                         break;
                     }
                 default: break;
@@ -228,18 +245,14 @@ namespace TPAlgoritmos3D
             }
         }
 
-        private void glControl_MouseDown(object sender, MouseEventArgs e)
+        private void glControl_OnMouseDown(object sender, MouseEventArgs e)
         {
-            
-            switch (e.Button)
-            {
-                case MouseButtons.Left:
-                    {
-                        System.Console.Out.WriteLine("X: " + e.X + " - Y: " + e.Y);
-                        controlador.Camara.RotateCamera(Math.PI / 8, 0);
-                        break;
-                    }
-            }
+            mousing = true;
+        }
+
+        private void glControl_OnMouseUp(object sender, MouseEventArgs e)
+        {
+            mousing = false;
         }
 
         /// <summary>
@@ -312,7 +325,7 @@ namespace TPAlgoritmos3D
             Gl.glViewport(0, 0, W_WIDTH, W_HEIGHT);
             Gl.glMatrixMode(Gl.GL_PROJECTION);
             Gl.glLoadIdentity();
-            Glu.gluPerspective(60.0, (float)W_WIDTH / (float)W_HEIGHT, 0.10, 100.0);
+            Glu.gluPerspective(60.0, (float)W_WIDTH / (float)W_HEIGHT, 0.10, 200.0);
         }
 
         #endregion

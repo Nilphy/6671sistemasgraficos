@@ -5,6 +5,7 @@ using System.Text;
 using Trochita3D.Curvas;
 using Trochita3D.Entidades;
 using Tao.OpenGl;
+using System.Drawing;
 
 namespace Trochita3D.Core
 {
@@ -13,11 +14,11 @@ namespace Trochita3D.Core
     /// </summary>
     public class TerrainInitializer
     {
-        private static int ALTURA_MAXIMA = 2;
-        private static double X_MAX = 80;
-        private static double Y_MAX = 80;
-        private static int CANTIDAD_PIXELES_ANCHO_IMAGEN = 512;
-        private static int CANTIDAD_PIXELES_ALTO_IMAGEN = 384;
+        private const int ALTURA_MAXIMA = 2;
+        private const double X_MAX = 180;
+        private const double Y_MAX = 180;
+        private const int MAX_VERTEX_X = 90;
+        private const int MAX_VERTEX_Y = 90;
 
         private static int[] indices;
         private static double[] vertices;
@@ -31,31 +32,25 @@ namespace Trochita3D.Core
         private void BuildTerrain()
         {
             // Se procesa la imagen bmp
-            byte[] bytesDeLaImagen = BMPUtils.ObtenerBytesDeArchivo(@"../../Imagenes/Bitmap.bmp");
-            byte[] bytesUtiles = BMPUtils.ObtenerBytesUtilesDelArchivo(bytesDeLaImagen);
-            double[] bytesDeLaImagenEscalados = BMPUtils.EscalarBytes(ALTURA_MAXIMA, bytesUtiles);
-            
-            IList<double> zetas = new List<double>(bytesDeLaImagenEscalados);
-            
-            this.GenerarVerticesYNormales(zetas);
-
-            this.GenerarIndices(zetas.Count, CANTIDAD_PIXELES_ALTO_IMAGEN, CANTIDAD_PIXELES_ANCHO_IMAGEN);
+            Bitmap mapa = new Bitmap(@"../../Imagenes/Bitmap.bmp");
+            this.GenerarVerticesYNormales(mapa);
+            this.GenerarIndices(vertices.Length, MAX_VERTEX_Y, MAX_VERTEX_X);
         }
 
-        private void GenerarVerticesYNormales(IList<double> zetas)
+        private void GenerarVerticesYNormales(Bitmap mapa)
         {
             IList<double> vertex = new List<double>();
-            Punto[][] matriz = new Punto[CANTIDAD_PIXELES_ALTO_IMAGEN][];
+            Punto[][] matriz = new Punto[MAX_VERTEX_Y][];
             int k = 0;
 
-            for (int y = 0; y < CANTIDAD_PIXELES_ALTO_IMAGEN; y++)
+            for (int y = 0; y < MAX_VERTEX_Y; y++)
             {
-                matriz[y] = new Punto[CANTIDAD_PIXELES_ANCHO_IMAGEN];
-                for (int x = 0; x < CANTIDAD_PIXELES_ANCHO_IMAGEN; x++)
+                matriz[y] = new Punto[MAX_VERTEX_X];
+                for (int x = 0; x < MAX_VERTEX_X; x++)
                 {
-                    double coordenadaX = (double)x * (double)X_MAX / (double)CANTIDAD_PIXELES_ANCHO_IMAGEN;
-                    double coordenadaY = (double)y * (double)Y_MAX / (double)CANTIDAD_PIXELES_ALTO_IMAGEN;
-                    double coordenadaZ = zetas[k++];
+                    double coordenadaX = (double)x * (double)X_MAX / (double)MAX_VERTEX_X;
+                    double coordenadaY = (double)y * (double)Y_MAX / (double)MAX_VERTEX_Y;
+                    double coordenadaZ = mapa.GetPixel(x * (mapa.Width / MAX_VERTEX_X), y * (mapa.Height / MAX_VERTEX_Y)).B * ((double)ALTURA_MAXIMA / (double)255);
 
                     vertex.Add(coordenadaX);
                     vertex.Add(coordenadaY);
@@ -74,17 +69,17 @@ namespace Trochita3D.Core
             Punto puntoEste = null;
             Punto puntoOeste = null;
 
-            for (int i = 0; i < CANTIDAD_PIXELES_ALTO_IMAGEN; i++)
+            for (int i = 0; i < MAX_VERTEX_Y; i++)
             {
-                for (int j = 0; j < CANTIDAD_PIXELES_ANCHO_IMAGEN; j++)
+                for (int j = 0; j < MAX_VERTEX_X; j++)
                 {
                     puntoNorte = null;
                     puntoSur = null;
                     puntoEste = null;
                     puntoOeste = null;
-                    if (i + 1 < CANTIDAD_PIXELES_ALTO_IMAGEN - 1) puntoNorte = matriz[i + 1][j];
+                    if (i + 1 < MAX_VERTEX_Y - 1) puntoNorte = matriz[i + 1][j];
                     if (i - 1 > 0) puntoSur = matriz[i - 1][j];
-                    if (j + 1 < CANTIDAD_PIXELES_ANCHO_IMAGEN - 1) puntoEste = matriz[i][j + 1];
+                    if (j + 1 < MAX_VERTEX_X - 1) puntoEste = matriz[i][j + 1];
                     if (j - 1 > 0) puntoOeste = matriz[i][j - 1];
 
                     normal = Punto.CalcularNormal(matriz[i][j], puntoNorte, puntoEste, puntoSur, puntoOeste, false);
@@ -134,9 +129,28 @@ namespace Trochita3D.Core
             Gl.glDrawElements(Gl.GL_QUADS, indices.Length, Gl.GL_UNSIGNED_INT, indices);
             Gl.glDisable(Gl.GL_LIGHTING);
 
+            //this.DibujarNormales(vertices, normales);
+
             Gl.glPopMatrix();
         }
 
+        private void DibujarNormales(double[] vertices, double[] normales)
+        {
+            Gl.glDisable(Gl.GL_LIGHTING);
+            for (int i = 0; i < vertices.Length; i += 3)
+            {
+                Gl.glPushMatrix();
+                Gl.glTranslated(vertices[i], vertices[i + 1], vertices[i + 2]);
+                Gl.glBegin(Gl.GL_LINES);
+                Gl.glColor3d(1, 0, 0);
+                Gl.glVertex3d(0, 0, 0);
+                Gl.glColor3d(0.2, 0, 0);
+                Gl.glVertex3d(normales[i], normales[i + 1], normales[i + 2]);
+                Gl.glEnd();
+                Gl.glPopMatrix();
+            }
+            Gl.glEnable(Gl.GL_LIGHTING);
+        }
         
     }
 }

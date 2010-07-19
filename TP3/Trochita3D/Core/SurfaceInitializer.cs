@@ -13,13 +13,15 @@ namespace Trochita3D.Core
     /// </summary>
     public class SurfaceInitializer
     {
-        private const double DELTA_U = 0.0005;
+        private const double DELTA_U = 0.05;
+        private const double DELTA_U2 = 0.0005;
         private const int CANT_PUNTOS_TERRAPLEN = 10;
 
         private IList<Seccion> seccionesTerraplen = new List<Seccion>();
         private IList<Seccion> seccionesRieles1 = new List<Seccion>();
         private IList<Seccion> seccionesRieles2 = new List<Seccion>();
         private IList<Punto> path;
+        private IList<Punto> detailPath;
         private IList<double> distanciaAcumuladaPorPuntoPath;
 
         private static int[] indicesTerraplen;
@@ -37,6 +39,7 @@ namespace Trochita3D.Core
         public SurfaceInitializer()
         {
             this.path = GetBsplineControlPoints(DELTA_U);
+            this.detailPath = GetBsplineControlPoints(DELTA_U2);
             this.BuildTerraplen();
             this.BuildRieles();
             Gl.glEnableClientState(Gl.GL_VERTEX_ARRAY);
@@ -55,10 +58,29 @@ namespace Trochita3D.Core
         {
             IList<Punto> ptsControl = new List<Punto>();
 
-            ptsControl.Add(new Punto(30, 30, 0));
-            ptsControl.Add(new Punto(30, -30, 0));
-            ptsControl.Add(new Punto(-30, -30, 0));
-            ptsControl.Add(new Punto(-30, 30, 0));
+            ptsControl.Add(new Punto(55, 80, 0));
+            ptsControl.Add(new Punto(72, 60, 0));
+            ptsControl.Add(new Punto(76, 35, 0));
+            ptsControl.Add(new Punto(46, 11, 0));
+            ptsControl.Add(new Punto(46, -15, 0));
+            ptsControl.Add(new Punto(60, -30, 0));
+            ptsControl.Add(new Punto(75, -35, 0));
+            ptsControl.Add(new Punto(83, -50, 0));
+            ptsControl.Add(new Punto(83, -65, 0));
+            ptsControl.Add(new Punto(77, -79, 0));
+            ptsControl.Add(new Punto(43, -71, 0));
+            ptsControl.Add(new Punto(21, -63, 0));
+            ptsControl.Add(new Punto(1, -76, 0));
+            ptsControl.Add(new Punto(-8, -74, 0));
+            ptsControl.Add(new Punto(-25, -69, 0));
+            ptsControl.Add(new Punto(-52, -64, 0));
+            ptsControl.Add(new Punto(-63, -45, 0));
+            ptsControl.Add(new Punto(-57, -14, 0));
+            ptsControl.Add(new Punto(-40, 10, 0));
+            ptsControl.Add(new Punto(-45, 30, 0));
+            ptsControl.Add(new Punto(-67, 47, 0));
+            ptsControl.Add(new Punto(-57, 70, 0));
+            ptsControl.Add(new Punto(-23, 80, 0));
 
             CurvaBsplineSegmentosCubicos path = new CurvaBsplineSegmentosCubicos(ptsControl);
 
