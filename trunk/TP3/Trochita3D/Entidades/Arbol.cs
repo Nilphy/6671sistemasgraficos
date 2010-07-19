@@ -5,6 +5,7 @@ using System.Text;
 using Tao.OpenGl;
 using Trochita3D.Core;
 using Trochita3D.Curvas;
+using Common.Utils;
 
 
 namespace Trochita3D.Entidades
@@ -156,7 +157,7 @@ namespace Trochita3D.Entidades
 
         private Punto[][] generarMatrizVertices(Punto[] curva, double gradosRevolucion, int cantidadCaras)
         {
-            double anguloRotacionRadianes = GradosARadianes(gradosRevolucion / cantidadCaras);
+            double anguloRotacionRadianes = MathUtils.DegreeToRadian(gradosRevolucion / cantidadCaras);
             CurvaBzierSegmentosCubicos curvaBS = new CurvaBzierSegmentosCubicos(curva);
             Punto[] curvaDiscretizada = curvaBS.GetPuntosDiscretos(PASO_BEZIER).ToArray<Punto>();
 
@@ -199,16 +200,6 @@ namespace Trochita3D.Entidades
             }
 
             return matriz;
-        }
-
-        private static double RadianesAGrados(double radianes)
-        {
-            return radianes * 180.0f / Math.PI;
-        }
-
-        private static double GradosARadianes(double grados)
-        {
-            return grados * Math.PI / 180.0f;
         }
 
         private static double RandomEntre(double numMin, double numMax)

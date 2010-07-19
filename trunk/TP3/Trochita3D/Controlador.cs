@@ -21,8 +21,5 @@ namespace Trochita3D
             this.Camara = new Camara();
         }
 
-       
-
-
     }
 }
