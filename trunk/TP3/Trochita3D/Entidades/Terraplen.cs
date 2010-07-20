@@ -12,13 +12,10 @@ namespace Trochita3D.Entidades
 {
     public class Terraplen
     {
-
-        public const double ALTURA = 2.2;
-
         private IList<Punto> puntosControl = new List<Punto>();
         private CurvaBzierSegmentosCubicos curvaCamino;
 
-        public Terraplen()
+        public Terraplen(double altura)
         {
             // Curva del terraplen
             puntosControl.Add(new Punto(0, -2, 0));
@@ -27,8 +24,8 @@ namespace Trochita3D.Entidades
             puntosControl.Add(new Punto(0, -1, 2));
 
             // Plano del terraplen
-            puntosControl.Add(new Punto(0, -0.5, ALTURA));
-            puntosControl.Add(new Punto(0, 0.5, ALTURA));
+            puntosControl.Add(new Punto(0, -0.5, altura));
+            puntosControl.Add(new Punto(0, 0.5, altura));
             puntosControl.Add(new Punto(0, 1, 2));
 
             // Curva del terraplen
