@@ -429,8 +429,6 @@ namespace Trochita3D.Core
             Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_DIFFUSE, new float[] { 128f / 255f, 64f / 255f, 0.0f, 1 });
             Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_SPECULAR, new float[] { 0, 0, 0, 1 });
             Gl.glDrawElements(Gl.GL_QUADS, indicesTablas.Length, Gl.GL_UNSIGNED_INT, indicesTablas);
-
-            DibujarNormales(verticesTablas, normalesTablas);
         }
 
         /// <summary>

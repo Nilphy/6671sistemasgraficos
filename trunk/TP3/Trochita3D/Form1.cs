@@ -240,6 +240,10 @@ namespace TPAlgoritmos3D
                     Gl.glPolygonMode(Gl.GL_FRONT_AND_BACK, Gl.GL_FILL);
                     glControl.Refresh();
                     break;
+                case 'm':
+                    controlador.Escena.SwitchDayLight();
+                    glControl.Refresh();
+                    break;
                 default:
                     break;
             }
