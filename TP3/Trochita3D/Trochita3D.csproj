@@ -68,6 +68,7 @@
     <Compile Include="Core\CaraFigura.cs" />
     <Compile Include="Core\CaraGuardabarro.cs" />
     <Compile Include="Core\Figura.cs" />
+    <Compile Include="Core\Skybox.cs" />
     <Compile Include="Entidades\GuardabarroTren.cs" />
     <Compile Include="Core\Cuboide.cs" />
     <Compile Include="Core\OrientacionesCara.cs" />
@@ -119,6 +120,11 @@
   <ItemGroup>
     <Content Include="bin\Debug\Imagenes\Bitmap.bmp" />
     <Content Include="Imagenes\Bitmap.bmp" />
+    <Content Include="Imagenes\Texturas\Skybox\mpa23bk.bmp" />
+    <Content Include="Imagenes\Texturas\Skybox\mpa23ft.bmp" />
+    <Content Include="Imagenes\Texturas\Skybox\mpa23lf.bmp" />
+    <Content Include="Imagenes\Texturas\Skybox\mpa23rt.bmp" />
+    <Content Include="Imagenes\Texturas\Skybox\mpa23up.bmp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj">

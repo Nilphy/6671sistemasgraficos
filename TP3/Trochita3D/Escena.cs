@@ -5,6 +5,8 @@ using System.Text;
 using Trochita3D.Core;
 using Trochita3D.Entidades;
 using Tao.OpenGl;
+using System.Drawing;
+using System.Drawing.Imaging;
 
 namespace Trochita3D
 {
@@ -24,9 +26,10 @@ namespace Trochita3D
         #endregion
 
         // Partes de la escena
-        private SurfaceInitializer surfaceInitializer = new SurfaceInitializer();
-        private TerrainInitializer terrainInitializer = new TerrainInitializer();
-        private WaterInitializer waterInitializer = new WaterInitializer();
+        private SurfaceInitializer surfaceInitializer;
+        private TerrainInitializer terrainInitializer;
+        private WaterInitializer waterInitializer;
+        private Skybox skybox;
         private Train Tren = new Train(TREN_LUZ_AMBIENTE, TREN_LUZ_BRILLO, TREN_LUZ, TREN_SHININESS);
         private bool daylight = true;
 
@@ -50,7 +53,7 @@ namespace Trochita3D
         private float[] day_light_ambient = new float[4] { 0.15f, 0.15f, 0.15f, 1.0f };
         private float[] night_light_color = new float[4] { 64f / 255f, 156f / 255f, 1.0f, 1.0f };
         private float[] night_light_ambient = new float[4] { 0.05f, 0.05f, 0.15f, 1.0f };
-        private float[] light_position = new float[4] { 7.0f, 7.0f, 10.0f, 0.0f };
+        private float[] light_position = new float[4] { 7.0f, 7.0f, 100.0f, 0.0f };
 
         private float[] secondary_day_light_color = new float[4] { 0.20f, 0.20f, 0.20f, 1.0f };
         private float[] secondary_day_light_ambient = new float[4] { 0.05f, 0.05f, 0.05f, 1.0f };
@@ -61,10 +64,12 @@ namespace Trochita3D
 
         public void Inicializar()
         {
+            this.skybox = new Skybox();
             this.surfaceInitializer = new SurfaceInitializer();
             this.surfaceInitializer.BuildSurface();
+            this.terrainInitializer = new TerrainInitializer();
+            this.waterInitializer = new WaterInitializer();
             Tren.Posicion = this.surfaceInitializer.GetPositionByDistancia(0);
-
             this.InicializarLuces();
         }
 
@@ -119,11 +124,12 @@ namespace Trochita3D
 
         public void Dibujar()
         {
+            skybox.Dibujar();
             surfaceInitializer.DrawSurface();
             terrainInitializer.DrawTerrain();
             waterInitializer.DrawPlaneOfWater();
             Tren.Draw();
-            
+
             for (int i = 0; i < arboles.Length; ++i)
             {
                 Gl.glPushMatrix();
