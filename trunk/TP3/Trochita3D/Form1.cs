@@ -31,10 +31,11 @@ namespace TPAlgoritmos3D
         public Double PASO_TIEMPO = 0.001;
         private Timer timer;
 
+        private const int WIDTH_ESCENA = 400;
+        private const int HEIGHT_ESCENA = 400;
+
         private int MAXIMA_COORDENADA = 100;
         private bool mousing = false;
-        private Point ptLastMousePosit = new Point();
-        private Point ptCurrentMousePosit = new Point();
 
         #region ids de display lists
 
@@ -83,7 +84,6 @@ namespace TPAlgoritmos3D
         private void Init()
         {
             // Capturar movimiento del mouse
-            //Cursor.Hide();
             this.glControl.MouseDown += new MouseEventHandler(this.glControl_OnMouseDown);
             this.glControl.MouseUp += new MouseEventHandler(this.glControl_OnMouseUp);
 
@@ -92,10 +92,13 @@ namespace TPAlgoritmos3D
             Gl.glClearColor(0.02f, 0.02f, 0.04f, 0.0f);
             Gl.glShadeModel(Gl.GL_SMOOTH);
             Gl.glEnable(Gl.GL_DEPTH_TEST);
+            Gl.glEnable(Gl.GL_NORMALIZE);
+
+            this.Set3DEnv();
 
             // Crea objetos e inicializa luces 
             // TODO poner la creación de objetos en display lists
-            controlador.Escena.Inicializar();
+            controlador.Escena.Inicializar(480, 480);
 
             // Se configura el Timer para la simulación.
             this.InicializarTimer(TimerEventProcessor);
@@ -122,43 +125,22 @@ namespace TPAlgoritmos3D
 
         private void glControl_Paint(object sender, PaintEventArgs e)
         {
-            Gl.glClear(Gl.GL_COLOR_BUFFER_BIT | Gl.GL_DEPTH_BUFFER_BIT);
-
-            this.Set3DEnv();
-
             Gl.glMatrixMode(Gl.GL_MODELVIEW);
             Gl.glLoadIdentity();
 
-            ptCurrentMousePosit.X = Cursor.Position.X;
-            ptCurrentMousePosit.Y = Cursor.Position.Y;
+            Gl.glClear(Gl.GL_COLOR_BUFFER_BIT | Gl.GL_DEPTH_BUFFER_BIT);
 
-            if (mousing)
-            {
-                int nXDiff = (ptLastMousePosit.X - ptCurrentMousePosit.X);
-                int nYDiff = (ptLastMousePosit.Y - ptCurrentMousePosit.Y);
+            controlador.Camara.UpdateCameraByMouse(mousing);
+            controlador.Camara.Look();
 
-                controlador.Camara.RotateCamera(MathUtils.DegreeToRadian((double)nXDiff / 3d), MathUtils.DegreeToRadian((double)nYDiff / 3d));
-            }
-
-            ptLastMousePosit.X = ptCurrentMousePosit.X;
-            ptLastMousePosit.Y = ptCurrentMousePosit.Y;
-
-            Glu.gluLookAt(controlador.Camara.Eye.X, controlador.Camara.Eye.Y, controlador.Camara.Eye.Z, controlador.Camara.At.X, controlador.Camara.At.Y, controlador.Camara.At.Z, controlador.Camara.Up.X, controlador.Camara.Up.Y, controlador.Camara.Up.Z);
+            controlador.Escena.DibujarSkybox();
             
             // Si corresponde se dibujan los ejes
             if (controlador.view_axis) Gl.glCallList(DL_AXIS);
             // Se corresponde se dibuja la grilla
             if (controlador.view_grid) Gl.glCallList(DL_GRID);
 
-            Gl.glEnable(Gl.GL_NORMALIZE);
-
             controlador.Escena.Dibujar();
-        }
-
-        protected void RefreshEye() 
-        {
-            glControl.Refresh();
-            return;
         }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
@@ -278,7 +260,6 @@ namespace TPAlgoritmos3D
         private void DrawAxis()
         {
             Gl.glDisable(Gl.GL_LIGHTING);
-
             Gl.glBegin(Gl.GL_LINES);
 
             // X
@@ -300,7 +281,6 @@ namespace TPAlgoritmos3D
             Gl.glVertex3d(0, 0, 15);
 
             Gl.glEnd();
-
             Gl.glEnable(Gl.GL_LIGHTING);
         }
 
@@ -329,7 +309,7 @@ namespace TPAlgoritmos3D
             Gl.glViewport(0, 0, W_WIDTH, W_HEIGHT);
             Gl.glMatrixMode(Gl.GL_PROJECTION);
             Gl.glLoadIdentity();
-            Glu.gluPerspective(60.0, (float)W_WIDTH / (float)W_HEIGHT, 0.10, 200.0);
+            Glu.gluPerspective(60.0, (float)W_WIDTH / (float)W_HEIGHT, 0.10, 1000.0);
         }
 
         #endregion
