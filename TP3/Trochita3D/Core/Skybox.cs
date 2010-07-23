@@ -10,45 +10,24 @@ namespace Trochita3D.Core
 {
     public class Skybox
     {
-        private int skybox_left;
-        private int skybox_front;
-        private int skybox_right;
-        private int skybox_back;
-        private int skybox_up;
-        private int skybox_down;
+        private Textura left;
+        private Textura front;
+        private Textura right;
+        private Textura back;
+        private Textura up;
+        private Textura down;
 
         private int size;
 
         public Skybox(int size)
         {
             this.size = size;
-            this.LoadImage(out skybox_left, @"../../Imagenes/Texturas/Skybox/mpa23lf.bmp");
-            this.LoadImage(out skybox_front, @"../../Imagenes/Texturas/Skybox/mpa23ft.bmp");
-            this.LoadImage(out skybox_right, @"../../Imagenes/Texturas/Skybox/mpa23rt.bmp");
-            this.LoadImage(out skybox_back, @"../../Imagenes/Texturas/Skybox/mpa23bk.bmp");
-            this.LoadImage(out skybox_up, @"../../Imagenes/Texturas/Skybox/mpa23up.bmp");
-            this.LoadImage(out skybox_down, @"../../Imagenes/Texturas/Skybox/mpa23dn.bmp");
-        }
-
-        private void LoadImage(out int idTexture, string fileName)
-        {
-            Gl.glGenTextures(1, out idTexture);
-            Bitmap bmp = new Bitmap(fileName);
-            bmp.RotateFlip(RotateFlipType.RotateNoneFlipY);
-            Rectangle rect = new Rectangle(0, 0, bmp.Width, bmp.Height);
-            BitmapData bmpData = bmp.LockBits(rect, ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
-
-            Gl.glBindTexture(Gl.GL_TEXTURE_2D, idTexture);
-            Gl.glTexParameteri(Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_WRAP_S, Gl.GL_CLAMP_TO_EDGE);
-            Gl.glTexParameteri(Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_WRAP_T, Gl.GL_CLAMP_TO_EDGE);
-            Gl.glTexParameteri(Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_MIN_FILTER, Gl.GL_NEAREST);
-            Gl.glTexParameteri(Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_MAG_FILTER, Gl.GL_NEAREST);
-            Gl.glTexImage2D(Gl.GL_TEXTURE_2D, 0, Gl.GL_RGB8, bmp.Width, bmp.Height, 0, Gl.GL_BGR_EXT, Gl.GL_UNSIGNED_BYTE, bmpData.Scan0);
-
-            //Unlock the bits.
-            bmp.UnlockBits(bmpData);
-            //Get rid of the image.
-            bmp.Dispose();
+            this.left = new Textura(@"../../Imagenes/Texturas/Skybox/mpa23lf.bmp");
+            this.front = new Textura(@"../../Imagenes/Texturas/Skybox/mpa23ft.bmp");
+            this.right = new Textura(@"../../Imagenes/Texturas/Skybox/mpa23rt.bmp");
+            this.back = new Textura(@"../../Imagenes/Texturas/Skybox/mpa23bk.bmp");
+            this.up = new Textura(@"../../Imagenes/Texturas/Skybox/mpa23up.bmp");
+            this.down = new Textura(@"../../Imagenes/Texturas/Skybox/mpa23dn.bmp");
         }
 
         public void Dibujar()
@@ -59,7 +38,7 @@ namespace Trochita3D.Core
             double compNorm = 90 / (new Punto(90, 90, 90)).Modulo();
             double dimension = size / 2;
 
-            Gl.glBindTexture(Gl.GL_TEXTURE_2D, skybox_left);
+            left.Activate();
             Gl.glBegin(Gl.GL_QUADS);
                 Gl.glTexCoord2d(0, 0); Gl.glNormal3d(-compNorm, compNorm, compNorm); Gl.glVertex3d(dimension, -dimension, -dimension);
                 Gl.glTexCoord2d(1, 0); Gl.glNormal3d(-compNorm, -compNorm, compNorm); Gl.glVertex3d(dimension, dimension, -dimension);
@@ -67,7 +46,7 @@ namespace Trochita3D.Core
                 Gl.glTexCoord2d(0, 1); Gl.glNormal3d(-compNorm, compNorm, -compNorm); Gl.glVertex3d(dimension, -dimension, dimension);
             Gl.glEnd();
 
-            Gl.glBindTexture(Gl.GL_TEXTURE_2D, skybox_front);
+            front.Activate();
             Gl.glBegin(Gl.GL_QUADS);
                 Gl.glTexCoord2d(0, 0); Gl.glNormal3d(compNorm, compNorm, compNorm); Gl.glVertex3d(-dimension, -dimension, -dimension);
                 Gl.glTexCoord2d(1, 0); Gl.glNormal3d(-compNorm, compNorm, compNorm); Gl.glVertex3d(dimension, -dimension, -dimension);
@@ -75,7 +54,7 @@ namespace Trochita3D.Core
                 Gl.glTexCoord2d(0, 1); Gl.glNormal3d(compNorm, compNorm, -compNorm); Gl.glVertex3d(-dimension, -dimension, dimension);
             Gl.glEnd();
 
-            Gl.glBindTexture(Gl.GL_TEXTURE_2D, skybox_right);
+            right.Activate();
             Gl.glBegin(Gl.GL_QUADS);
                 Gl.glTexCoord2d(0, 0); Gl.glNormal3d(compNorm, -compNorm, compNorm); Gl.glVertex3d(-dimension, dimension, -dimension);
                 Gl.glTexCoord2d(1, 0); Gl.glNormal3d(compNorm, compNorm, compNorm); Gl.glVertex3d(-dimension, -dimension, -dimension);
@@ -83,7 +62,7 @@ namespace Trochita3D.Core
                 Gl.glTexCoord2d(0, 1); Gl.glNormal3d(compNorm, -compNorm, -compNorm); Gl.glVertex3d(-dimension, dimension, dimension);
             Gl.glEnd();
 
-            Gl.glBindTexture(Gl.GL_TEXTURE_2D, skybox_back);
+            back.Activate();
             Gl.glBegin(Gl.GL_QUADS);
                 Gl.glTexCoord2d(0, 0); Gl.glNormal3d(-compNorm, -compNorm, compNorm); Gl.glVertex3d(dimension, dimension, -dimension);
                 Gl.glTexCoord2d(1, 0); Gl.glNormal3d(compNorm, -compNorm, compNorm); Gl.glVertex3d(-dimension, dimension, -dimension);
@@ -91,7 +70,7 @@ namespace Trochita3D.Core
                 Gl.glTexCoord2d(0, 1); Gl.glNormal3d(-compNorm, -compNorm, -compNorm); Gl.glVertex3d(dimension, dimension, dimension);
             Gl.glEnd();
 
-            Gl.glBindTexture(Gl.GL_TEXTURE_2D, skybox_up);
+            up.Activate();
             Gl.glBegin(Gl.GL_QUADS);
                 Gl.glTexCoord2d(0, 0); Gl.glNormal3d(compNorm, -compNorm, -compNorm); Gl.glVertex3d(-dimension, dimension, dimension);
                 Gl.glTexCoord2d(1, 0); Gl.glNormal3d(compNorm, compNorm, -compNorm); Gl.glVertex3d(-dimension, -dimension, dimension);
@@ -99,7 +78,7 @@ namespace Trochita3D.Core
                 Gl.glTexCoord2d(0, 1); Gl.glNormal3d(-compNorm, -compNorm, -compNorm); Gl.glVertex3d(dimension, dimension, dimension);
             Gl.glEnd();
 
-            Gl.glBindTexture(Gl.GL_TEXTURE_2D, skybox_down);
+            down.Activate();
             Gl.glBegin(Gl.GL_QUADS);
                 Gl.glTexCoord2d(1, 1); Gl.glNormal3d(compNorm, compNorm, compNorm); Gl.glVertex3d(-dimension, -dimension, -dimension);
                 Gl.glTexCoord2d(1, 0); Gl.glNormal3d(-compNorm, compNorm, compNorm); Gl.glVertex3d(dimension, -dimension, -dimension);

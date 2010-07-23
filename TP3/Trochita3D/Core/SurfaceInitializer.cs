@@ -20,6 +20,8 @@ namespace Trochita3D.Core
         private const int CANT_PUNTOS_TERRAPLEN = 10;
         private const int DIST_TABLA = 2; // Distancia entre tablas de la vía.
 
+        private Textura terraplenTx;
+
         private IList<Seccion> seccionesTerraplen = new List<Seccion>();
         private IList<Seccion> seccionesRieles1 = new List<Seccion>();
         private IList<Seccion> seccionesRieles2 = new List<Seccion>();
@@ -522,7 +524,6 @@ namespace Trochita3D.Core
             Gl.glEnable(Gl.GL_LIGHTING);
         }
 
-
         public Punto GetPositionByDistancia(double distancia)
         {
             double distanciaDesdeElComienzoDeLaVuelta = distancia % distanciaAcumuladaPorPuntoPath[distanciaAcumuladaPorPuntoPath.Count - 1];
@@ -536,6 +537,11 @@ namespace Trochita3D.Core
             }
 
             throw new InvalidProgramException("No se encontró el punto donde supera la distancia");
+        }
+
+        private void LoadTextures()
+        {
+            this.terraplenTx = new Textura(@"../../Imagenes/Texturas/Tierra.bmp");
         }
     }
 }
