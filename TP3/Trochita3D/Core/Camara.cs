@@ -2,6 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Drawing;
+using System.Windows.Forms;
+using Common.Utils;
+using Tao.OpenGl;
 
 namespace Trochita3D.Core
 {
@@ -17,6 +21,9 @@ namespace Trochita3D.Core
         private double hRadians;
         private double vRadians;
 
+        private Point ptLastMousePosit = new Point();
+        private Point ptCurrentMousePosit = new Point();
+
         public Punto Eye { get; set; }
         public Punto At { get; set; }
         public Punto Up { get; set; }
@@ -28,6 +35,30 @@ namespace Trochita3D.Core
             this.Up = new Punto(0, 0, 1);
 
             this.RotateCamera(0, 0);
+        }
+
+        public void UpdateCameraByMouse(bool mousing)
+        {
+            ptCurrentMousePosit.X = Cursor.Position.X;
+            ptCurrentMousePosit.Y = Cursor.Position.Y;
+
+            if (mousing)
+            {
+                int nXDiff = (ptLastMousePosit.X - ptCurrentMousePosit.X);
+                int nYDiff = (ptLastMousePosit.Y - ptCurrentMousePosit.Y);
+
+                RotateCamera(MathUtils.DegreeToRadian((double)nXDiff / 3d), MathUtils.DegreeToRadian((double)nYDiff / 3d));
+            }
+
+            ptLastMousePosit.X = ptCurrentMousePosit.X;
+            ptLastMousePosit.Y = ptCurrentMousePosit.Y;
+        }
+
+        public void Look()
+        {
+            Glu.gluLookAt(Eye.X, Eye.Y, Eye.Z, 
+                            At.X, At.Y, At.Z, 
+                            Up.X, Up.Y, Up.Z);
         }
 
         public void RotateCamera(double h, double v)

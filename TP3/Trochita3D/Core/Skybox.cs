@@ -15,14 +15,19 @@ namespace Trochita3D.Core
         private int skybox_right;
         private int skybox_back;
         private int skybox_up;
+        private int skybox_down;
 
-        public Skybox()
+        private int size;
+
+        public Skybox(int size)
         {
+            this.size = size;
             this.LoadImage(out skybox_left, @"../../Imagenes/Texturas/Skybox/mpa23lf.bmp");
             this.LoadImage(out skybox_front, @"../../Imagenes/Texturas/Skybox/mpa23ft.bmp");
             this.LoadImage(out skybox_right, @"../../Imagenes/Texturas/Skybox/mpa23rt.bmp");
             this.LoadImage(out skybox_back, @"../../Imagenes/Texturas/Skybox/mpa23bk.bmp");
             this.LoadImage(out skybox_up, @"../../Imagenes/Texturas/Skybox/mpa23up.bmp");
+            this.LoadImage(out skybox_down, @"../../Imagenes/Texturas/Skybox/mpa23dn.bmp");
         }
 
         private void LoadImage(out int idTexture, string fileName)
@@ -34,8 +39,8 @@ namespace Trochita3D.Core
             BitmapData bmpData = bmp.LockBits(rect, ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
 
             Gl.glBindTexture(Gl.GL_TEXTURE_2D, idTexture);
-            Gl.glTexParameteri(Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_WRAP_S, Gl.GL_CLAMP);
-            Gl.glTexParameteri(Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_WRAP_T, Gl.GL_CLAMP);
+            Gl.glTexParameteri(Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_WRAP_S, Gl.GL_CLAMP_TO_EDGE);
+            Gl.glTexParameteri(Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_WRAP_T, Gl.GL_CLAMP_TO_EDGE);
             Gl.glTexParameteri(Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_MIN_FILTER, Gl.GL_NEAREST);
             Gl.glTexParameteri(Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_MAG_FILTER, Gl.GL_NEAREST);
             Gl.glTexImage2D(Gl.GL_TEXTURE_2D, 0, Gl.GL_RGB8, bmp.Width, bmp.Height, 0, Gl.GL_BGR_EXT, Gl.GL_UNSIGNED_BYTE, bmpData.Scan0);
@@ -48,60 +53,62 @@ namespace Trochita3D.Core
 
         public void Dibujar()
         {
-            Gl.glPushMatrix();
-            //Gl.glLoadIdentity();
-            //Gl.glPushAttrib(Gl.GL_ENABLE_BIT);
             Gl.glEnable(Gl.GL_TEXTURE_2D);
-            //Gl.glDisable(Gl.GL_DEPTH_TEST);
             Gl.glDisable(Gl.GL_LIGHTING);
-            //Gl.glDisable(Gl.GL_BLEND);
             Gl.glColor4d(1, 1, 1, 1);
             double compNorm = 90 / (new Punto(90, 90, 90)).Modulo();
+            double dimension = size / 2;
 
             Gl.glBindTexture(Gl.GL_TEXTURE_2D, skybox_left);
             Gl.glBegin(Gl.GL_QUADS);
-            Gl.glTexCoord2d(0, 0); Gl.glNormal3d(-compNorm, compNorm, compNorm); Gl.glVertex3d(90, -90, -90);
-            Gl.glTexCoord2d(1, 0); Gl.glNormal3d(-compNorm, -compNorm, compNorm); Gl.glVertex3d(90, 90, -90);
-            Gl.glTexCoord2d(1, 1); Gl.glNormal3d(-compNorm, -compNorm, -compNorm); Gl.glVertex3d(90, 90, 90);
-            Gl.glTexCoord2d(0, 1); Gl.glNormal3d(-compNorm, compNorm, -compNorm); Gl.glVertex3d(90, -90, 90);
+                Gl.glTexCoord2d(0, 0); Gl.glNormal3d(-compNorm, compNorm, compNorm); Gl.glVertex3d(dimension, -dimension, -dimension);
+                Gl.glTexCoord2d(1, 0); Gl.glNormal3d(-compNorm, -compNorm, compNorm); Gl.glVertex3d(dimension, dimension, -dimension);
+                Gl.glTexCoord2d(1, 1); Gl.glNormal3d(-compNorm, -compNorm, -compNorm); Gl.glVertex3d(dimension, dimension, dimension);
+                Gl.glTexCoord2d(0, 1); Gl.glNormal3d(-compNorm, compNorm, -compNorm); Gl.glVertex3d(dimension, -dimension, dimension);
             Gl.glEnd();
 
             Gl.glBindTexture(Gl.GL_TEXTURE_2D, skybox_front);
             Gl.glBegin(Gl.GL_QUADS);
-            Gl.glTexCoord2d(0, 0); Gl.glNormal3d(compNorm, compNorm, compNorm); Gl.glVertex3d(-90, -90, -90);
-            Gl.glTexCoord2d(1, 0); Gl.glNormal3d(-compNorm, compNorm, compNorm); Gl.glVertex3d(90, -90, -90);
-            Gl.glTexCoord2d(1, 1); Gl.glNormal3d(-compNorm, compNorm, -compNorm); Gl.glVertex3d(90, -90, 90);
-            Gl.glTexCoord2d(0, 1); Gl.glNormal3d(compNorm, compNorm, -compNorm); Gl.glVertex3d(-90, -90, 90);
+                Gl.glTexCoord2d(0, 0); Gl.glNormal3d(compNorm, compNorm, compNorm); Gl.glVertex3d(-dimension, -dimension, -dimension);
+                Gl.glTexCoord2d(1, 0); Gl.glNormal3d(-compNorm, compNorm, compNorm); Gl.glVertex3d(dimension, -dimension, -dimension);
+                Gl.glTexCoord2d(1, 1); Gl.glNormal3d(-compNorm, compNorm, -compNorm); Gl.glVertex3d(dimension, -dimension, dimension);
+                Gl.glTexCoord2d(0, 1); Gl.glNormal3d(compNorm, compNorm, -compNorm); Gl.glVertex3d(-dimension, -dimension, dimension);
             Gl.glEnd();
 
             Gl.glBindTexture(Gl.GL_TEXTURE_2D, skybox_right);
             Gl.glBegin(Gl.GL_QUADS);
-            Gl.glTexCoord2d(0, 0); Gl.glNormal3d(compNorm, -compNorm, compNorm); Gl.glVertex3d(-90, 90, -90);
-            Gl.glTexCoord2d(1, 0); Gl.glNormal3d(compNorm, compNorm, compNorm); Gl.glVertex3d(-90, -90, -90);
-            Gl.glTexCoord2d(1, 1); Gl.glNormal3d(compNorm, compNorm, -compNorm); Gl.glVertex3d(-90, -90, 90);
-            Gl.glTexCoord2d(0, 1); Gl.glNormal3d(compNorm, -compNorm, -compNorm); Gl.glVertex3d(-90, 90, 90);
+                Gl.glTexCoord2d(0, 0); Gl.glNormal3d(compNorm, -compNorm, compNorm); Gl.glVertex3d(-dimension, dimension, -dimension);
+                Gl.glTexCoord2d(1, 0); Gl.glNormal3d(compNorm, compNorm, compNorm); Gl.glVertex3d(-dimension, -dimension, -dimension);
+                Gl.glTexCoord2d(1, 1); Gl.glNormal3d(compNorm, compNorm, -compNorm); Gl.glVertex3d(-dimension, -dimension, dimension);
+                Gl.glTexCoord2d(0, 1); Gl.glNormal3d(compNorm, -compNorm, -compNorm); Gl.glVertex3d(-dimension, dimension, dimension);
             Gl.glEnd();
 
             Gl.glBindTexture(Gl.GL_TEXTURE_2D, skybox_back);
             Gl.glBegin(Gl.GL_QUADS);
-            Gl.glTexCoord2d(0, 0); Gl.glNormal3d(-compNorm, -compNorm, compNorm); Gl.glVertex3d(90, 90, -90);
-            Gl.glTexCoord2d(1, 0); Gl.glNormal3d(-compNorm, -compNorm, compNorm); Gl.glVertex3d(-90, 90, -90);
-            Gl.glTexCoord2d(1, 1); Gl.glNormal3d(-compNorm, -compNorm, -compNorm); Gl.glVertex3d(-90, 90, 90);
-            Gl.glTexCoord2d(0, 1); Gl.glNormal3d(compNorm, -compNorm, -compNorm); Gl.glVertex3d(90, 90, 90);
+                Gl.glTexCoord2d(0, 0); Gl.glNormal3d(-compNorm, -compNorm, compNorm); Gl.glVertex3d(dimension, dimension, -dimension);
+                Gl.glTexCoord2d(1, 0); Gl.glNormal3d(compNorm, -compNorm, compNorm); Gl.glVertex3d(-dimension, dimension, -dimension);
+                Gl.glTexCoord2d(1, 1); Gl.glNormal3d(compNorm, -compNorm, -compNorm); Gl.glVertex3d(-dimension, dimension, dimension);
+                Gl.glTexCoord2d(0, 1); Gl.glNormal3d(-compNorm, -compNorm, -compNorm); Gl.glVertex3d(dimension, dimension, dimension);
             Gl.glEnd();
 
             Gl.glBindTexture(Gl.GL_TEXTURE_2D, skybox_up);
             Gl.glBegin(Gl.GL_QUADS);
-            Gl.glTexCoord2d(0, 0); Gl.glNormal3d(compNorm, compNorm, -compNorm); Gl.glVertex3d(-90, -90, 90);
-            Gl.glTexCoord2d(1, 0); Gl.glNormal3d(-compNorm, compNorm, -compNorm); Gl.glVertex3d(90, -90, 90);
-            Gl.glTexCoord2d(1, 1); Gl.glNormal3d(-compNorm, compNorm, -compNorm); Gl.glVertex3d(90, -90, 90);
-            Gl.glTexCoord2d(0, 1); Gl.glNormal3d(compNorm, compNorm, -compNorm); Gl.glVertex3d(-90, -90, 90);
+                Gl.glTexCoord2d(0, 0); Gl.glNormal3d(compNorm, -compNorm, -compNorm); Gl.glVertex3d(-dimension, dimension, dimension);
+                Gl.glTexCoord2d(1, 0); Gl.glNormal3d(compNorm, compNorm, -compNorm); Gl.glVertex3d(-dimension, -dimension, dimension);
+                Gl.glTexCoord2d(1, 1); Gl.glNormal3d(-compNorm, compNorm, -compNorm); Gl.glVertex3d(dimension, -dimension, dimension);
+                Gl.glTexCoord2d(0, 1); Gl.glNormal3d(-compNorm, -compNorm, -compNorm); Gl.glVertex3d(dimension, dimension, dimension);
+            Gl.glEnd();
+
+            Gl.glBindTexture(Gl.GL_TEXTURE_2D, skybox_down);
+            Gl.glBegin(Gl.GL_QUADS);
+                Gl.glTexCoord2d(1, 1); Gl.glNormal3d(compNorm, compNorm, compNorm); Gl.glVertex3d(-dimension, -dimension, -dimension);
+                Gl.glTexCoord2d(1, 0); Gl.glNormal3d(-compNorm, compNorm, compNorm); Gl.glVertex3d(dimension, -dimension, -dimension);
+                Gl.glTexCoord2d(0, 0); Gl.glNormal3d(-compNorm, -compNorm, compNorm); Gl.glVertex3d(dimension, dimension, -dimension);
+                Gl.glTexCoord2d(0, 1); Gl.glNormal3d(compNorm, -compNorm, compNorm); Gl.glVertex3d(-dimension, dimension, -dimension);
             Gl.glEnd();
 
             Gl.glDisable(Gl.GL_TEXTURE_2D);
             Gl.glEnable(Gl.GL_LIGHTING);
-            //Gl.glPopAttrib();
-            Gl.glPopMatrix();
         }
 
         private void DibujarNormales()

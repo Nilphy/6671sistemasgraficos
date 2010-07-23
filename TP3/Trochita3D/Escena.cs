@@ -62,9 +62,9 @@ namespace Trochita3D
 
         #endregion
 
-        public void Inicializar()
+        public void Inicializar(int width, int height)
         {
-            this.skybox = new Skybox();
+            this.skybox = new Skybox(width);
             this.surfaceInitializer = new SurfaceInitializer();
             this.surfaceInitializer.BuildSurface();
             this.terrainInitializer = new TerrainInitializer();
@@ -122,9 +122,13 @@ namespace Trochita3D
             Gl.glEnable(Gl.GL_LIGHTING);
         }
 
-        public void Dibujar()
+        public void DibujarSkybox()
         {
             skybox.Dibujar();
+        }
+
+        public void Dibujar()
+        {
             surfaceInitializer.DrawSurface();
             terrainInitializer.DrawTerrain();
             waterInitializer.DrawPlaneOfWater();

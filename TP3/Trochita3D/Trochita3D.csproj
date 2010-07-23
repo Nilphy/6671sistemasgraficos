@@ -121,6 +121,7 @@
     <Content Include="bin\Debug\Imagenes\Bitmap.bmp" />
     <Content Include="Imagenes\Bitmap.bmp" />
     <Content Include="Imagenes\Texturas\Skybox\mpa23bk.bmp" />
+    <Content Include="Imagenes\Texturas\Skybox\mpa23dn.bmp" />
     <Content Include="Imagenes\Texturas\Skybox\mpa23ft.bmp" />
     <Content Include="Imagenes\Texturas\Skybox\mpa23lf.bmp" />
     <Content Include="Imagenes\Texturas\Skybox\mpa23rt.bmp" />
