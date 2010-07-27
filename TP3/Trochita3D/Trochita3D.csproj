@@ -121,6 +121,7 @@
   <ItemGroup>
     <Content Include="bin\Debug\Imagenes\Bitmap.bmp" />
     <Content Include="Imagenes\Bitmap.bmp" />
+    <Content Include="Imagenes\Texturas\Arbol\copa.bmp" />
     <Content Include="Imagenes\Texturas\Skybox\mpa23bk.bmp" />
     <Content Include="Imagenes\Texturas\Skybox\mpa23dn.bmp" />
     <Content Include="Imagenes\Texturas\Skybox\mpa23ft.bmp" />
@@ -128,6 +129,7 @@
     <Content Include="Imagenes\Texturas\Skybox\mpa23rt.bmp" />
     <Content Include="Imagenes\Texturas\Skybox\mpa23up.bmp" />
     <Content Include="Imagenes\Texturas\Tierra.bmp" />
+    <Content Include="Imagenes\Texturas\Arbol\tronco_1.bmp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj">
