@@ -6,6 +6,8 @@ using Tao.OpenGl;
 using Trochita3D.Core;
 using Trochita3D.Curvas;
 using Common.Utils;
+using System.Drawing;
+using System.Drawing.Imaging;
 
 
 namespace Trochita3D.Entidades
@@ -24,6 +26,9 @@ namespace Trochita3D.Entidades
         private static double MINIMO_RADIO = .3f;
 
         private Glu.GLUquadric quadraticCylinder = Glu.gluNewQuadric();
+
+        private Textura texturaTronco = null;
+        private Textura texturaCopa = null;
 
         private static double LONGITUD_TRONCO_DEFAULT = 2.0f;
         private static Punto[] FORMA_COPA_DEFAULT = new Punto[] 
@@ -111,16 +116,24 @@ namespace Trochita3D.Entidades
 
         private void DibujarTronco()
         {
-            float[] colorBrown      = new float[4] { 124.0f / 255.0f, 87.0f / 255.0f, 59.0f / 255.0f, .5f };
-            float[] colorNone       =  new float [4] { 0.0f, 0.0f, 0.0f, 0.0f };
+            if (texturaTronco == null) 
+                texturaTronco = new Textura(@"../../Imagenes/Texturas/Arbol/tronco_1.bmp");
 
+            Gl.glEnable(Gl.GL_TEXTURE_2D);
+            
+            float[] colorBrown = new float[4] { 124.0f / 255.0f, 87.0f / 255.0f, 59.0f / 255.0f, .5f };
+            float[] colorNone  =  new float [4] { 0.0f, 0.0f, 0.0f, 0.0f };
             Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_AMBIENT_AND_DIFFUSE, colorBrown);
             Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_SPECULAR, new float[] { 0, 0, 0, 1 });
             Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_SHININESS, new float[] {50.0f});
-
+            
+            texturaTronco.Activate();
+            Glu.gluQuadricDrawStyle(quadraticCylinder, Glu.GLU_FILL);
             Glu.gluQuadricNormals(quadraticCylinder, Glu.GLU_SMOOTH);
+            Glu.gluQuadricTexture(quadraticCylinder, Gl.GL_TRUE);
             Glu.gluCylinder(quadraticCylinder, this.radioBaseTronco, this.radioBaseTronco, this.longitudTronco, CANTIDAD_CARAS, 1);
 
+            Gl.glDisable(Gl.GL_TEXTURE_2D);
         }
 
         ~Arbol()
@@ -130,6 +143,19 @@ namespace Trochita3D.Entidades
 
         private void DibujarCopa ()
         {
+            if (texturaCopa == null)
+                texturaCopa = new Textura(@"../../Imagenes/Texturas/Arbol/copa.bmp");
+
+            Gl.glEnable(Gl.GL_TEXTURE_2D);
+            texturaCopa.Activate();
+/*
+            Gl.glBegin(Gl.GL_QUADS);
+            Gl.glTexCoord2d(0.0, 0.0); Gl.glVertex2d(0.0, 0.0);
+            Gl.glTexCoord2d(1.0, 0.0); Gl.glVertex2d(10.0, 0.0);
+            Gl.glTexCoord2d(1.0, 1.0); Gl.glVertex2d(10.0, 10.0);
+            Gl.glTexCoord2d(0.0, 1.0); Gl.glVertex2d(0.0, 10.0);
+            Gl.glEnd();
+            */
             float[] colorGreen = new float[4] { 0f, .4f, 0f, .5f };
             float[] colorNone = new float[4] { 0.0f, 0.0f, 0.0f, 0.0f };
 
@@ -140,7 +166,9 @@ namespace Trochita3D.Entidades
             Gl.glPushMatrix();
 
             Gl.glRotated(90.0f, 1, 0, 0);
+            
             Gl.glBegin(Gl.GL_TRIANGLE_STRIP);
+            bool alternate = true;
             for (int i = 0; i < matrizPuntosCopa.Length - 2; i++) // por columnas duplicadas
             {
                 for (int j = 0; j < matrizPuntosCopa[i].Length; j++)
@@ -148,11 +176,24 @@ namespace Trochita3D.Entidades
                     Gl.glNormal3d(matrizPuntosCopa[i][j].NormalX, matrizPuntosCopa[i][j].NormalY, matrizPuntosCopa[i][j].NormalZ);
                     Gl.glVertex3d(matrizPuntosCopa[i][j].X, matrizPuntosCopa[i][j].Y, matrizPuntosCopa[i][j].Z);
 
+                    if (alternate)
+                        Gl.glTexCoord2d(0.0, 0.0);
+                    else
+                        Gl.glTexCoord2d(1.0, 0.0);
+
                     Gl.glNormal3d(matrizPuntosCopa[i + 1][j].NormalX, matrizPuntosCopa[i + 1][j].NormalY, matrizPuntosCopa[i + 1][j].NormalZ);
                     Gl.glVertex3d(matrizPuntosCopa[i + 1][j].X, matrizPuntosCopa[i + 1][j].Y, matrizPuntosCopa[i + 1][j].Z);
+
+                    if (alternate)
+                        Gl.glTexCoord2d(0.0, 1.0);
+                    else
+                        Gl.glTexCoord2d(1.0, 1.0);
+
+                    alternate = !alternate;
                 }
             }
             Gl.glEnd();
+            Gl.glDisable(Gl.GL_TEXTURE_2D);
 
             if (DIBUJAR_NORMALES)
             {
