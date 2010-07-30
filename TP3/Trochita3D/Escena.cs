@@ -7,6 +7,7 @@ using Trochita3D.Entidades;
 using Tao.OpenGl;
 using System.Drawing;
 using System.Drawing.Imaging;
+using Common.Utils;
 
 namespace Trochita3D
 {
@@ -33,19 +34,27 @@ namespace Trochita3D
         private Train Tren = new Train(TREN_LUZ_AMBIENTE, TREN_LUZ_BRILLO, TREN_LUZ, TREN_SHININESS);
         private bool daylight = true;
 
-        Arbol[] arboles = Arbol.GenerarArbolesAleatorios(10);
-        Punto[] posicionArboles = new Punto[10] {
-            new Punto(0, 0, 0),
-            new Punto(6, 6, 0),
-            new Punto(-4, -4, 0),
-            new Punto(6, 12, 0),
-            new Punto(-10, 4, 0),
-            new Punto(8, 15, 0),
-            new Punto(-15, 7, 0),
-            new Punto(1, -10, 0),
-            new Punto(3, -15, 0),
-            new Punto(15, 15, 0)
+        Punto[] posicionArboles = new Punto[] {
+            new Punto(20, 5, 0),
+            new Punto(38, 0, 0),
+            new Punto(30, 6, 0),
+            new Punto(38, 12, 0),
+            new Punto(24, 20, 0),
+            new Punto(24, -15, 0),
+            new Punto(25, 30, 0),
+            new Punto(-20, -5, 0),
+            new Punto(-38, 0, 0),
+            new Punto(-30, -6, 0),
+            new Punto(-38, -12, 0),
+            new Punto(-24, -20, 0),
+            new Punto(-24, 30, 0),
+            new Punto(-40, 35, 0),
+            new Punto(-35, 25, 0),
+            new Punto(-25, -35, 0),
+            new Punto(-35, -35, 0),
+            new Punto(-15, -40, 0)
         };
+        Arbol[] arboles = null;
 
         #region Variables asociadas a las fuentes de luz de la escena
         
@@ -70,6 +79,7 @@ namespace Trochita3D
             this.terrainInitializer = new TerrainInitializer();
             this.waterInitializer = new WaterInitializer();
             Tren.Posicion = this.surfaceInitializer.GetPositionByDistancia(0);
+            arboles = Arbol.GenerarArbolesAleatorios(posicionArboles.Count());
             this.InicializarLuces();
         }
 
@@ -133,10 +143,11 @@ namespace Trochita3D
             terrainInitializer.DrawTerrain();
             waterInitializer.DrawPlaneOfWater();
             Tren.Draw();
-
-            for (int i = 0; i < arboles.Length; ++i)
+            
+            for (int i = 0; i < arboles.Count(); ++i)
             {
                 Gl.glPushMatrix();
+                Gl.glScaled(2, 2, 2);
                 Punto posicion = posicionArboles[i];
                 Gl.glTranslated(posicion.X, posicion.Y, posicion.Z);
                 arboles[i].Dibujar();

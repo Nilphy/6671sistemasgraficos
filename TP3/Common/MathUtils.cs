@@ -25,11 +25,18 @@ namespace Common.Utils
         {
             return Math.PI * angle / 180.0;
         }
+
         public static double RadianToDegree(double angle)
         {
             return angle * (180.0 / Math.PI);
         }
 
+        public static double RandomBetween(double numMin, double numMax)
+        {
+            Random RandomNumber = new Random((int)DateTime.Now.Ticks);
+            double random = numMax * (RandomNumber.NextDouble() + numMin) % numMax;
+            return random;
+        }
 
     }
 }

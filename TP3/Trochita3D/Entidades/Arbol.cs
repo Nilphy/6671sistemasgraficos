@@ -43,9 +43,9 @@ namespace Trochita3D.Entidades
                 new Punto ( .9,   3.5, 0 ), 
                 new Punto ( .8,   4.0, 0 ), 
                 new Punto ( .5,   4.5, 0 ), 
-                new Punto ( .2,   4.7, 0 ),
-                new Punto ( .1,   4.8, 0 ),
-                new Punto ( 0,   5, 0 )
+                new Punto ( .2,   5.0, 0 ),
+                new Punto ( .1,   5.5, 0 ),
+                new Punto ( 0,   6, 0 )
             };
 
         public static Arbol[] GenerarArbolesAleatorios(int cantidad)
@@ -66,7 +66,7 @@ namespace Trochita3D.Entidades
                     }
                     else
                     {
-                        double nuevoX = Arbol.FORMA_COPA_DEFAULT[j].X + Arbol.RandomEntre(0f, +2.0f);
+                        double nuevoX = Arbol.FORMA_COPA_DEFAULT[j].X + MathUtils.RandomBetween(0f, +2.0f);
                         double nuevoY = Arbol.FORMA_COPA_DEFAULT[j].Y;
                         double nuevoZ = Arbol.FORMA_COPA_DEFAULT[j].Z;
 
@@ -78,8 +78,7 @@ namespace Trochita3D.Entidades
                     }
                 }
 
-                double longitudTronco = LONGITUD_TRONCO_DEFAULT + Arbol.RandomEntre(0f, +2.5f);
-
+                double longitudTronco = LONGITUD_TRONCO_DEFAULT + MathUtils.RandomBetween(0f, +2.5f);
                 Arbol arbol = new Arbol(longitudTronco, formaCopa);
                 arboles[i] = arbol;
             }
@@ -121,11 +120,11 @@ namespace Trochita3D.Entidades
 
             Gl.glEnable(Gl.GL_TEXTURE_2D);
             
-            float[] colorBrown = new float[4] { 124.0f / 255.0f, 87.0f / 255.0f, 59.0f / 255.0f, .5f };
+            float[] colorBrown = new float[4] { 124.0f / 255.0f, 87.0f / 255.0f, 59.0f / 255.0f, .15f };
             float[] colorNone  =  new float [4] { 0.0f, 0.0f, 0.0f, 0.0f };
             Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_AMBIENT_AND_DIFFUSE, colorBrown);
-            Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_SPECULAR, new float[] { 0, 0, 0, 1 });
-            Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_SHININESS, new float[] {50.0f});
+            Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_SPECULAR, new float[] { 0, 0, 0, 0 });
+            Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_SHININESS, new float[] {1.0f});
             
             texturaTronco.Activate();
             Glu.gluQuadricDrawStyle(quadraticCylinder, Glu.GLU_FILL);
@@ -143,56 +142,68 @@ namespace Trochita3D.Entidades
 
         private void DibujarCopa ()
         {
+            Gl.glPushMatrix();
+            Gl.glRotated(90.0f, 1, 0, 0);
+
             if (texturaCopa == null)
                 texturaCopa = new Textura(@"../../Imagenes/Texturas/Arbol/copa.bmp");
 
             Gl.glEnable(Gl.GL_TEXTURE_2D);
             texturaCopa.Activate();
-/*
-            Gl.glBegin(Gl.GL_QUADS);
-            Gl.glTexCoord2d(0.0, 0.0); Gl.glVertex2d(0.0, 0.0);
-            Gl.glTexCoord2d(1.0, 0.0); Gl.glVertex2d(10.0, 0.0);
-            Gl.glTexCoord2d(1.0, 1.0); Gl.glVertex2d(10.0, 10.0);
-            Gl.glTexCoord2d(0.0, 1.0); Gl.glVertex2d(0.0, 10.0);
-            Gl.glEnd();
-            */
-            float[] colorGreen = new float[4] { 0f, .4f, 0f, .5f };
+
+            float[] colorGray = new float[4] { .5f, .5f, .5f, .15f };
             float[] colorNone = new float[4] { 0.0f, 0.0f, 0.0f, 0.0f };
 
-            Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_AMBIENT_AND_DIFFUSE, colorGreen);
-            Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_SPECULAR, new float[] { 0, 0, 0, 1 });
-            Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_SHININESS, new float[] { 10.0f });
+            Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_AMBIENT_AND_DIFFUSE, colorGray);
+            Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_SPECULAR, new float[] { 0, 0, 0, 0 });
+            Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_SHININESS, new float[] { 1.0f });
 
-            Gl.glPushMatrix();
+    
+            Punto[] posicionesTextura = new Punto[] 
+            {
+                new Punto ( 0,   0,  0 ),
+                new Punto ( 1,   0, 0 ),
+                new Punto ( 0,   1, 0 ),
+                new Punto ( 1,   1, 0 )
+            };
 
-            Gl.glRotated(90.0f, 1, 0, 0);
             
-            Gl.glBegin(Gl.GL_TRIANGLE_STRIP);
-            bool alternate = true;
             for (int i = 0; i < matrizPuntosCopa.Length - 2; i++) // por columnas duplicadas
             {
+                int cicloPosicionTextura = 0;
+                Punto posicionTextura = null;
+                
+     
+
+                Gl.glBegin(Gl.GL_TRIANGLE_STRIP);
                 for (int j = 0; j < matrizPuntosCopa[i].Length; j++)
                 {
+                    double ancho = (matrizPuntosCopa[i + 1][j] - matrizPuntosCopa[i][j]).Modulo();
+                    double alto = 1.0f;
+                    if (j < matrizPuntosCopa[i].Length-1)
+                    {
+                        alto = (matrizPuntosCopa[i][j + 1] - matrizPuntosCopa[i][j]).Modulo();
+                    }
+
+                    double anchoSobreAlto = ancho / alto;
+
+                    posicionTextura = posicionesTextura[cicloPosicionTextura];
+                    cicloPosicionTextura = (cicloPosicionTextura + 1) % posicionesTextura.Length;
+
                     Gl.glNormal3d(matrizPuntosCopa[i][j].NormalX, matrizPuntosCopa[i][j].NormalY, matrizPuntosCopa[i][j].NormalZ);
                     Gl.glVertex3d(matrizPuntosCopa[i][j].X, matrizPuntosCopa[i][j].Y, matrizPuntosCopa[i][j].Z);
 
-                    if (alternate)
-                        Gl.glTexCoord2d(0.0, 0.0);
-                    else
-                        Gl.glTexCoord2d(1.0, 0.0);
+                    Gl.glTexCoord2d(posicionTextura.X, posicionTextura.Y);
+
+                    posicionTextura = posicionesTextura[cicloPosicionTextura];
+                    cicloPosicionTextura = (cicloPosicionTextura + 1) % posicionesTextura.Length;
 
                     Gl.glNormal3d(matrizPuntosCopa[i + 1][j].NormalX, matrizPuntosCopa[i + 1][j].NormalY, matrizPuntosCopa[i + 1][j].NormalZ);
                     Gl.glVertex3d(matrizPuntosCopa[i + 1][j].X, matrizPuntosCopa[i + 1][j].Y, matrizPuntosCopa[i + 1][j].Z);
-
-                    if (alternate)
-                        Gl.glTexCoord2d(0.0, 1.0);
-                    else
-                        Gl.glTexCoord2d(1.0, 1.0);
-
-                    alternate = !alternate;
+                    Gl.glTexCoord2d(posicionTextura.X, posicionTextura.Y);
                 }
+                Gl.glEnd();
             }
-            Gl.glEnd();
             Gl.glDisable(Gl.GL_TEXTURE_2D);
 
             if (DIBUJAR_NORMALES)
@@ -244,7 +255,9 @@ namespace Trochita3D.Entidades
         {
             double anguloRotacionRadianes = MathUtils.DegreeToRadian(gradosRevolucion / cantidadCaras);
             CurvaBzierSegmentosCubicos curvaBS = new CurvaBzierSegmentosCubicos(curva);
-            Punto[] curvaDiscretizada = curvaBS.GetPuntosDiscretos(PASO_BEZIER).ToArray<Punto>();
+            IList<Punto> curvaDiscretizada1 = curvaBS.GetPuntosDiscretos(PASO_BEZIER);
+            curvaDiscretizada1.RemoveAt(curvaDiscretizada1.Count - 2);
+            Punto[] curvaDiscretizada = curvaDiscretizada1.ToArray<Punto>();
 
             Punto[] normales = this.ObtenerNormalesCurva2D(curvaDiscretizada);
 
@@ -328,13 +341,6 @@ namespace Trochita3D.Entidades
             }
             */
             return matriz;
-        }
-
-        private static double RandomEntre(double numMin, double numMax)
-        {
-            Random RandomNumber = new Random((int)DateTime.Now.Ticks);
-            double random = numMax * (RandomNumber.NextDouble() + numMin) % numMax;
-            return random;
         }
     }
 
