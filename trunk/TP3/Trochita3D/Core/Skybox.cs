@@ -22,12 +22,12 @@ namespace Trochita3D.Core
         public Skybox(int size)
         {
             this.size = size;
-            this.left = new Textura(@"../../Imagenes/Texturas/Skybox/mpa23lf.bmp");
-            this.front = new Textura(@"../../Imagenes/Texturas/Skybox/mpa23ft.bmp");
-            this.right = new Textura(@"../../Imagenes/Texturas/Skybox/mpa23rt.bmp");
-            this.back = new Textura(@"../../Imagenes/Texturas/Skybox/mpa23bk.bmp");
-            this.up = new Textura(@"../../Imagenes/Texturas/Skybox/mpa23up.bmp");
-            this.down = new Textura(@"../../Imagenes/Texturas/Skybox/mpa23dn.bmp");
+            this.left = new Textura(@"../../Imagenes/Texturas/Skybox/mpa23lf.bmp", false);
+            this.front = new Textura(@"../../Imagenes/Texturas/Skybox/mpa23ft.bmp", false);
+            this.right = new Textura(@"../../Imagenes/Texturas/Skybox/mpa23rt.bmp", false);
+            this.back = new Textura(@"../../Imagenes/Texturas/Skybox/mpa23bk.bmp", false);
+            this.up = new Textura(@"../../Imagenes/Texturas/Skybox/mpa23up.bmp", false);
+            this.down = new Textura(@"../../Imagenes/Texturas/Skybox/mpa23dn.bmp", false);
         }
 
         public void Dibujar()

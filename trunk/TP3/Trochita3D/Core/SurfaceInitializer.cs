@@ -20,8 +20,6 @@ namespace Trochita3D.Core
         private const int CANT_PUNTOS_TERRAPLEN = 10;
         private const int DIST_TABLA = 2; // Distancia entre tablas de la vía.
 
-        private Textura terraplenTx;
-
         private IList<Seccion> seccionesTerraplen = new List<Seccion>();
         private IList<Seccion> seccionesRieles1 = new List<Seccion>();
         private IList<Seccion> seccionesRieles2 = new List<Seccion>();
@@ -45,15 +43,24 @@ namespace Trochita3D.Core
         private static double[] normalesRieles2;
         private static double[] normalesTablas;
 
+        private static double[] texCoordTerraplen;
+        private static double[] texCoordRieles1;
+        private static double[] texCoordRieles2;
+        private static double[] texCoordTablas;
+
+        private Textura texTierra;
+        private Textura texRiel;
+
         public SurfaceInitializer()
         {
             this.path = GetBsplineControlPoints(DELTA_U);
             this.detailPath = GetBsplineControlPoints(DELTA_U2);
+
+            this.LoadTextures();
+
             this.BuildTerraplen();
             this.BuildRieles();
             this.BuildTablas();
-            Gl.glEnableClientState(Gl.GL_VERTEX_ARRAY);
-            Gl.glEnableClientState(Gl.GL_NORMAL_ARRAY);
         }
 
         /// <summary>
@@ -411,10 +418,19 @@ namespace Trochita3D.Core
         {
             Gl.glEnable(Gl.GL_LIGHTING);
 
+            //Gl.glEnable(Gl.GL_TEXTURE_2D);
+            Gl.glEnableClientState(Gl.GL_VERTEX_ARRAY);
+            Gl.glEnableClientState(Gl.GL_NORMAL_ARRAY);
+            //Gl.glEnableClientState(Gl.GL_TEXTURE_COORD_ARRAY);
+
             this.DrawTerraplen();
             this.DrawRieles();
             this.DrawTablas();
 
+            Gl.glDisableClientState(Gl.GL_VERTEX_ARRAY);
+            Gl.glDisableClientState(Gl.GL_NORMAL_ARRAY);
+            //Gl.glDisableClientState(Gl.GL_TEXTURE_COORD_ARRAY);
+            //Gl.glDisable(Gl.GL_TEXTURE_2D);
             Gl.glDisable(Gl.GL_LIGHTING);
         }
 
@@ -474,11 +490,15 @@ namespace Trochita3D.Core
         /// </summary>
         private void DrawTerraplen()
         {
+            texTierra.Activate();
             Gl.glVertexPointer(3, Gl.GL_DOUBLE, 3 * sizeof(double), verticesTerraplen);
             Gl.glNormalPointer(Gl.GL_DOUBLE, 3 * sizeof(double), normalesTerraplen);
+            //Gl.glTexCoordPointer(2, Gl.GL_DOUBLE, 2 * sizeof(double), texCoordTerraplen);
+
             Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_AMBIENT, new float[] { 0.6f, 0.5f, 0.35f, 0.25f });
             Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_DIFFUSE, new float[] { 0.61568f, 0.48627f, 0.34117f, 1 });
             Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_SPECULAR, new float[] { 0, 0, 0, 1 });
+
             Gl.glDrawElements(Gl.GL_TRIANGLE_STRIP, indicesTerraplen.Length, Gl.GL_UNSIGNED_INT, indicesTerraplen);
         }
 
@@ -541,7 +561,8 @@ namespace Trochita3D.Core
 
         private void LoadTextures()
         {
-            this.terraplenTx = new Textura(@"../../Imagenes/Texturas/Tierra.bmp");
+            this.texTierra = new Textura(@"../../Imagenes/Texturas/Tierra.bmp", true);
+            this.texRiel = new Textura(@"../../Imagenes/Texturas/Riel.bmp", true);
         }
     }
 }
