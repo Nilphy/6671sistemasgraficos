@@ -105,12 +105,12 @@ namespace Trochita3D.Core
 
                     textCoord.Add(0);
                     textCoord.Add(0);
-                    textCoord.Add(X_MAX / 2);
+                    textCoord.Add(X_MAX / 10);
                     textCoord.Add(0);
-                    textCoord.Add(X_MAX / 2);
-                    textCoord.Add(Y_MAX / 2);
+                    textCoord.Add(X_MAX / 10);
+                    textCoord.Add(Y_MAX / 10);
                     textCoord.Add(0);
-                    textCoord.Add(Y_MAX / 2);
+                    textCoord.Add(Y_MAX / 10);
                 }
             }
 
