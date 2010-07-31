@@ -23,9 +23,13 @@ namespace Trochita3D.Core
         private static int[] indices;
         private static double[] vertices;
         private static double[] normales;
+        private static double[] textures;
+
+        private Textura textura;
         
         public TerrainInitializer()
         {
+            this.textura = new Textura(@"../../Imagenes/Texturas/Pasto.bmp", true);
             this.BuildTerrain();
         }
 
@@ -96,6 +100,7 @@ namespace Trochita3D.Core
         private void GenerarIndices(int cantidadTotalPixeles, int cantidadPixelesAlto, int cantidadPixelesAncho)
         {
             IList<int> index = new List<int>();
+            IList<double> texturesCoord = new List<double>();
 
             for (int i = 0; i < ((cantidadPixelesAlto - 1) * cantidadPixelesAncho); i += cantidadPixelesAncho)
             {
@@ -105,10 +110,20 @@ namespace Trochita3D.Core
                     index.Add(k + i + cantidadPixelesAncho);
                     index.Add(k + i + cantidadPixelesAncho + 1);
                     index.Add(k + i + 1);
+
+                    texturesCoord.Add(0);
+                    texturesCoord.Add(0);
+                    texturesCoord.Add(1);
+                    texturesCoord.Add(0);
+                    texturesCoord.Add(1);
+                    texturesCoord.Add(1);
+                    texturesCoord.Add(0);
+                    texturesCoord.Add(1);
                 }
             }
 
             indices = index.ToArray<int>();
+            textures = texturesCoord.ToArray<double>();
         }
 
         public void DrawTerrain()
@@ -119,14 +134,27 @@ namespace Trochita3D.Core
             Gl.glEnable(Gl.GL_LIGHTING);
             Gl.glTranslated(-(double)X_MAX / (double)2, -(double)Y_MAX / (double)2, 0.0f);
             
-            Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_AMBIENT, new float[] { 0.5f, 0.5f, 0.5f, 1 });
-            Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_DIFFUSE, new float[] { 0.1f, 0.3f, 0.15f, 1 });
-            Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_SPECULAR, new float[] { 0.1f, 0.3f, 0.15f, 1 });
+            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_AMBIENT, new float[] { 0.5f, 0.5f, 0.5f, 1 });
+            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_DIFFUSE, new float[] { 0.1f, 0.3f, 0.15f, 1 });
+            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_SPECULAR, new float[] { 0.0f, 0.0f, 0.0f, 1 });
 
+            Gl.glEnable(Gl.GL_TEXTURE_2D);
+            Gl.glEnableClientState(Gl.GL_VERTEX_ARRAY);
+            Gl.glEnableClientState(Gl.GL_NORMAL_ARRAY);
+            Gl.glEnableClientState(Gl.GL_TEXTURE_COORD_ARRAY);
+
+            textura.Activate();
+            
             Gl.glVertexPointer(3, Gl.GL_DOUBLE, 3 * sizeof(double), vertices);
             Gl.glNormalPointer(Gl.GL_DOUBLE, 3 * sizeof(double), normales);
+            Gl.glTexCoordPointer(2, Gl.GL_DOUBLE, 2 * sizeof(double), textures);
 
             Gl.glDrawElements(Gl.GL_QUADS, indices.Length, Gl.GL_UNSIGNED_INT, indices);
+
+            Gl.glDisableClientState(Gl.GL_VERTEX_ARRAY);
+            Gl.glDisableClientState(Gl.GL_NORMAL_ARRAY);
+            Gl.glDisableClientState(Gl.GL_TEXTURE_COORD_ARRAY);
+            Gl.glDisable(Gl.GL_TEXTURE_2D);
             Gl.glDisable(Gl.GL_LIGHTING);
 
             //this.DibujarNormales(vertices, normales);

@@ -115,8 +115,8 @@ namespace Trochita3D.Entidades
 
         private void DibujarTronco()
         {
-            if (texturaTronco == null) 
-                texturaTronco = new Textura(@"../../Imagenes/Texturas/Arbol/tronco_1.bmp");
+            if (texturaTronco == null)
+                texturaTronco = new Textura(@"../../Imagenes/Texturas/Arbol/tronco_1.bmp", false);
 
             Gl.glEnable(Gl.GL_TEXTURE_2D);
             
@@ -146,7 +146,7 @@ namespace Trochita3D.Entidades
             Gl.glRotated(90.0f, 1, 0, 0);
 
             if (texturaCopa == null)
-                texturaCopa = new Textura(@"../../Imagenes/Texturas/Arbol/copa.bmp");
+                texturaCopa = new Textura(@"../../Imagenes/Texturas/Arbol/copa.bmp", false);
 
             Gl.glEnable(Gl.GL_TEXTURE_2D);
             texturaCopa.Activate();

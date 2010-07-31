@@ -121,7 +121,10 @@
   <ItemGroup>
     <Content Include="bin\Debug\Imagenes\Bitmap.bmp" />
     <Content Include="Imagenes\Bitmap.bmp" />
+    <Content Include="Imagenes\Texturas\Agua.bmp" />
     <Content Include="Imagenes\Texturas\Arbol\copa.bmp" />
+    <Content Include="Imagenes\Texturas\Pasto.bmp" />
+    <Content Include="Imagenes\Texturas\Riel.bmp" />
     <Content Include="Imagenes\Texturas\Skybox\mpa23bk.bmp" />
     <Content Include="Imagenes\Texturas\Skybox\mpa23dn.bmp" />
     <Content Include="Imagenes\Texturas\Skybox\mpa23ft.bmp" />
