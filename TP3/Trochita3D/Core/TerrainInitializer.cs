@@ -45,7 +45,6 @@ namespace Trochita3D.Core
         {
             IList<double> vertex = new List<double>();
             Punto[][] matriz = new Punto[MAX_VERTEX_Y][];
-            int k = 0;
 
             for (int y = 0; y < MAX_VERTEX_Y; y++)
             {

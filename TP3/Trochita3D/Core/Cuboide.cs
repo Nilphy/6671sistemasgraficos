@@ -10,34 +10,22 @@ namespace Trochita3D.Core
     public class Cuboide : Figura
     {
         public Cuboide(
-            double ancho, 
-            double largo, 
-            double alto, 
-            int cantidadDivisionesAncho, 
-            int cantidadDivisionesLargo, 
-            int cantidadDivisionesAlto, 
+            double ancho,
+            double largo,
+            double alto,
             Punto posicion,
-            float[] luzAmbiente, 
+            float[] luzAmbiente,
             float[] luzBrillo,
             float[] luz,
             int shininess)
-        {
-            this.Ancho = ancho;
-            this.Alto = alto;
-            this.Largo = largo;
-            this.CantidadDivisionesAlto = cantidadDivisionesAlto;
-            this.CantidadDivisionesAncho = cantidadDivisionesAncho;
-            this.CantidadDivisionesLargo = cantidadDivisionesLargo;
-            this.Posicion = posicion;
-            this.Luz = luz;
-            this.LuzAmbiente = luzAmbiente;
-            this.LuzBrillo = luzBrillo;
-            this.Shininess = shininess;
-            this.Generar();
-        }
+            : base(ancho, largo, alto, posicion, luz, luzAmbiente, luzBrillo, shininess) { }
+
+        #region Métodos heredados
 
         public override void Generar()
         {
+            this.CalcularDivisionesYPasos();
+
             caras = new List<CaraFigura>();
 
             caras.Add(new CaraCuboide(this, OrientacionesCara.Abajo, 0, this.Luz, this.LuzBrillo, this.LuzAmbiente, this.Shininess));
@@ -52,5 +40,21 @@ namespace Trochita3D.Core
                 cara.Generar();
             }
         }
+
+        /// <summary>
+        /// Inicialmente voy a poner 10 divisiones por cara y dps veré
+        /// </summary>
+        protected override void CalcularDivisionesYPasos()
+        {
+            this.PasoX = this.LongitudX / 10;
+            this.PasoY = this.LongitudY / 10;
+            this.PasoZ = this.LongitudZ / 10;
+
+            this.CantidadDivisionesX = 10;
+            this.CantidadDivisionesY = 10;
+            this.CantidadDivisionesZ = 10;
+        }
+
+        #endregion 
     }
 }

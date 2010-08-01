@@ -20,7 +20,7 @@ namespace Trochita3D
         private static float[] TREN_LUZ_BRILLO = new float[] { 0.2f, 0.2f, 0.2f, 1 };
         private static int TREN_SHININESS = 180;
 
-        private static double VELOCIDAD_TREN = 5000;
+        private static double VELOCIDAD_TREN = 100;
         private static double tiempo = 0;
 
 

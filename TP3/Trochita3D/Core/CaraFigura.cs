@@ -79,55 +79,8 @@ namespace Trochita3D.Core
         protected double zInicial;
         protected double zFinal;
 
-        // Calculan la distancia entre dos vértices dada la cantidad de divisiones
-        protected double PasoX
-        {
-            get
-            {
-                return ((xFinal - xInicial) / Figura.CantidadDivisionesAncho) > 0 ? ((xFinal - xInicial) / Figura.CantidadDivisionesAncho) : -((xFinal - xInicial) / Figura.CantidadDivisionesAncho);
-            }
-        }
-        protected double PasoY
-        {
-            get
-            {
-                return ((yFinal - yInicial) / Figura.CantidadDivisionesLargo) > 0 ? ((yFinal - yInicial) / Figura.CantidadDivisionesLargo) : -((yFinal - yInicial) / Figura.CantidadDivisionesLargo);
-            }
-        }
-        protected double PasoZ
-        {
-            get
-            {
-                return ((zFinal - zInicial) / Figura.CantidadDivisionesAlto) > 0 ? ((zFinal - zInicial) / Figura.CantidadDivisionesAlto) : -((zFinal - zInicial) / Figura.CantidadDivisionesAlto);
-            }
-        }
-
-        protected int CantidadPixelesAncho
-        {
-            get
-            {
-                int cantidadPixelesAncho = 0;
-
-                if (this.Orientacion.Equals(OrientacionesCara.Abajo) || this.Orientacion.Equals(OrientacionesCara.Arriba))
-                    cantidadPixelesAncho = Figura.CantidadDivisionesLargo;
-                else if (this.Orientacion.Equals(OrientacionesCara.Derecha) || this.Orientacion.Equals(OrientacionesCara.Izquierda))
-                    cantidadPixelesAncho = Figura.CantidadDivisionesAncho;
-                else
-                    cantidadPixelesAncho = Figura.CantidadDivisionesLargo;
-
-                return cantidadPixelesAncho + 1;
-            }
-        }
-        protected int CantidadPixelesAlto
-        {
-            get
-            {
-                if (this.Orientacion.Equals(OrientacionesCara.Abajo) || this.Orientacion.Equals(OrientacionesCara.Arriba))
-                    return Figura.CantidadDivisionesAncho + 1;                
-                else
-                    return Figura.CantidadDivisionesAlto + 1;
-            }
-        }
+        protected virtual int CantidadPixelesAncho { set; get; }
+        protected virtual int CantidadPixelesAlto { set; get; }
 
         // Cada vez que se vuelve a generar la cara cuboide se deben recalcular los arrais 
         private Boolean recalcularIndices;
@@ -148,13 +101,34 @@ namespace Trochita3D.Core
             this.LuzAmbiente = luzAmbiente;
             this.LuzBrillo = luzBrillo;
             this.Shininess = shininess;
+
+            this.CalcularCantidadDivisiones();
         }
+
+        #region Metodos abstractos 
+
+        protected abstract void CalcularCantidadDivisiones();
+
+        protected abstract void CalcularExtremos();
+
+        protected abstract Punto CompletarPunto(Punto puntoCentro);
+
+        protected abstract void GenerarNormales();
+
+        protected abstract void GenerarIndices();
+
+        protected abstract void GenerarVertices();
+
+        #endregion 
 
         public void Draw()
         {
+            Gl.glMatrixMode(Gl.GL_MODELVIEW);
             Gl.glPushMatrix();
 
             Gl.glEnable(Gl.GL_LIGHTING);
+            Gl.glEnableClientState(Gl.GL_VERTEX_ARRAY);
+            Gl.glEnableClientState(Gl.GL_NORMAL_ARRAY);
 
             Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_AMBIENT, LuzAmbiente);
             Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_DIFFUSE, Luz);
@@ -165,12 +139,12 @@ namespace Trochita3D.Core
             Gl.glNormalPointer(Gl.GL_DOUBLE, 3 * sizeof(double), this.Normales);
 
             Gl.glDrawElements(Gl.GL_QUADS, this.Indices.Length, Gl.GL_UNSIGNED_INT, this.Indices);
+            Gl.glDisableClientState(Gl.GL_VERTEX_ARRAY);
+            Gl.glDisableClientState(Gl.GL_NORMAL_ARRAY);
             Gl.glDisable(Gl.GL_LIGHTING);
 
             Gl.glPopMatrix();
         }
-
-        #region Generadores
 
         public void Generar()
         {
@@ -182,22 +156,5 @@ namespace Trochita3D.Core
             this.GenerarNormales();
         }
 
-        protected abstract void GenerarNormales();
-
-        protected abstract void GenerarIndices();
-
-        protected abstract void GenerarVertices();
-
-        #endregion
-        #region Utilitarios
-
-        /// <summary>
-        /// Dadas las dimensiones del cuboide calcula los extremos de los rangos de las coordenadas del cubo
-        /// </summary>
-        protected abstract void CalcularExtremos();
-
-        protected abstract Punto CompletarPunto(Punto puntoCentro);
-
-        #endregion
     }
 }

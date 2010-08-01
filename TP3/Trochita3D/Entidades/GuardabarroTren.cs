@@ -10,30 +10,29 @@ namespace Trochita3D.Core
     public class GuardabarroTren : Figura
     {
         public GuardabarroTren(
-            double ancho, 
-            double largo, 
-            double alto, 
-            int cantidadDivisionesAncho, 
-            int cantidadDivisionesLargo, 
-            int cantidadDivisionesAlto, 
+            double ancho,
+            double largo,
+            double alto,
             Punto posicion,
             float[] luz,
-            float[] luzAmbiente, 
+            float[] luzAmbiente,
             float[] luzBrillo,
             int shininess)
+            : base(ancho, largo, alto, posicion, luz, luzAmbiente, luzBrillo, shininess) { }
+
+        #region Metodos heredados
+
+        // la cantidad de divisiones tiene que ser impar, porque la cantidad de pixeles
+        // es 1 + que la cantidad de divisiones y se divide en dos para ambas caras
+        protected override void CalcularDivisionesYPasos()
         {
-            this.Ancho = ancho;
-            this.Alto = alto;
-            this.Largo = largo;
-            this.CantidadDivisionesAlto = cantidadDivisionesAlto;
-            this.CantidadDivisionesAncho = cantidadDivisionesAncho;
-            this.CantidadDivisionesLargo = cantidadDivisionesLargo;
-            this.Posicion = posicion;
-            this.Luz = luz;
-            this.LuzAmbiente = luzAmbiente;
-            this.LuzBrillo = luzBrillo;
-            this.Shininess = shininess;
-            this.Generar();
+            this.CantidadDivisionesX = 8;
+            this.CantidadDivisionesY = 8;
+            this.CantidadDivisionesZ = 8;
+
+            this.PasoX = this.LongitudX / this.CantidadDivisionesX;
+            this.PasoY = this.LongitudY / this.CantidadDivisionesY;
+            this.PasoZ = this.LongitudZ / this.CantidadDivisionesZ;
         }
 
         public override void Generar()
@@ -48,5 +47,7 @@ namespace Trochita3D.Core
                 cara.Generar();
             }
         }
+
+        #endregion
     }
 }

@@ -8,10 +8,41 @@ namespace Trochita3D.Core
 {
     public class CaraCuboide : CaraFigura
     {
+        private int cantidadPixelesX;
+        private int cantidadPixelesY;
+        private int cantidadPixelesZ;
+
+        protected override int CantidadPixelesAncho
+        {
+            get
+            {
+                int cantidadPixelesAncho = 0;
+
+                if (this.Orientacion.Equals(OrientacionesCara.Abajo) || this.Orientacion.Equals(OrientacionesCara.Arriba))
+                    cantidadPixelesAncho = Figura.CantidadDivisionesY;
+                else if (this.Orientacion.Equals(OrientacionesCara.Derecha) || this.Orientacion.Equals(OrientacionesCara.Izquierda))
+                    cantidadPixelesAncho = Figura.CantidadDivisionesX;
+                else
+                    cantidadPixelesAncho = Figura.CantidadDivisionesY;
+
+                return cantidadPixelesAncho + 1;
+            }
+        }
+        protected override int CantidadPixelesAlto
+        {
+            get
+            {
+                if (this.Orientacion.Equals(OrientacionesCara.Abajo) || this.Orientacion.Equals(OrientacionesCara.Arriba))
+                    return Figura.CantidadDivisionesX + 1;
+                else
+                    return Figura.CantidadDivisionesZ + 1;
+            }
+        }
+
         public CaraCuboide(Figura figura, OrientacionesCara orientacion, int numero, float[] luz, float[] luzBrillo, float[] luzAmbiente, int shininess) 
             : base(figura, orientacion, numero, luzAmbiente, luzBrillo, luz, shininess) { }
 
-        #region Generadores
+        #region Métodos heredados
 
         protected override void GenerarNormales()
         {
@@ -122,21 +153,106 @@ namespace Trochita3D.Core
         {
             this.vertices = new List<Punto>();
 
-            for (double x = xInicial; x <= xFinal; x += ((this.PasoX == 0) ? 1 : this.PasoX))
+            for (int indicePixelX = 0; indicePixelX < this.cantidadPixelesX; indicePixelX++)
             {
-                for (double y = yInicial; y <= yFinal; y += ((this.PasoY == 0) ? 1 : this.PasoY))
+                for (int indicePixelY = 0; indicePixelY < this.cantidadPixelesY; indicePixelY++)
                 {
-                    for (double z = zInicial; z <= zFinal; z += ((this.PasoZ == 0) ? 1 : this.PasoZ))
+                    for (int indicePixelZ = 0; indicePixelZ < this.cantidadPixelesZ; indicePixelZ++)
                     {
-                        vertices.Add(new Punto(x, y, z));
+                        vertices.Add(this.CalcularPuntoXCoordenadasPixeles(indicePixelX, indicePixelY, indicePixelZ));
                     }
                 }
             }
         }
 
-        #endregion
-        #region Utilitarios
+        protected override void CalcularCantidadDivisiones()
+        {
+            this.cantidadPixelesX = Figura.CantidadDivisionesX + 1;
+            this.cantidadPixelesY = Figura.CantidadDivisionesY + 1;
+            this.cantidadPixelesZ = Figura.CantidadDivisionesZ + 1;
 
+            if (this.Orientacion.Equals(OrientacionesCara.Abajo) ||
+                this.Orientacion.Equals(OrientacionesCara.Arriba))
+            {
+                this.cantidadPixelesZ = 1;
+            }
+            else if (this.Orientacion.Equals(OrientacionesCara.Adelante) ||
+                this.Orientacion.Equals(OrientacionesCara.Atraz))
+            {
+                this.cantidadPixelesX = 1;
+            }
+            else
+            {
+                this.cantidadPixelesY = 1;
+            }
+
+        }
+
+        protected override void CalcularExtremos()
+        {
+            if (Orientacion.Equals(OrientacionesCara.Abajo))
+            {
+                xInicial = 0;
+                xFinal = Figura.LongitudX;
+                yInicial = 0;
+                yFinal = Figura.LongitudY;
+                zInicial = 0;
+                zFinal = 0;
+            }
+            else if (Orientacion.Equals(OrientacionesCara.Adelante))
+            {
+                xInicial = Figura.LongitudX;
+                xFinal = Figura.LongitudX;
+                yInicial = 0;
+                yFinal = Figura.LongitudY;
+                zInicial = 0;
+                zFinal = Figura.LongitudZ;
+            }
+            else if (Orientacion.Equals(OrientacionesCara.Arriba))
+            {
+                xInicial = 0;
+                xFinal = Figura.LongitudX;
+                yInicial = 0;
+                yFinal = Figura.LongitudY;
+                zInicial = Figura.LongitudZ;
+                zFinal = Figura.LongitudZ;
+            }
+            else if (Orientacion.Equals(OrientacionesCara.Atraz))
+            {
+                xInicial = 0;
+                xFinal = 0;
+                yInicial = 0;
+                yFinal = Figura.LongitudY;
+                zInicial = 0;
+                zFinal = Figura.LongitudZ;
+            }
+            else if (Orientacion.Equals(OrientacionesCara.Derecha))
+            {
+                xInicial = 0;
+                xFinal = Figura.LongitudX;
+                yInicial = Figura.LongitudY;
+                yFinal = Figura.LongitudY;
+                zInicial = 0;
+                zFinal = Figura.LongitudZ;
+            }
+            else if (Orientacion.Equals(OrientacionesCara.Izquierda))
+            {
+                xInicial = 0;
+                xFinal = Figura.LongitudX;
+                yInicial = 0;
+                yFinal = 0;
+                zInicial = 0;
+                zFinal = Figura.LongitudZ;
+            }
+
+            xInicial += Figura.Posicion.X;
+            xFinal += Figura.Posicion.X;
+            yInicial += Figura.Posicion.Y;
+            yFinal += Figura.Posicion.Y;
+            zInicial += Figura.Posicion.Z;
+            zFinal += Figura.Posicion.Z;
+        }
+        
         protected override Punto CompletarPunto(Punto puntoCentro)
         {
             if (Orientacion.Equals(OrientacionesCara.Abajo))
@@ -165,69 +281,18 @@ namespace Trochita3D.Core
             }
         }
 
-        protected override void CalcularExtremos()
-        {
-            if (Orientacion.Equals(OrientacionesCara.Abajo))
-            {
-                xInicial = 0;
-                xFinal = Figura.Ancho;
-                yInicial = 0;
-                yFinal = Figura.Largo;
-                zInicial = 0;
-                zFinal = 0;
-            }
-            else if (Orientacion.Equals(OrientacionesCara.Adelante))
-            {
-                xInicial = Figura.Ancho;
-                xFinal = Figura.Ancho;
-                yInicial = 0;
-                yFinal = Figura.Largo;
-                zInicial = 0;
-                zFinal = Figura.Alto;
-            }
-            else if (Orientacion.Equals(OrientacionesCara.Arriba))
-            {
-                xInicial = 0;
-                xFinal = Figura.Ancho;
-                yInicial = 0;
-                yFinal = Figura.Largo;
-                zInicial = Figura.Alto;
-                zFinal = Figura.Alto;
-            }
-            else if (Orientacion.Equals(OrientacionesCara.Atraz))
-            {
-                xInicial = 0;
-                xFinal = 0;
-                yInicial = 0;
-                yFinal = Figura.Largo;
-                zInicial = 0;
-                zFinal = Figura.Alto;
-            }
-            else if (Orientacion.Equals(OrientacionesCara.Derecha))
-            {
-                xInicial = 0;
-                xFinal = Figura.Ancho;
-                yInicial = Figura.Largo;
-                yFinal = Figura.Largo;
-                zInicial = 0;
-                zFinal = Figura.Alto;
-            }
-            else if (Orientacion.Equals(OrientacionesCara.Izquierda))
-            {
-                xInicial = 0;
-                xFinal = Figura.Ancho;
-                yInicial = 0;
-                yFinal = 0;
-                zInicial = 0;
-                zFinal = Figura.Alto;
-            }
+        #endregion
+        #region Utilitarios
 
-            xInicial += Figura.Posicion.X;
-            xFinal += Figura.Posicion.X;
-            yInicial += Figura.Posicion.Y;
-            yFinal += Figura.Posicion.Y;
-            zInicial += Figura.Posicion.Z;
-            zFinal += Figura.Posicion.Z;
+        private Punto CalcularPuntoXCoordenadasPixeles(int indicePixelX, int indicePixelY, int indicePixelZ)
+        {
+            Punto punto = new Punto();
+
+            punto.X = this.xInicial + indicePixelX * this.Figura.PasoX;
+            punto.Y = this.yInicial + indicePixelY * this.Figura.PasoY;
+            punto.Z = this.zInicial + indicePixelZ * this.Figura.PasoZ;
+
+            return punto;
         }
 
         #endregion
