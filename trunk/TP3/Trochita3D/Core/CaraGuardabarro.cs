@@ -11,7 +11,7 @@ namespace Trochita3D.Core
         public CaraGuardabarro(Figura figura, OrientacionesCara orientacion, int numero, float[] luzAmbiente, float[] luzBrillo, float[] luz, int shininess) :
             base(figura, orientacion, numero, luzAmbiente, luzBrillo, luz, shininess) { }
         
-        #region Generadores
+        #region Métodos Heredados
 
         protected override void GenerarNormales()
         {
@@ -21,28 +21,28 @@ namespace Trochita3D.Core
             Punto puntoEste = null;
             Punto puntoOeste = null;
             Punto puntoCentro = null;
-            
-            for (int indiceFila = 0; indiceFila < CantidadPixelesAlto; indiceFila++) // indice fila
+
+            for (int indiceColumna = 0; indiceColumna < CantidadPixelesAncho; indiceColumna++) // indice columna
             {
-                for (int indiceColumna = 0; indiceColumna < CantidadPixelesAncho; indiceColumna++) // indice columna
+                for (int indiceFila = 0; indiceFila < CantidadPixelesAlto; indiceFila++) // indice fila
                 {
-                    puntoCentro = vertices[indiceFila * CantidadPixelesAncho + indiceColumna];
-                    
-                    if (indiceFila + 1 < CantidadPixelesAlto - 1) // Hay punto norte
-                        puntoNorte = vertices[(indiceFila + 1) * CantidadPixelesAncho + indiceColumna];
+                    puntoCentro = vertices[indiceFila + (indiceColumna * CantidadPixelesAlto)];
+
+                    if (indiceColumna + 1 < CantidadPixelesAncho - 1) // Hay punto norte
+                        puntoNorte = vertices[(indiceColumna + 1) * CantidadPixelesAlto + indiceFila];
                     else puntoNorte = this.CompletarPunto(puntoCentro);
 
-                    if (indiceFila - 1 >= 0) // Hay punto sur
-                        puntoSur = vertices[(indiceFila - 1) * CantidadPixelesAncho + indiceColumna];
+                    if (indiceColumna - 1 >= 0) // Hay punto sur
+                        puntoSur = vertices[(indiceColumna - 1) * CantidadPixelesAlto + indiceFila];
                     else puntoSur = this.CompletarPunto(puntoCentro);
-                    
-                    if (indiceColumna - 1 >= 0) // Hay punto este
-                        puntoOeste = vertices[indiceFila * CantidadPixelesAncho + indiceColumna - 1];
-                    else puntoOeste = this.CompletarPunto(puntoCentro);
 
-                    if (indiceColumna + 1 < CantidadPixelesAncho - 1) // Hay punto oeste
-                        puntoEste = vertices[indiceFila * CantidadPixelesAncho + indiceColumna + 1];
+                    if (indiceFila + 1 < CantidadPixelesAlto) // Hay punto este
+                        puntoEste = vertices[indiceColumna * CantidadPixelesAlto + indiceFila + 1];
                     else puntoEste = this.CompletarPunto(puntoCentro);
+
+                    if (indiceFila - 1 >= 0) // Hay punto oeste
+                        puntoOeste = vertices[indiceColumna * CantidadPixelesAlto + indiceFila - 1];
+                    else puntoOeste = this.CompletarPunto(puntoCentro);
 
                     normales.Add(Punto.CalcularNormal(puntoCentro, puntoNorte, puntoEste, puntoSur, puntoOeste, false));
                 }
@@ -53,14 +53,14 @@ namespace Trochita3D.Core
         {
             this.indices = new List<int>();
 
-            for (int indicePrimerElementoFila = 0; indicePrimerElementoFila < ((CantidadPixelesAlto - 1) * CantidadPixelesAncho); indicePrimerElementoFila += CantidadPixelesAlto)
+            for (int indicePrimerElementoColumna = 0; indicePrimerElementoColumna < ((CantidadPixelesAlto - 1) * (CantidadPixelesAncho - 1)); indicePrimerElementoColumna += CantidadPixelesAlto)
             {
-                for (int numeroColumna = 0; numeroColumna < CantidadPixelesAncho - 1; numeroColumna++)
+                for (int numeroFila = 0; numeroFila < CantidadPixelesAlto - 1; numeroFila++)
                 {
-                    indices.Add(numeroColumna + indicePrimerElementoFila);
-                    indices.Add(numeroColumna + indicePrimerElementoFila + CantidadPixelesAncho);
-                    indices.Add(numeroColumna + indicePrimerElementoFila + CantidadPixelesAncho + 1);
-                    indices.Add(numeroColumna + indicePrimerElementoFila + 1);
+                    indices.Add(numeroFila + indicePrimerElementoColumna);
+                    indices.Add(numeroFila + indicePrimerElementoColumna + CantidadPixelesAlto);
+                    indices.Add(numeroFila + indicePrimerElementoColumna + CantidadPixelesAlto + 1);
+                    indices.Add(numeroFila + indicePrimerElementoColumna + 1);
                 }
             }
         }
@@ -69,43 +69,37 @@ namespace Trochita3D.Core
         {
             this.vertices = new List<Punto>();
 
-            for (double x = xInicial; x <= xFinal; x += ((this.PasoX == 0) ? 1 : this.PasoX))
+            for (int indicePixelX = 0; indicePixelX < this.CantidadPixelesAncho; indicePixelX++)
             {
-                for (double z = zInicial; z <= zFinal; z += ((this.PasoZ == 0) ? 1 : this.PasoZ))
+                for (int indicePixelZ = 0; indicePixelZ < this.CantidadPixelesAlto; indicePixelZ++)
                 {
-                    vertices.Add(new Punto(x, this.CalcularY(x, z), z));
+                    vertices.Add(this.CalcularPuntoXindices(indicePixelX, indicePixelZ));
                 }
             }
         }
 
-        #endregion
-        #region Utilitarios
-
         protected override Punto CompletarPunto(Punto puntoCentro)
         {
-            return null; 
+            return null;
         }
 
-        /// <summary>
-        /// Dadas las dimensiones del cuboide calcula los extremos de los rangos de las coordenadas del cubo
-        /// </summary>
         protected override void CalcularExtremos()
         {
             if (Orientacion.Equals(OrientacionesCara.Izquierda))
             {
                 xInicial = 0;
-                xFinal = Figura.Ancho / 2d;
+                xFinal = Figura.LongitudX / 2d;
             }
             else
             {
-                xInicial = Figura.Ancho / 2d;
-                xFinal = Figura.Ancho;
+                xInicial = Figura.LongitudX / 2d;
+                xFinal = Figura.LongitudX;
             }
-            
+
             yInicial = 0;
-            yFinal = Figura.Largo;
+            yFinal = Figura.LongitudY;
             zInicial = 0;
-            zFinal = Figura.Alto;
+            zFinal = Figura.LongitudZ;
 
             xInicial += Figura.Posicion.X;
             xFinal += Figura.Posicion.X;
@@ -113,6 +107,26 @@ namespace Trochita3D.Core
             yFinal += Figura.Posicion.Y;
             zInicial += Figura.Posicion.Z;
             zFinal += Figura.Posicion.Z;
+        }
+
+        protected override void CalcularCantidadDivisiones()
+        {
+            this.CantidadPixelesAncho = (Figura.CantidadDivisionesX / 2) + 1;
+            this.CantidadPixelesAlto = Figura.CantidadDivisionesZ + 1;
+        }
+
+        #endregion
+        #region Utilitarios
+
+        private Punto CalcularPuntoXindices(int indicePixelX, int indicePixelZ)
+        {
+            Punto punto = new Punto();
+
+            punto.X = this.xInicial + ((double)indicePixelX) * this.Figura.PasoX;
+            punto.Z = this.zInicial + ((double)indicePixelZ) * this.Figura.PasoZ;
+            punto.Y = this.CalcularY(punto.X, punto.Z);
+
+            return punto;
         }
 
         private double CalcularY(double x, double z)

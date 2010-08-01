@@ -159,23 +159,26 @@ namespace TPAlgoritmos3D
                     }
                 case Keys.Left:
                     {
-                        controlador.Camara.SlideCamera(0, 1);
-                        break;
+
+                        controlador.Camara.SlideCamera(1, 0);
+                        break; 
                     }
                 case Keys.Right:
-                    {
-                        controlador.Camara.SlideCamera(0, -1);
-                        break;
-                    }
-                case Keys.Add:
                     {
                         controlador.Camara.SlideCamera(-1, 0);
                         break;
                     }
+                case Keys.Add:
+                    {
+                        controlador.Camara.SlideCamera(0, 1);
+                        break;
+                        
+                    }
                 case Keys.Subtract:
                     {
-                        controlador.Camara.SlideCamera(1, 0);
+                        controlador.Camara.SlideCamera(0, -1);
                         break;
+                        
                     }
                 default: break;
             }

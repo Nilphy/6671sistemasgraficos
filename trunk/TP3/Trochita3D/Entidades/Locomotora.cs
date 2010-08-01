@@ -16,18 +16,18 @@ namespace Trochita3D.Core
         private static double ALTO_VIAS = 2.4d;
 
         // Rectángulo conductor
-        private static double ANCHO_RECTANGULO = 3d;
-        private static double LARGO_RECTANULO = 3d;
-        private static double ALTO_RECTANGULO = 4.5d;
+        private static double ANCHO_RECTANGULO = 1d;
+        private static double LARGO_RECTANULO = 1d;
+        private static double ALTO_RECTANGULO = 1.7d;
 
         // trompa
         private static double RADIO_TROMPA = (ANCHO_RECTANGULO - ANCHO_RECTANGULO/4d)/2d;
         private static double LARGO_TROMPA = LARGO_RECTANULO * 2d;
         
         // Base
-        private static double ANCHO_BASE = ANCHO_RECTANGULO + 1;
+        private static double ANCHO_BASE = ANCHO_RECTANGULO + ANCHO_RECTANGULO / 10d;
         private static double ALTO_BASE = ALTO_RECTANGULO/20d;
-        private static double LARGO_BASE = LARGO_RECTANULO*2d + 0.2d;
+        private static double LARGO_BASE = LARGO_RECTANULO*2d;
             
         // Paragolpe        
         private static double ANCHO_PARAGOLPE = ANCHO_BASE;
@@ -36,12 +36,12 @@ namespace Trochita3D.Core
 
         // Agarrador
         private static double RADIO_AGARRADOR = RADIO_TROMPA / 5d;
-        private static double LARGO_AGARRADOR = 1;
+        private static double LARGO_AGARRADOR = LARGO_TROMPA / 4d;
 
         // Techo
-        private static double ANCHO_TECHO = ANCHO_RECTANGULO + 0.5;
-        private static double LARGO_TECHO = LARGO_RECTANULO + 0.5;
-        private static double ALTO_TECHO = 0.6;
+        private static double ANCHO_TECHO = ANCHO_RECTANGULO + 0.5d;
+        private static double LARGO_TECHO = LARGO_RECTANULO + 0.5d;
+        private static double ALTO_TECHO = ALTO_RECTANGULO / 10d;
 
         // Guardabarros
         private static double ALTO_GUARDABARROS = ALTO_PARAGOLPE;
@@ -49,10 +49,10 @@ namespace Trochita3D.Core
         private static double ANCHO_GUARDABARROS = ANCHO_PARAGOLPE;
 
         // Ruedas
-        private static double ESPACIADO_RUEDAS = ANCHO_BASE / 2d; // Esto tiene que ir con la distancia entre los rieles
-        private static double RADIO_INTERNO_RUEDAS = (ALTO_PARAGOLPE + ALTO_GUARDABARROS) / 2d;
-        private static double RADIO_EXTERNO_RUEDAS = RADIO_INTERNO_RUEDAS + 0.1d;
-        private static double ANCHO_RUEDAS = 0.8d;
+        private static double ESPACIADO_RUEDAS =  0.4d;
+        private static double RADIO_INTERNO_RUEDAS = RADIO_EXTERNO_RUEDAS * 0.2d;
+        private static double RADIO_EXTERNO_RUEDAS = (ALTO_PARAGOLPE + ALTO_GUARDABARROS) / 2d;
+        private static double ANCHO_RUEDAS = 0.2d;
 
         #endregion
         #region Partes de la locomotora
@@ -85,10 +85,10 @@ namespace Trochita3D.Core
             this.LuzBrillo = luzBrillo;
             this.Shininess = shininess;
 
-            rectanguloTechoConductor = new Cuboide(ANCHO_TECHO, LARGO_TECHO, ALTO_TECHO, 32, 32, 32, new Punto(-ANCHO_TECHO/2d, -0.25, ALTO_RECTANGULO), this.LuzAmbiente, this.LuzBrillo, this.Luz, this.Shininess);
-            rectanguloBase = new Cuboide(ANCHO_BASE, LARGO_BASE, ALTO_BASE, 32, 32, 32, new Punto(-ANCHO_BASE / 2d, 0, -ALTO_BASE), this.LuzAmbiente, this.LuzBrillo, this.Luz, this.Shininess);
-            rectanguloConductor = new Cuboide(ANCHO_RECTANGULO, LARGO_RECTANULO, ALTO_RECTANGULO, 32, 32, 32, new Punto(-ANCHO_RECTANGULO / 2d, 0, 0), this.LuzAmbiente, this.LuzBrillo, this.Luz, this.Shininess);
-            rectanguloParagolpe = new Cuboide(ANCHO_PARAGOLPE, LARGO_PARAGOLPE, ALTO_PARAGOLPE, 32, 32, 32, new Punto(-ANCHO_PARAGOLPE / 2d, LARGO_BASE, -ALTO_PARAGOLPE), this.LuzAmbiente, this.LuzBrillo, this.Luz, this.Shininess);
+            rectanguloTechoConductor = new Cuboide(ANCHO_TECHO, LARGO_TECHO, ALTO_TECHO, new Punto(-ANCHO_TECHO/2d, -0.25, ALTO_RECTANGULO), this.LuzAmbiente, this.LuzBrillo, this.Luz, this.Shininess);
+            rectanguloBase = new Cuboide(ANCHO_BASE, LARGO_BASE, ALTO_BASE, new Punto(-ANCHO_BASE / 2d, 0, -ALTO_BASE), this.LuzAmbiente, this.LuzBrillo, this.Luz, this.Shininess);
+            rectanguloConductor = new Cuboide(ANCHO_RECTANGULO, LARGO_RECTANULO, ALTO_RECTANGULO, new Punto(-ANCHO_RECTANGULO / 2d, 0, 0), this.LuzAmbiente, this.LuzBrillo, this.Luz, this.Shininess);
+            rectanguloParagolpe = new Cuboide(ANCHO_PARAGOLPE, LARGO_PARAGOLPE, ALTO_PARAGOLPE, new Punto(-ANCHO_PARAGOLPE / 2d, LARGO_BASE, -ALTO_PARAGOLPE), this.LuzAmbiente, this.LuzBrillo, this.Luz, this.Shininess);
 
             ruedas = new List<Rueda>();
 
@@ -97,7 +97,7 @@ namespace Trochita3D.Core
             ruedas.Add(new Rueda(this.CalcularPuntoCentroRueda(false, true), AnguloRotacionRuedas, RADIO_INTERNO_RUEDAS, RADIO_EXTERNO_RUEDAS, ANCHO_RUEDAS, this.LuzAmbiente, this.LuzBrillo, this.Luz, this.Shininess));
             ruedas.Add(new Rueda(this.CalcularPuntoCentroRueda(false, false), AnguloRotacionRuedas, RADIO_INTERNO_RUEDAS, RADIO_EXTERNO_RUEDAS, ANCHO_RUEDAS, this.LuzAmbiente, this.LuzBrillo, this.Luz, this.Shininess));
 
-            guardabarroTren = new GuardabarroTren(ANCHO_GUARDABARROS, LARGO_GUARDABARROS, ALTO_GUARDABARROS, 32, 32, 32, new Punto(-ANCHO_GUARDABARROS / 2d, LARGO_BASE + LARGO_PARAGOLPE, -ALTO_PARAGOLPE - ALTO_GUARDABARROS + 0.2), this.Luz, this.LuzAmbiente, this.LuzBrillo, this.Shininess);
+            guardabarroTren = new GuardabarroTren(ANCHO_GUARDABARROS, LARGO_GUARDABARROS, ALTO_GUARDABARROS, new Punto(-ANCHO_GUARDABARROS / 2d, LARGO_BASE + LARGO_PARAGOLPE, -ALTO_PARAGOLPE - ALTO_GUARDABARROS + 0.2), this.Luz, this.LuzAmbiente, this.LuzBrillo, this.Shininess);
         }
 
         #region Dibujadores
