@@ -564,5 +564,20 @@ namespace Trochita3D.Core
             this.texTierra = new Textura(@"../../Imagenes/Texturas/Tierra.bmp", true);
             this.texRiel = new Textura(@"../../Imagenes/Texturas/Riel.bmp", true);
         }
+
+        internal double GetInclinacionByDistancia(double distancia)
+        {
+            double distanciaDesdeElComienzoDeLaVuelta = distancia % distanciaAcumuladaPorPuntoPath[distanciaAcumuladaPorPuntoPath.Count - 1];
+
+            for (int i = 0; i < path.Count; i++)
+            {
+                if (distanciaDesdeElComienzoDeLaVuelta <= distanciaAcumuladaPorPuntoPath[i])
+                {
+                    return 180 + seccionesTerraplen[i].Angulo;
+                }
+            }
+
+            throw new InvalidProgramException("No se encontró el punto donde supera la distancia");
+        }
     }
 }
