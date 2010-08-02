@@ -20,7 +20,7 @@ namespace Trochita3D
         private static float[] TREN_LUZ_BRILLO = new float[] { 0.2f, 0.2f, 0.2f, 1 };
         private static int TREN_SHININESS = 180;
 
-        private static double VELOCIDAD_TREN = 100;
+        private static double VELOCIDAD_TREN = 1000;
         private static double tiempo = 0;
 
 
@@ -68,6 +68,9 @@ namespace Trochita3D
         private float[] secondary_day_light_ambient = new float[4] { 0.05f, 0.05f, 0.05f, 1.0f };
         private float[] secondary_night_light_color = new float[4] { 0.20f, 0.20f, 0.20f, 1.0f };
         private float[] secondary_night_light_ambient = new float[4] { 0.05f, 0.05f, 0.05f, 1.0f };
+        
+        private float[] light_linterna_position = new float[4] { 10.0f, 10.0f, 10.0f, 1.0f };
+        private float[] light_linterna_direction = new float[3] { 1.0f, 1.0f, 1.0f };
 
         #endregion
 
@@ -129,6 +132,12 @@ namespace Trochita3D
             Gl.glLightf(Gl.GL_LIGHT4, Gl.GL_SPOT_CUTOFF, 180.0f);
             Gl.glEnable(Gl.GL_LIGHT4);
 
+            Gl.glLightf(Gl.GL_LIGHT6, Gl.GL_SPOT_CUTOFF, 10.0f);
+            Gl.glLightfv(Gl.GL_LIGHT6, Gl.GL_DIFFUSE, day_light_color);
+            Gl.glLightfv(Gl.GL_LIGHT6, Gl.GL_AMBIENT, day_light_ambient);
+            //Gl.glLightfv(Gl.GL_LIGHT6, Gl.GL_SPOT_DIRECTION, this.light_linterna_direction);
+            //Gl.glLighti(Gl.GL_LIGHT6, Gl.GL_QUADRATIC_ATTENUATION, 1);
+
             Gl.glEnable(Gl.GL_LIGHTING);
         }
 
@@ -142,7 +151,7 @@ namespace Trochita3D
             surfaceInitializer.DrawSurface();
             terrainInitializer.DrawTerrain();
             waterInitializer.DrawPlaneOfWater();
-            Tren.Draw();
+            Tren.Draw(!this.daylight);
             
             for (int i = 0; i < arboles.Count(); ++i)
             {
@@ -162,14 +171,18 @@ namespace Trochita3D
             double distancia = VELOCIDAD_TREN * tiempo;
 
             Punto posicion = surfaceInitializer.GetPositionByDistancia(distancia);
+            double inclinacion = surfaceInitializer.GetInclinacionByDistancia(distancia);
 
             Tren.Posicion = posicion;
+            Tren.InclinaciónLocomotora = inclinacion;
         }
 
         public void SwitchDayLight()
         {
             this.daylight = !this.daylight;
             this.InicializarLuces();
+            if (daylight) Gl.glDisable(Gl.GL_LIGHT6);
+            else Gl.glEnable(Gl.GL_LIGHT6);
         }
     }
 }
