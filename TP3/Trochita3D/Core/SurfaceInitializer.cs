@@ -573,7 +573,7 @@ namespace Trochita3D.Core
             {
                 if (distanciaDesdeElComienzoDeLaVuelta <= distanciaAcumuladaPorPuntoPath[i])
                 {
-                    return 180 + seccionesTerraplen[i].Angulo;
+                    return seccionesTerraplen[i].Angulo * (180 / Math.PI) + 90;
                 }
             }
 
