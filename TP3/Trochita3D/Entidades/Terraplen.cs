@@ -10,13 +10,19 @@ using Trochita3D.Curvas;
 
 namespace Trochita3D.Entidades
 {
-    public class Terraplen
+    public class Terraplen : SuperficieBarrido
     {
+        // Cantidad de puntos que definen la sección del terraplen.
+        private const int CANT_PTOS_SECCION = 10;
+
         private IList<Punto> puntosControl = new List<Punto>();
-        private CurvaBzierSegmentosCubicos curvaCamino;
+        private CurvaBzierSegmentosCubicos curvaSeccion;
+        private IList<double> distanciaAcumuladaPorPuntoPath;
 
         public Terraplen(double altura)
         {
+            this.RENDER_MODE = Gl.GL_TRIANGLE_STRIP;
+
             // Curva del terraplen
             puntosControl.Add(new Punto(0, -2, 0));
             puntosControl.Add(new Punto(0, -1.6, 1.6));
@@ -34,28 +40,73 @@ namespace Trochita3D.Entidades
             puntosControl.Add(new Punto(0, 1.6, 1.6));
             puntosControl.Add(new Punto(0, 2, 0));
 
-            this.curvaCamino = new CurvaBzierSegmentosCubicos(puntosControl);
+            this.curvaSeccion = new CurvaBzierSegmentosCubicos(puntosControl);
         }
 
-        public Seccion GetSeccion(int cantPuntos)
+        protected override void LoadMaterialProperties()
         {
-            return new Seccion(this.curvaCamino.GetPuntosDiscretos(1d / cantPuntos));
+            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_AMBIENT, new float[] { 0.6f, 0.5f, 0.35f, 0.25f });
+            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_DIFFUSE, new float[] { 0.61568f, 0.48627f, 0.34117f, 1 });
+            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_SPECULAR, new float[] { 0, 0, 0, 1 });
         }
 
-        public void Dibujar()
+        public override Seccion GetSeccion()
         {
-            Gl.glPushMatrix();
-            Gl.glBegin(Gl.GL_LINE_STRIP);
+            return new Seccion(curvaSeccion.GetPuntosDiscretos(3d / CANT_PTOS_SECCION));
+        }
 
-            Gl.glColor3d(0.5, 0.5, 0);
-            foreach (Punto punto in curvaCamino.GetPuntosDiscretos(0.001))
+        public override void SetCamino(IList<Punto> camino)
+        {
+            base.SetCamino(camino);
+            this.CalcularDistanciaAcumulada();
+        }
+
+        private void CalcularDistanciaAcumulada()
+        {
+            distanciaAcumuladaPorPuntoPath = new List<double>();
+            Punto puntoAnterior = camino[camino.Count - 1];
+            Punto puntoActual;
+            for (int i = 0; i < camino.Count; i++)
             {
-                Gl.glVertex3d(punto.X, punto.Y, punto.Z);
+                puntoActual = camino[i];
+
+                if (i == 0)
+                    distanciaAcumuladaPorPuntoPath.Add(0d);
+                else
+                    distanciaAcumuladaPorPuntoPath.Add(puntoAnterior.CalcularDistancia(puntoActual) + distanciaAcumuladaPorPuntoPath[i - 1]);
+
+                puntoAnterior = puntoActual;
+            }
+        }
+
+        public Punto GetPositionByDistancia(double distancia)
+        {
+            double distanciaDesdeElComienzoDeLaVuelta = distancia % distanciaAcumuladaPorPuntoPath[distanciaAcumuladaPorPuntoPath.Count - 1];
+
+            for (int i = 0; i < camino.Count; i++)
+            {
+                if (distanciaDesdeElComienzoDeLaVuelta <= distanciaAcumuladaPorPuntoPath[i])
+                {
+                    return camino[i];
+                }
             }
 
-            Gl.glEnd();
-            Gl.glPopMatrix();
+            throw new InvalidProgramException("No se encontró el punto donde supera la distancia");
         }
 
+        public double GetInclinacionByDistancia(double distancia)
+        {
+            double distanciaDesdeElComienzoDeLaVuelta = distancia % distanciaAcumuladaPorPuntoPath[distanciaAcumuladaPorPuntoPath.Count - 1];
+
+            for (int i = 0; i < camino.Count; i++)
+            {
+                if (distanciaDesdeElComienzoDeLaVuelta <= distanciaAcumuladaPorPuntoPath[i])
+                {
+                    return secciones[i].Angulo * (180 / Math.PI) + 90;
+                }
+            }
+
+            throw new InvalidProgramException("No se encontró el punto donde supera la distancia");
+        }
     }
 }
