@@ -13,35 +13,20 @@ namespace Trochita3D.Core
     /// </summary>
     public class SurfaceInitializer
     {
-        private const double DELTA_U = 0.05;
-        private const double DELTA_U2 = 0.0005;
-        private const double ALTURA_TERRAPLEN = 2.2;
-        private const double DIST_RIELES = 0.4;
-        private const int CANT_PUNTOS_TERRAPLEN = 10;
-        private const int DIST_TABLA = 2; // Distancia entre tablas de la vía.
+        //private const double DELTA_U = 0.05;
+        //private const double DELTA_U2 = 0.0005;
+        //private const double ALTURA_TERRAPLEN = 2.2;
+        //private const int DIST_TABLA = 2; // Distancia entre tablas de la vía.
 
-        private IList<Seccion> seccionesTerraplen = new List<Seccion>();
-        private IList<Seccion> seccionesRieles1 = new List<Seccion>();
-        private IList<Seccion> seccionesRieles2 = new List<Seccion>();
-        private IList<Seccion> seccionesTablas = new List<Seccion>();
-        private IList<Punto> path;
-        private IList<Punto> detailPath;
-        private IList<double> distanciaAcumuladaPorPuntoPath;
+        //private IList<Seccion> seccionesTablas = new List<Seccion>();
+        //private IList<Punto> path;
+        //private IList<Punto> detailPath;
 
-        private static int[] indicesTerraplen;
-        private static int[] indicesRieles1;
-        private static int[] indicesRieles2;
-        private static int[] indicesTablas;
+        //private static int[] indicesTablas;
 
-        private static double[] verticesTerraplen;
-        private static double[] verticesRieles1;
-        private static double[] verticesRieles2;
-        private static double[] verticesTablas;
+        //private static double[] verticesTablas;
 
-        private static double[] normalesTerraplen;
-        private static double[] normalesRieles1;
-        private static double[] normalesRieles2;
-        private static double[] normalesTablas;
+        //private static double[] normalesTablas;
 
         private static double[] texCoordTerraplen;
         private static double[] texCoordRieles1;
@@ -53,14 +38,13 @@ namespace Trochita3D.Core
 
         public SurfaceInitializer()
         {
-            this.path = GetBsplineControlPoints(DELTA_U);
-            this.detailPath = GetBsplineControlPoints(DELTA_U2);
+            //this.path = GetBsplineControlPoints(DELTA_U);
+            //this.detailPath = GetBsplineControlPoints(DELTA_U2);
 
             this.LoadTextures();
 
-            this.BuildTerraplen();
-            this.BuildRieles();
-            this.BuildTablas();
+            //this.BuildRieles();
+            //this.BuildTablas();
         }
 
         /// <summary>
@@ -107,100 +91,12 @@ namespace Trochita3D.Core
         #region Armado de Superficies
 
         /// <summary>
-        /// Construye las secciones correspondientes al terraplen. Completa el listado
-        /// de secciones ubicadas a través del trayecto indicado en path para ir
-        /// formando las secciones correspondientes a la superficie del terraplen.
-        /// </summary>
-        private void BuildTerraplen()
-        {
-            distanciaAcumuladaPorPuntoPath = new List<double>();
-            Terraplen terraplen = new Terraplen(ALTURA_TERRAPLEN);
-            Punto puntoAnterior = path[path.Count - 1];
-            Punto puntoActual;
-            Punto vectorPuntoAnteriorActual;
-            Seccion seccion;
-            seccion = terraplen.GetSeccion(CANT_PUNTOS_TERRAPLEN);
-            double dx, dy, angulo;
-
-            for (int i = 0; i < path.Count; i++)
-            {
-                puntoActual = path[i];
-                vectorPuntoAnteriorActual = puntoActual - puntoAnterior;
-                seccion = terraplen.GetSeccion(CANT_PUNTOS_TERRAPLEN);
-                dx = puntoActual.X - puntoAnterior.X;
-                dy = puntoActual.Y - puntoAnterior.Y;
-                angulo = Math.Atan(dy / dx);
-
-                int cuadrante = vectorPuntoAnteriorActual.GetCuadrante();
-                if (cuadrante.Equals(1) || cuadrante.Equals(4))
-                    angulo -= Math.PI;
-
-                seccion.Rotar(angulo);
-                seccion.Trasladar(puntoActual.X, puntoActual.Y, puntoActual.Z);
-                seccionesTerraplen.Add(seccion);
-
-                if (i == 0)
-                    distanciaAcumuladaPorPuntoPath.Add(0d);
-                else
-                    distanciaAcumuladaPorPuntoPath.Add(puntoAnterior.CalcularDistancia(puntoActual) + distanciaAcumuladaPorPuntoPath[i-1]);
-
-                puntoAnterior = puntoActual;
-            }
-        }
-
-        /// <summary>
-        /// Construye las secciones correspondientes al riel. Completa el listado
-        /// de secciones ubicadas a través del trayecto indicado en path para ir
-        /// formando las secciones correspondientes a la superficie de los rieles.
-        /// </summary>
-        private void BuildRieles()
-        {
-            Riel riel = new Riel();
-            Punto puntoAnterior = path[path.Count - 1];
-            Punto puntoActual;
-            Punto vectorPuntoAnteriorActual;
-            Seccion seccionRiel1;
-            Seccion seccionRiel2;
-            double dx, dy, angulo;
-
-            for (int i = 0; i < path.Count; i++)
-            {
-                puntoActual = path[i];
-                vectorPuntoAnteriorActual = puntoActual - puntoAnterior;
-                seccionRiel1 = riel.GetSeccion();
-                seccionRiel2 = riel.GetSeccion();
-
-                dx = puntoActual.X - puntoAnterior.X;
-                dy = puntoActual.Y - puntoAnterior.Y;
-
-                angulo = Math.Atan(dy / dx);
-
-                int cuadrante = vectorPuntoAnteriorActual.GetCuadrante();
-                if (cuadrante.Equals(1) || cuadrante.Equals(4))
-                    angulo -= Math.PI;
-
-                seccionRiel1.Escalar(1, 0.2, 0.2);
-                seccionRiel1.Trasladar(0, -DIST_RIELES, 0);
-                seccionRiel1.Rotar(angulo);
-                seccionRiel1.Trasladar(puntoActual.X, puntoActual.Y, puntoActual.Z + ALTURA_TERRAPLEN);
-
-                seccionRiel2.Escalar(1, 0.2, 0.2);
-                seccionRiel2.Trasladar(0, DIST_RIELES, 0);
-                seccionRiel2.Rotar(angulo);
-                seccionRiel2.Trasladar(puntoActual.X, puntoActual.Y, puntoActual.Z + ALTURA_TERRAPLEN);
-
-                seccionesRieles1.Add(seccionRiel1);
-                seccionesRieles2.Add(seccionRiel2);
-                puntoAnterior = puntoActual;
-            }
-        }
-
-        /// <summary>
         /// Construye las secciones correspondientes a las tablas de los rieles. 
         /// Completa el listado de secciones ubicadas a través del trayecto indicado 
         /// en path para ir formando las secciones correspondientes a la superficie 
         /// de los rieles.
         /// </summary>
+        /*
         private void BuildTablas()
         {
             Tabla tabla = new Tabla();
@@ -247,6 +143,7 @@ namespace Trochita3D.Core
                 puntoAnterior = puntoActual;
             }
         }
+        */
 
         /// <summary>
         /// Construye las distintas superficies de la escena.
@@ -257,29 +154,13 @@ namespace Trochita3D.Core
             IList<double> vertices = new List<double>();
             IList<double> normales = new List<double>();
 
-            // Terraplen
-            this.BuildSurfaceDataBuffers(seccionesTerraplen, vertices, indices, normales);
-            verticesTerraplen = vertices.ToArray<double>();
-            normalesTerraplen = normales.ToArray<double>();
-            indicesTerraplen = indices.ToArray<int>();
-
-            // Riel 1
-            this.BuildSurfaceDataBuffers(seccionesRieles1, vertices, indices, normales);
-            verticesRieles1 = vertices.ToArray<double>();
-            normalesRieles1 = normales.ToArray<double>();
-            indicesRieles1 = indices.ToArray<int>();
-
-            // Riel 2
-            this.BuildSurfaceDataBuffers(seccionesRieles2, vertices, indices, normales);
-            verticesRieles2 = vertices.ToArray<double>();
-            normalesRieles2 = normales.ToArray<double>();
-            indicesRieles2 = indices.ToArray<int>();
-
             // Tablas
+            /*
             this.BuildTablasDataBuffers(seccionesTablas, vertices, indices, normales);
             verticesTablas = vertices.ToArray<double>();
             normalesTablas = normales.ToArray<double>();
             indicesTablas = indices.ToArray<int>();
+            */
         }
 
         /// <summary>
@@ -423,9 +304,7 @@ namespace Trochita3D.Core
             Gl.glEnableClientState(Gl.GL_NORMAL_ARRAY);
             //Gl.glEnableClientState(Gl.GL_TEXTURE_COORD_ARRAY);
 
-            this.DrawTerraplen();
-            this.DrawRieles();
-            this.DrawTablas();
+            //this.DrawTablas();
 
             Gl.glDisableClientState(Gl.GL_VERTEX_ARRAY);
             Gl.glDisableClientState(Gl.GL_NORMAL_ARRAY);
@@ -439,6 +318,7 @@ namespace Trochita3D.Core
         /// los valores previamente cargados en las listas de vertices, normales e 
         /// índices.
         /// </summary>
+        /*
         private void DrawTablas()
         {
             Gl.glVertexPointer(3, Gl.GL_DOUBLE, 3 * sizeof(double), verticesTablas);
@@ -448,59 +328,7 @@ namespace Trochita3D.Core
             Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_SPECULAR, new float[] { 0, 0, 0, 1 });
             Gl.glDrawElements(Gl.GL_QUADS, indicesTablas.Length, Gl.GL_UNSIGNED_INT, indicesTablas);
         }
-
-        /// <summary>
-        /// Dibuja la superficie correspondiente a los rieles tomando los valores
-        /// previamente cargados en las listas de vertices, normales e índices.
-        /// </summary>
-        private void DrawRieles()
-        {
-            // Silver
-            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_AMBIENT, new float[] { 0.19225f, 0.19225f, 0.19225f, 1.0f });
-            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_DIFFUSE, new float[] { 0.50754f, 0.50754f, 0.50754f, 1.0f });
-            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_SPECULAR, new float[] { 0.508273f, 0.508273f, 0.508273f, 1.0f });
-            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_SHININESS, new float[] { 51.2f });
-
-            // Polished Silver
-            /*
-            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_AMBIENT, new float[] { 0.23125f, 0.23125f, 0.23125f, 1.0f });
-            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_DIFFUSE, new float[] { 0.2775f, 0.2775f, 0.2775f, 1.0f });
-            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_SPECULAR, new float[] { 0.773911f, 0.773911f, 0.773911f, 1.0f });
-            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_SHININESS, new float[] { 0.896f });
-            */
-
-            // Chrome
-            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_AMBIENT, new float[] { 0.25f, 0.25f, 0.25f, 1.0f });
-            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_DIFFUSE, new float[] { 0.4f, 0.4f, 0.4f, 1.0f });
-            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_SPECULAR, new float[] { 0.774597f, 0.774597f, 0.774597f, 1.0f });
-            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_SHININESS, new float[] { 76.8f });
-
-            Gl.glVertexPointer(3, Gl.GL_DOUBLE, 3 * sizeof(double), verticesRieles1);
-            Gl.glNormalPointer(Gl.GL_DOUBLE, 3 * sizeof(double), normalesRieles1);
-            Gl.glDrawElements(Gl.GL_QUAD_STRIP, indicesRieles1.Length, Gl.GL_UNSIGNED_INT, indicesRieles1);
-
-            Gl.glVertexPointer(3, Gl.GL_DOUBLE, 3 * sizeof(double), verticesRieles2);
-            Gl.glNormalPointer(Gl.GL_DOUBLE, 3 * sizeof(double), normalesRieles2);
-            Gl.glDrawElements(Gl.GL_QUAD_STRIP, indicesRieles2.Length, Gl.GL_UNSIGNED_INT, indicesRieles2);
-        }
-
-        /// <summary>
-        /// Dibuja la superficie correspondiente al terraplen tomando los valores
-        /// previamente cargados en las listas de vertices, normales e índices.
-        /// </summary>
-        private void DrawTerraplen()
-        {
-            texTierra.Activate();
-            Gl.glVertexPointer(3, Gl.GL_DOUBLE, 3 * sizeof(double), verticesTerraplen);
-            Gl.glNormalPointer(Gl.GL_DOUBLE, 3 * sizeof(double), normalesTerraplen);
-            //Gl.glTexCoordPointer(2, Gl.GL_DOUBLE, 2 * sizeof(double), texCoordTerraplen);
-
-            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_AMBIENT, new float[] { 0.6f, 0.5f, 0.35f, 0.25f });
-            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_DIFFUSE, new float[] { 0.61568f, 0.48627f, 0.34117f, 1 });
-            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_SPECULAR, new float[] { 0, 0, 0, 1 });
-
-            Gl.glDrawElements(Gl.GL_TRIANGLE_STRIP, indicesTerraplen.Length, Gl.GL_UNSIGNED_INT, indicesTerraplen);
-        }
+        */
 
         #endregion
 
@@ -526,58 +354,10 @@ namespace Trochita3D.Core
 
         #endregion
 
-        private void DibujarNormales(double[] vertices, double[] normales)
-        {
-            Gl.glDisable(Gl.GL_LIGHTING);
-            for (int i = 0; i < vertices.Length; i += 3)
-            {
-                Gl.glPushMatrix();
-                Gl.glTranslated(vertices[i], vertices[i + 1], vertices[i + 2]);
-                Gl.glBegin(Gl.GL_LINES);
-                Gl.glColor3d(1, 0, 0);
-                Gl.glVertex3d(0, 0, 0);
-                Gl.glColor3d(0.2, 0, 0);
-                Gl.glVertex3d(normales[i], normales[i + 1], normales[i + 2]);
-                Gl.glEnd();
-                Gl.glPopMatrix();
-            }
-            Gl.glEnable(Gl.GL_LIGHTING);
-        }
-
-        public Punto GetPositionByDistancia(double distancia)
-        {
-            double distanciaDesdeElComienzoDeLaVuelta = distancia % distanciaAcumuladaPorPuntoPath[distanciaAcumuladaPorPuntoPath.Count - 1];
-
-            for (int i = 0; i < path.Count; i++)
-            {
-                if (distanciaDesdeElComienzoDeLaVuelta <= distanciaAcumuladaPorPuntoPath[i])
-                {
-                    return path[i];
-                }
-            }
-
-            throw new InvalidProgramException("No se encontró el punto donde supera la distancia");
-        }
-
         private void LoadTextures()
         {
             this.texTierra = new Textura(@"../../Imagenes/Texturas/Tierra.bmp", true);
             this.texRiel = new Textura(@"../../Imagenes/Texturas/Riel.bmp", true);
-        }
-
-        internal double GetInclinacionByDistancia(double distancia)
-        {
-            double distanciaDesdeElComienzoDeLaVuelta = distancia % distanciaAcumuladaPorPuntoPath[distanciaAcumuladaPorPuntoPath.Count - 1];
-
-            for (int i = 0; i < path.Count; i++)
-            {
-                if (distanciaDesdeElComienzoDeLaVuelta <= distanciaAcumuladaPorPuntoPath[i])
-                {
-                    return seccionesTerraplen[i].Angulo * (180 / Math.PI) + 90;
-                }
-            }
-
-            throw new InvalidProgramException("No se encontró el punto donde supera la distancia");
         }
     }
 }

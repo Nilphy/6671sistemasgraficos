@@ -8,12 +8,19 @@ using Tao.OpenGl;
 using System.Drawing;
 using System.Drawing.Imaging;
 using Common.Utils;
+using Trochita3D.Curvas;
 
 namespace Trochita3D
 {
     public class Escena
     {
         public Camara Camara { get; set; }
+
+        private const double DELTA_U = 0.05;
+        private const double DELTA_U2 = 0.0005;
+        private const double ALTURA_TERRAPLEN = 2.2;
+        private const double DIST_RIELES = 0.8;
+        private const int DIST_TABLA = 2; // Distancia entre tablas de la vía.
 
         #region Constantes del tren
 
@@ -28,8 +35,34 @@ namespace Trochita3D
 
         #endregion
 
+        #region Variables asociadas a las fuentes de luz de la escena
+
+        private float[] day_light_color = new float[4] { 1.0f, 1.0f, 1.0f, 1.0f };
+        private float[] day_light_ambient = new float[4] { 0.15f, 0.15f, 0.15f, 1.0f };
+        private float[] night_light_color = new float[4] { 64f / 255f, 156f / 255f, 1.0f, 1.0f };
+        private float[] night_light_ambient = new float[4] { 0.05f, 0.05f, 0.15f, 1.0f };
+        private float[] light_position = new float[4] { 7.0f, 7.0f, 100.0f, 0.0f };
+
+        private float[] secondary_day_light_color = new float[4] { 0.20f, 0.20f, 0.20f, 1.0f };
+        private float[] secondary_day_light_ambient = new float[4] { 0.05f, 0.05f, 0.05f, 1.0f };
+        private float[] secondary_night_light_color = new float[4] { 0.20f, 0.20f, 0.20f, 1.0f };
+        private float[] secondary_night_light_ambient = new float[4] { 0.05f, 0.05f, 0.05f, 1.0f };
+
+        private float[] light_linterna_position = new float[4] { 10.0f, 10.0f, 10.0f, 1.0f };
+        private float[] light_linterna_direction = new float[3] { 1.0f, 1.0f, 1.0f };
+
+        #endregion
+
+        private IList<Punto> path;
+        private IList<Punto> detailPath;
+
+        private Terraplen terraplen;
+        private Riel riel1;
+        private Riel riel2;
+        private Tabla tabla;
+
         // Partes de la escena
-        private SurfaceInitializer surfaceInitializer;
+        //private SurfaceInitializer surfaceInitializer;
         private TerrainInitializer terrainInitializer;
         private WaterInitializer waterInitializer;
         private Skybox skybox;
@@ -58,34 +91,84 @@ namespace Trochita3D
         };
         Arbol[] arboles = null;
 
-        #region Variables asociadas a las fuentes de luz de la escena
-        
-        private float[] day_light_color = new float[4] { 1.0f, 1.0f, 1.0f, 1.0f };
-        private float[] day_light_ambient = new float[4] { 0.15f, 0.15f, 0.15f, 1.0f };
-        private float[] night_light_color = new float[4] { 64f / 255f, 156f / 255f, 1.0f, 1.0f };
-        private float[] night_light_ambient = new float[4] { 0.05f, 0.05f, 0.15f, 1.0f };
-        private float[] light_position = new float[4] { 7.0f, 7.0f, 100.0f, 0.0f };
-
-        private float[] secondary_day_light_color = new float[4] { 0.20f, 0.20f, 0.20f, 1.0f };
-        private float[] secondary_day_light_ambient = new float[4] { 0.05f, 0.05f, 0.05f, 1.0f };
-        private float[] secondary_night_light_color = new float[4] { 0.20f, 0.20f, 0.20f, 1.0f };
-        private float[] secondary_night_light_ambient = new float[4] { 0.05f, 0.05f, 0.05f, 1.0f };
-        
-        private float[] light_linterna_position = new float[4] { 10.0f, 10.0f, 10.0f, 1.0f };
-        private float[] light_linterna_direction = new float[3] { 1.0f, 1.0f, 1.0f };
-
-        #endregion
-
         public void Inicializar(int width, int height)
         {
+            // Crea los puntos del camino a seguir por el terraplen y la vía.
+            this.path = GetBsplineControlPoints(DELTA_U);
+
+            // Crea los puntos del camino a seguir por el terraplen y la vía 
+            // con mayor definición de puntos. 
+            this.detailPath = GetBsplineControlPoints(DELTA_U2);
+
+            this.InicializarLuces();
+
+            // Se crean las estructuras de la escena.
             this.skybox = new Skybox(width);
-            this.surfaceInitializer = new SurfaceInitializer();
-            this.surfaceInitializer.BuildSurface();
+
+            this.terraplen = new Terraplen(ALTURA_TERRAPLEN);
+            this.terraplen.SetCamino(path);
+
+            this.riel1 = new Riel();
+            this.riel1.Escalar(1, 0.2, 0.2);
+            this.riel1.Trasladar(0, DIST_RIELES / 2d, ALTURA_TERRAPLEN);
+            this.riel1.SetCamino(path);
+
+            this.riel2 = new Riel();
+            this.riel2.Escalar(1, 0.2, 0.2);
+            this.riel2.Trasladar(0, -DIST_RIELES / 2d, ALTURA_TERRAPLEN);
+            this.riel2.SetCamino(path);
+
+            this.tabla = new Tabla(DIST_TABLA, ALTURA_TERRAPLEN);
+            this.tabla.SetCamino(detailPath);
+
+            //this.surfaceInitializer = new SurfaceInitializer();
+            //this.surfaceInitializer.BuildSurface();
+
             this.terrainInitializer = new TerrainInitializer();
             this.waterInitializer = new WaterInitializer();
-            Tren.Posicion = this.surfaceInitializer.GetPositionByDistancia(0);
+            Tren.Posicion = this.terraplen.GetPositionByDistancia(0);
             arboles = Arbol.GenerarArbolesAleatorios(posicionArboles.Count());
-            this.InicializarLuces();
+        }
+
+        /// <summary>
+        /// Obtiene los puntos discretos del trayecto a realizar por el terraplen
+        /// a partir de los puntos de control definidos en esta misma funcion.
+        /// </summary>
+        /// <param name="du">Delta U</param>
+        /// <returns>
+        /// Lista de vertices que corresponden a la curva que representa el trayecto.
+        /// </returns>
+        private IList<Punto> GetBsplineControlPoints(double du)
+        {
+            IList<Punto> ptsControl = new List<Punto>();
+
+            ptsControl.Add(new Punto(55, 80, 0));
+            ptsControl.Add(new Punto(72, 60, 0));
+            ptsControl.Add(new Punto(76, 35, 0));
+            ptsControl.Add(new Punto(46, 11, 0));
+            ptsControl.Add(new Punto(46, -15, 0));
+            ptsControl.Add(new Punto(60, -30, 0));
+            ptsControl.Add(new Punto(75, -35, 0));
+            ptsControl.Add(new Punto(83, -50, 0));
+            ptsControl.Add(new Punto(83, -65, 0));
+            ptsControl.Add(new Punto(77, -79, 0));
+            ptsControl.Add(new Punto(43, -71, 0));
+            ptsControl.Add(new Punto(21, -63, 0));
+            ptsControl.Add(new Punto(1, -76, 0));
+            ptsControl.Add(new Punto(-8, -74, 0));
+            ptsControl.Add(new Punto(-25, -69, 0));
+            ptsControl.Add(new Punto(-52, -64, 0));
+            ptsControl.Add(new Punto(-63, -45, 0));
+            ptsControl.Add(new Punto(-57, -14, 0));
+            ptsControl.Add(new Punto(-40, 10, 0));
+            ptsControl.Add(new Punto(-45, 30, 0));
+            ptsControl.Add(new Punto(-67, 47, 0));
+            ptsControl.Add(new Punto(-57, 70, 0));
+            ptsControl.Add(new Punto(-23, 80, 0));
+
+            CurvaBsplineSegmentosCubicos path = new CurvaBsplineSegmentosCubicos(ptsControl);
+
+            return path.GetPuntosDiscretos(du);
         }
 
         /// <summary>
@@ -150,7 +233,12 @@ namespace Trochita3D
 
         public void Dibujar()
         {
-            surfaceInitializer.DrawSurface();
+            //this.surfaceInitializer.DrawSurface();
+            this.terraplen.Dibujar();
+            this.riel1.Dibujar();
+            this.riel2.Dibujar();
+            this.tabla.Dibujar();
+
             terrainInitializer.DrawTerrain();
             waterInitializer.DrawPlaneOfWater();
 
@@ -176,8 +264,8 @@ namespace Trochita3D
             tiempo += deltaTiempo;
             double distancia = VELOCIDAD_TREN * tiempo;
 
-            Punto posicion = surfaceInitializer.GetPositionByDistancia(distancia);
-            double inclinacion = surfaceInitializer.GetInclinacionByDistancia(distancia);
+            Punto posicion = this.terraplen.GetPositionByDistancia(distancia);
+            double inclinacion = this.terraplen.GetInclinacionByDistancia(distancia);
 
             Tren.Posicion = posicion;
             Tren.InclinaciónLocomotora = inclinacion;
