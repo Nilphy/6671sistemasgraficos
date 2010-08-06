@@ -130,13 +130,11 @@ namespace Trochita3D.Core
             ruedas.Add(new Rueda(this.CalcularPuntoCentroRueda(false, false), AnguloRotacionRuedas, RADIO_INTERNO_RUEDAS, RADIO_EXTERNO_RUEDAS, ANCHO_RUEDAS, this.LuzAmbiente, this.LuzBrillo, this.Luz, this.Shininess));
 
             guardabarroTren = new GuardabarroTren(ANCHO_GUARDABARROS, LARGO_GUARDABARROS, ALTO_GUARDABARROS, new Punto(-ANCHO_GUARDABARROS / 2d, LARGO_BASE + LARGO_PARAGOLPE, -ALTO_PARAGOLPE - ALTO_GUARDABARROS + 0.2), this.Luz, this.LuzAmbiente, this.LuzBrillo, this.Shininess);
-
-            
         }
 
         #region Dibujadores
 
-        public void Draw(bool linternaPrendida)
+        public void Draw(bool linternaPrendida, CamaraLocomotora camara)
         {
             Gl.glMatrixMode(Gl.GL_MODELVIEW);
             Gl.glPushMatrix();
@@ -170,6 +168,15 @@ namespace Trochita3D.Core
 
             // Linterna
             this.DrawLinterna(linternaPrendida);
+
+
+            if (camara != null)
+            {
+                camara.Eye = this.Posicion.SumarPunto(new Punto(3, 0, 5).RotarProyeccionXY(this.InclinaciónLocomotora + 90));
+                camara.At = this.Posicion.SumarPunto(new Punto(5, 0, 4.5).RotarProyeccionXY(this.InclinaciónLocomotora + 90));
+                camara.Look();
+            }
+
             Gl.glPopMatrix();
         }
 

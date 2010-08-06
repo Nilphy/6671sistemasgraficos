@@ -13,6 +13,8 @@ namespace Trochita3D
 {
     public class Escena
     {
+        public Camara Camara { get; set; }
+
         #region Constantes del tren
 
         private static float[] TREN_LUZ = new float[] { 0.2f, 0.25f, 0.3f, 1 };
@@ -151,8 +153,12 @@ namespace Trochita3D
             surfaceInitializer.DrawSurface();
             terrainInitializer.DrawTerrain();
             waterInitializer.DrawPlaneOfWater();
-            Tren.Draw(!this.daylight);
-            
+
+            if (Camara is CamaraLocomotora)
+                Tren.Draw(!this.daylight, (CamaraLocomotora)Camara);
+            else
+                Tren.Draw(!this.daylight, null);
+
             for (int i = 0; i < arboles.Count(); ++i)
             {
                 Gl.glPushMatrix();
