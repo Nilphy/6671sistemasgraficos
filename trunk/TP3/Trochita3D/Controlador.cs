@@ -11,15 +11,29 @@ namespace Trochita3D
     {
         
         public Escena Escena { get; set; }
-        public Camara Camara { get; set;  }
+        
         public bool view_grid = true;
         public bool view_axis = true;
 
         public Controlador()
         {
             this.Escena = new Escena();
-            this.Camara = new Camara();
+            this.Escena.Camara = new CamaraAerea();
         }
 
+        public void PonerCamaraAerea()
+        {
+            this.Escena.Camara = new CamaraAerea();
+        }
+
+        public void PonerCamaraTerreno()
+        {
+            this.Escena.Camara = new CamaraTerreno();
+        }
+
+        public void PonerCamaraLocomotora()
+        {
+            this.Escena.Camara = new CamaraLocomotora();
+        }
     }
 }

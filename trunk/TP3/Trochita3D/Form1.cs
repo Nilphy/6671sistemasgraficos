@@ -130,8 +130,8 @@ namespace TPAlgoritmos3D
 
             Gl.glClear(Gl.GL_COLOR_BUFFER_BIT | Gl.GL_DEPTH_BUFFER_BIT);
 
-            controlador.Camara.UpdateCameraByMouse(mousing);
-            controlador.Camara.Look();
+            controlador.Escena.Camara.UpdateCameraByMouse(mousing);
+            controlador.Escena.Camara.Look();
 
             controlador.Escena.DibujarSkybox();
             
@@ -149,34 +149,33 @@ namespace TPAlgoritmos3D
             {
                 case Keys.Up:
                     {
-                        controlador.Camara.MoveCamera(1);
+                        controlador.Escena.Camara.MoveCamera(1);
                         break;
                     }
                 case Keys.Down:
                     {
-                        controlador.Camara.MoveCamera(-1);
+                        controlador.Escena.Camara.MoveCamera(-1);
                         break;
                     }
                 case Keys.Left:
                     {
-
-                        controlador.Camara.SlideCamera(1, 0);
+                        controlador.Escena.Camara.SlideCamera(1, 0);
                         break; 
                     }
                 case Keys.Right:
                     {
-                        controlador.Camara.SlideCamera(-1, 0);
+                        controlador.Escena.Camara.SlideCamera(-1, 0);
                         break;
                     }
                 case Keys.Add:
                     {
-                        controlador.Camara.SlideCamera(0, 1);
+                        controlador.Escena.Camara.SlideCamera(0, 1);
                         break;
                         
                     }
                 case Keys.Subtract:
                     {
-                        controlador.Camara.SlideCamera(0, -1);
+                        controlador.Escena.Camara.SlideCamera(0, -1);
                         break;
                         
                     }
@@ -186,22 +185,6 @@ namespace TPAlgoritmos3D
             return base.ProcessCmdKey(ref msg, keyData);
         }
 
-        /// <summary>
-        /// Maneja los eventos del teclado del usuario
-        /// 
-        /// g = muestra/oculta la grilla
-        /// a = muestra/oculta los ejes
-        /// l = baja la velocidad de la cámara
-        /// h = sube la velocidad de la cámara
-        /// r = limpia todos los valores generados por la simulación, inicializando nuevamente la escena
-        /// s = inicia la simulación
-        /// p = limpia la lista de puntos del camino (detiene la simulación)
-        /// o = limpia la lista de puntos del recorrido de la cámara (setea al modo de recorrido de la cámara como fijo)
-        /// esc = salir de la aplicación
-        /// m = cambia el modo de vista de la camara
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void glControl_KeyPress(object sender, KeyPressEventArgs e)
         {
             switch (e.KeyChar)
@@ -227,6 +210,18 @@ namespace TPAlgoritmos3D
                     break;
                 case 'm':
                     controlador.Escena.SwitchDayLight();
+                    glControl.Refresh();
+                    break;
+                case 'v':
+                    controlador.PonerCamaraAerea();
+                    glControl.Refresh();
+                    break;
+                case 'u':
+                    controlador.PonerCamaraTerreno();
+                    glControl.Refresh();
+                    break;
+                case 'l':
+                    controlador.PonerCamaraLocomotora();
                     glControl.Refresh();
                     break;
                 default:
