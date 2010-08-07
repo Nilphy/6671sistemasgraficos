@@ -24,8 +24,7 @@ namespace Trochita3D
 
         #region Constantes del tren
 
-        private static float[] TREN_LUZ = new float[] { 0.2f, 0.25f, 0.3f, 1 };
-        private static float[] TREN_LUZ_AMBIENTE = new float[] { 0.2f, 0.25f, 0.3f, 1 };
+        
         private static float[] TREN_LUZ_BRILLO = new float[] { 0.2f, 0.2f, 0.2f, 1 };
         private static int TREN_SHININESS = 180;
 
@@ -66,7 +65,7 @@ namespace Trochita3D
         private TerrainInitializer terrainInitializer;
         private WaterInitializer waterInitializer;
         private Skybox skybox;
-        private Train Tren = new Train(TREN_LUZ_AMBIENTE, TREN_LUZ_BRILLO, TREN_LUZ, TREN_SHININESS);
+        private Train Tren = new Train(TREN_LUZ_BRILLO, TREN_SHININESS);
         private bool daylight = true;
 
         Punto[] posicionArboles = new Punto[] {
