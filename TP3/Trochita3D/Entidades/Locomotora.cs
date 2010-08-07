@@ -79,7 +79,7 @@ namespace Trochita3D.Core
         private static double ANCHO_CONTENEDOR_LUZ = LARGO_BASE * 0.05d;
         private static double RADIO_LUZ = RADIO_CONTENEDOR_LUZ * 0.5;
 
-        private float[] luzEmicionPrendida = { 1.0f, 1.0f, 0.8f, 1.0f };
+        private float[] luzEmicionPrendida = { 0.8f, 1.0f, 0.2f, 1.0f };
         private float[] luzEmicionApagada = { 0.0f, 0.0f, 0.0f, 1.0f };
         private float[] light_linterna_position = new float[4] { 0.0f, 0.0f, 0.3f, 1.0f};
         private float[] light_linterna_direction = new float[4] { 0.0f, 1.0f, -0.3f, 1.0f};
@@ -98,38 +98,43 @@ namespace Trochita3D.Core
         #endregion
         #region Parámetros que se setean de afuera del tren 
 
+        public Punto Posicion { set; get; }
         private double AnguloRotacionRuedas { set; get; }
         public double InclinaciónLocomotora { set; get; }
-        public float[] LuzAmbiente { set; get; }
+
         public float[] LuzBrillo { set; get; }
-        public float[] Luz { set; get; }
         public int Shininess { set; get; }
-        
-        public Punto Posicion { set; get; }
 
         #endregion
+        #region Colores
+
+        private static float[] LUZ_ROJO = new float[] { 0.5f, 0.1f, 0.1f, 1 };
+        private static float[] LUZ_VERDE = new float[] { 0.2f, 0.5f, 0.2f, 1 };
+        private static float[] LUZ_AZUL = new float[] { 0.2f, 0.3f, 0.5f, 1 };
+        private static float[] LUZ_NEGRO = new float[] { 0.2f, 0.2f, 0.2f, 1 };
+
         #endregion
 
-        public Train(float[] luzAmbiente, float[] luzBrillo, float[] luz, int shininess)
+        #endregion
+
+        public Train(float[] luzBrillo, int shininess)
         {
-            this.Luz = luz;
-            this.LuzAmbiente = luzAmbiente;
             this.LuzBrillo = luzBrillo;
             this.Shininess = shininess;
 
-            rectanguloTechoConductor = new Cuboide(ANCHO_TECHO, LARGO_TECHO, ALTO_TECHO, new Punto(-ANCHO_TECHO/2d, -0.25, ALTO_RECTANGULO), this.LuzAmbiente, this.LuzBrillo, this.Luz, this.Shininess);
-            rectanguloBase = new Cuboide(ANCHO_BASE, LARGO_BASE, ALTO_BASE, new Punto(-ANCHO_BASE / 2d, 0, -ALTO_BASE), this.LuzAmbiente, this.LuzBrillo, this.Luz, this.Shininess);
-            rectanguloConductor = new Cuboide(ANCHO_RECTANGULO, LARGO_RECTANULO, ALTO_RECTANGULO, new Punto(-ANCHO_RECTANGULO / 2d, 0, 0), this.LuzAmbiente, this.LuzBrillo, this.Luz, this.Shininess);
-            rectanguloParagolpe = new Cuboide(ANCHO_PARAGOLPE, LARGO_PARAGOLPE, ALTO_PARAGOLPE, new Punto(-ANCHO_PARAGOLPE / 2d, LARGO_BASE, -ALTO_PARAGOLPE), this.LuzAmbiente, this.LuzBrillo, this.Luz, this.Shininess);
+            rectanguloTechoConductor = new Cuboide(ANCHO_TECHO, LARGO_TECHO, ALTO_TECHO, new Punto(-ANCHO_TECHO/2d, -0.25, ALTO_RECTANGULO), LUZ_ROJO, this.LuzBrillo, LUZ_ROJO, this.Shininess);
+            rectanguloBase = new Cuboide(ANCHO_BASE, LARGO_BASE, ALTO_BASE, new Punto(-ANCHO_BASE / 2d, 0, -ALTO_BASE), LUZ_ROJO, this.LuzBrillo, LUZ_ROJO, this.Shininess);
+            rectanguloConductor = new Cuboide(ANCHO_RECTANGULO, LARGO_RECTANULO, ALTO_RECTANGULO, new Punto(-ANCHO_RECTANGULO / 2d, 0, 0), LUZ_AZUL, this.LuzBrillo, LUZ_AZUL, this.Shininess);
+            rectanguloParagolpe = new Cuboide(ANCHO_PARAGOLPE, LARGO_PARAGOLPE, ALTO_PARAGOLPE, new Punto(-ANCHO_PARAGOLPE / 2d, LARGO_BASE, -ALTO_PARAGOLPE), LUZ_ROJO, this.LuzBrillo, LUZ_ROJO, this.Shininess);
 
             ruedas = new List<Rueda>();
 
-            ruedas.Add(new Rueda(this.CalcularPuntoCentroRueda(true, true), AnguloRotacionRuedas, RADIO_INTERNO_RUEDAS, RADIO_EXTERNO_RUEDAS, ANCHO_RUEDAS, this.LuzAmbiente, this.LuzBrillo, this.Luz, this.Shininess));
-            ruedas.Add(new Rueda(this.CalcularPuntoCentroRueda(true, false), AnguloRotacionRuedas, RADIO_INTERNO_RUEDAS, RADIO_EXTERNO_RUEDAS, ANCHO_RUEDAS, this.LuzAmbiente, this.LuzBrillo, this.Luz, this.Shininess));
-            ruedas.Add(new Rueda(this.CalcularPuntoCentroRueda(false, true), AnguloRotacionRuedas, RADIO_INTERNO_RUEDAS, RADIO_EXTERNO_RUEDAS, ANCHO_RUEDAS, this.LuzAmbiente, this.LuzBrillo, this.Luz, this.Shininess));
-            ruedas.Add(new Rueda(this.CalcularPuntoCentroRueda(false, false), AnguloRotacionRuedas, RADIO_INTERNO_RUEDAS, RADIO_EXTERNO_RUEDAS, ANCHO_RUEDAS, this.LuzAmbiente, this.LuzBrillo, this.Luz, this.Shininess));
+            ruedas.Add(new Rueda(this.CalcularPuntoCentroRueda(true, true), AnguloRotacionRuedas, RADIO_INTERNO_RUEDAS, RADIO_EXTERNO_RUEDAS, ANCHO_RUEDAS, LUZ_NEGRO, this.LuzBrillo, LUZ_NEGRO, this.Shininess));
+            ruedas.Add(new Rueda(this.CalcularPuntoCentroRueda(true, false), AnguloRotacionRuedas, RADIO_INTERNO_RUEDAS, RADIO_EXTERNO_RUEDAS, ANCHO_RUEDAS, LUZ_NEGRO, this.LuzBrillo, LUZ_NEGRO, this.Shininess));
+            ruedas.Add(new Rueda(this.CalcularPuntoCentroRueda(false, true), AnguloRotacionRuedas, RADIO_INTERNO_RUEDAS, RADIO_EXTERNO_RUEDAS, ANCHO_RUEDAS, LUZ_NEGRO, this.LuzBrillo, LUZ_NEGRO, this.Shininess));
+            ruedas.Add(new Rueda(this.CalcularPuntoCentroRueda(false, false), AnguloRotacionRuedas, RADIO_INTERNO_RUEDAS, RADIO_EXTERNO_RUEDAS, ANCHO_RUEDAS, LUZ_NEGRO, this.LuzBrillo, LUZ_NEGRO, this.Shininess));
 
-            guardabarroTren = new GuardabarroTren(ANCHO_GUARDABARROS, LARGO_GUARDABARROS, ALTO_GUARDABARROS, new Punto(-ANCHO_GUARDABARROS / 2d, LARGO_BASE + LARGO_PARAGOLPE, -ALTO_PARAGOLPE - ALTO_GUARDABARROS + 0.2), this.Luz, this.LuzAmbiente, this.LuzBrillo, this.Shininess);
+            guardabarroTren = new GuardabarroTren(ANCHO_GUARDABARROS, LARGO_GUARDABARROS, ALTO_GUARDABARROS, new Punto(-ANCHO_GUARDABARROS / 2d, LARGO_BASE + LARGO_PARAGOLPE, -ALTO_PARAGOLPE - ALTO_GUARDABARROS + 0.2), LUZ_ROJO, LUZ_ROJO, this.LuzBrillo, this.Shininess);
         }
 
         #region Dibujadores
@@ -192,8 +197,8 @@ namespace Trochita3D.Core
             Gl.glLightfv(Gl.GL_LIGHT6, Gl.GL_POSITION, light_linterna_position);
             Gl.glLightfv(Gl.GL_LIGHT6, Gl.GL_SPOT_DIRECTION, light_linterna_direction);
 
-            Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_AMBIENT, this.LuzAmbiente);
-            Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_DIFFUSE, this.Luz);
+            Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_AMBIENT, LUZ_ROJO);
+            Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_DIFFUSE, LUZ_ROJO);
             Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_SPECULAR, this.LuzBrillo);
             Gl.glMateriali(Gl.GL_FRONT, Gl.GL_SHININESS, this.Shininess);
 
@@ -209,7 +214,7 @@ namespace Trochita3D.Core
             if (prenderLinterna) Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_EMISSION, this.luzEmicionPrendida);
             Gl.glTranslated(0, 0, -(ANCHO_CONTENEDOR_LUZ * 0.8d));
             Gl.glRotated(180, 1, 0, 0);
-            Gl.glScaled(0.5d, 1, 2);
+            //Gl.glScaled(0.5d, 1, 2);
             Glu.gluDisk(quad, 0, RADIO_CONTENEDOR_LUZ, 20, 20);
             Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_EMISSION, this.luzEmicionApagada);
 
@@ -242,8 +247,8 @@ namespace Trochita3D.Core
             Gl.glTranslated((esIzquierdo ? -1 : 1) * ANCHO_RECTANGULO / 3d, LARGO_BASE + LARGO_PARAGOLPE + (LARGO_AGARRADOR / 2d), -RADIO_AGARRADOR);
             Gl.glRotated(90, 1, 0, 0);
             
-            Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_AMBIENT, this.LuzAmbiente);
-            Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_DIFFUSE, this.Luz);
+            Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_AMBIENT, LUZ_AZUL);
+            Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_DIFFUSE, LUZ_AZUL);
             Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_SPECULAR, this.LuzBrillo);
             Gl.glMateriali(Gl.GL_FRONT, Gl.GL_SHININESS, this.Shininess);
 
@@ -271,8 +276,8 @@ namespace Trochita3D.Core
             Gl.glTranslated(0, ANCHO_RECTANGULO + (LARGO_TROMPA / 2d), RADIO_TROMPA);
             Gl.glRotated(90, 1, 0, 0);
 
-            Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_AMBIENT, this.LuzAmbiente);
-            Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_DIFFUSE, this.Luz);
+            Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_AMBIENT, LUZ_VERDE);
+            Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_DIFFUSE, LUZ_VERDE);
             Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_SPECULAR, this.LuzBrillo);
             Gl.glMateriali(Gl.GL_FRONT, Gl.GL_SHININESS, this.Shininess);
 
