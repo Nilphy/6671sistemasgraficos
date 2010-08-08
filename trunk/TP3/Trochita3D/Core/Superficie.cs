@@ -14,20 +14,19 @@ namespace Trochita3D.Core
         protected double[] normals;
         protected int[] indexes;
         protected double[] textures;
+        protected Textura texture;
+
+        public double UTextureAspectRatio { get; set; }
+        public double VTextureAspectRatio { get; set; }
 
         protected int RENDER_MODE { get; set; }
 
         public Superficie()
         {
-            this.RENDER_MODE = Gl.GL_QUAD_STRIP; // Render mode default
+            this.RENDER_MODE = Gl.GL_TRIANGLE_STRIP; // Render mode default
         }
 
-        /// <summary>
-        /// Obtiene las secciones contiguas que representan la superficie modelada.
-        /// </summary>
-        protected abstract void LoadSecciones();
-
-        protected virtual void LoadTextures() { }
+        #region Métodos de Dibujo
 
         /// <summary>
         /// Carga las propiedades de material correspondientes a la superficie.
@@ -42,7 +41,7 @@ namespace Trochita3D.Core
             {
                 Gl.glEnable(Gl.GL_TEXTURE_2D);
                 Gl.glEnableClientState(Gl.GL_TEXTURE_COORD_ARRAY);
-                // this.texture.Activate();
+                this.texture.Activate();
             }
             Gl.glEnableClientState(Gl.GL_VERTEX_ARRAY);
             Gl.glEnableClientState(Gl.GL_NORMAL_ARRAY);
@@ -66,6 +65,15 @@ namespace Trochita3D.Core
             Gl.glDisable(Gl.GL_LIGHTING);
         }
 
+        #endregion
+
+        #region Construcción de la superficie
+
+        /// <summary>
+        /// Obtiene las secciones contiguas que representan la superficie modelada.
+        /// </summary>
+        protected abstract void LoadSecciones();
+
         /// <summary>
         /// Calcula los datos necesarios para poder generar la superficie indicada por las secciones
         /// contiguas indicadas en la colección de secciones. A través de esta calcula los vértices,
@@ -82,7 +90,8 @@ namespace Trochita3D.Core
             indices.Clear();
             normales.Clear();
 
-            // Armo la lista de vertices e indices. Esta ultima pensada que se arma con TRIANGLE.
+            // Armo la lista de vertices e indices. Esta ultima pensada que 
+            // se arma con TRIANGLE.
             for (int i = 0; i < secciones.Count; i++)
             {
                 seccion = secciones[i];
@@ -112,11 +121,97 @@ namespace Trochita3D.Core
             this.indexes = indices.ToArray<int>();
         }
 
+        /// <summary>
+        /// Carga la textura a ser aplicada sobre la superficie.
+        /// </summary>
+        /// <param name="fileName">Path al archivo imagen a ser utilizado para la textura</param>
+        /// <param name="uAspectRatio">Relación de aspecto para la coordenada U</param>
+        /// <param name="vAspectRatio">Relación de aspecto para la coordenada V</param>
+        public virtual void LoadTextures(string fileName, double uAspectRatio, double vAspectRatio)
+        {
+            this.UTextureAspectRatio = uAspectRatio;
+            this.VTextureAspectRatio = vAspectRatio;
+            this.texture = new Textura(fileName, true);
+        }
+
+        /// <summary>
+        /// Carga la textura a ser aplicada sobre la superficie.
+        /// </summary>
+        /// <param name="fileName">Path al archivo imagen a ser utilizado para la textura</param>
+        public virtual void LoadTextures(string fileName)
+        {
+            this.LoadTextures(fileName, 1, 1);
+        }
+
+        /// <summary>
+        /// Calcula las coordenadas de textura creando el buffer de coordenadas de textura
+        /// para la superficie.
+        /// </summary>
+        protected virtual void BuildTextureCoordBuffer()
+        {
+            double u, v = 0;
+            double distU = 0, distV = 0;
+            IList<double> textCoord = new List<double>();
+            
+            for (int i = 0; i < secciones.Count; i++)
+            {
+                Seccion seccion = secciones[i];
+
+                if (i != 0)
+                {
+                    Punto verticeAnt = secciones[i - 1].Vertices[secciones[i - 1].Vertices.Count / 2];
+                    Punto verticeActual = seccion.Vertices[seccion.Vertices.Count / 2];
+                    distV = (verticeActual - verticeAnt).Modulo();
+                    v += distV * VTextureAspectRatio;
+                }
+
+                u = 0;
+                for (int j = 0; j < seccion.Vertices.Count; j++)
+                {
+                    if (j != 0)
+                    {
+                        Punto verticeAnt = seccion.Vertices[j - 1];
+                        Punto verticeActual = seccion.Vertices[j];
+                        distU = (verticeActual - verticeAnt).Modulo();
+                        u += distU * UTextureAspectRatio;
+                    }
+
+                    textCoord.Add(v);
+                    textCoord.Add(u);
+                }
+            }
+
+            this.textures = textCoord.ToArray<double>();
+        }
+
+        /// <summary>
+        /// Construye la superficie a partir de los datos configurados para 
+        /// la misma.
+        /// </summary>
+        public virtual void Build()
+        {
+            // Primero carga las secciones que componen al superficie
+            this.LoadSecciones();
+
+            // Genera los vertices correspondientes a la superficie dada
+            // por las secciones junto con sus normales e índices.
+            this.BuildSurfaceDataBuffers();
+
+            // Si existe una textura a aplicar carga las coordenadas de 
+            // textura
+            if (this.HasTextures())
+            {
+                this.BuildTextureCoordBuffer();
+            }
+        }
+
+        #endregion
+
         #region Metodos Auxiliares
 
         private bool HasTextures()
         {
-            return this.textures != null;
+            return this.texture != null;
         }
 
         protected Punto GetNormalForVertex(Seccion seccion, int vertexPos)

@@ -224,6 +224,10 @@ namespace TPAlgoritmos3D
                     controlador.PonerCamaraLocomotora();
                     glControl.Refresh();
                     break;
+                case 'f':
+                    controlador.PonerCamaraLibre();
+                    glControl.Refresh();
+                    break;
                 default:
                     break;
             }

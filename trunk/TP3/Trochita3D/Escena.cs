@@ -57,17 +57,16 @@ namespace Trochita3D
         private IList<Punto> path;
         private IList<Punto> detailPath;
 
+        // Partes de la escena
+        private TerrainInitializer terrainInitializer;
+        private WaterInitializer waterInitializer;
+        private Skybox skybox;
+        private Train Tren = new Train(TREN_LUZ_BRILLO, TREN_SHININESS);
         private Terraplen terraplen;
         private Riel riel1;
         private Riel riel2;
         private Tabla tabla;
 
-        // Partes de la escena
-        //private SurfaceInitializer surfaceInitializer;
-        private TerrainInitializer terrainInitializer;
-        private WaterInitializer waterInitializer;
-        private Skybox skybox;
-        private Train Tren = new Train(TREN_LUZ_BRILLO, TREN_SHININESS);
         private bool daylight = true;
 
         Punto[] posicionArboles = new Punto[] {
@@ -109,26 +108,31 @@ namespace Trochita3D
 
             this.terraplen = new Terraplen(ALTURA_TERRAPLEN);
             this.terraplen.SetCamino(path);
+            this.terraplen.LoadTextures(@"../../Imagenes/Texturas/Tierra.bmp", 0.3, 0.3);
+            this.terraplen.Build();
 
             this.riel1 = new Riel();
             this.riel1.Escalar(1, 0.2, 0.2);
             this.riel1.Trasladar(0, DIST_RIELES / 2d, ALTURA_TERRAPLEN);
             this.riel1.SetCamino(path);
+            this.riel1.LoadTextures(@"../../Imagenes/Texturas/Riel.bmp");
+            this.riel1.Build();
 
             this.riel2 = new Riel();
             this.riel2.Escalar(1, 0.2, 0.2);
             this.riel2.Trasladar(0, -DIST_RIELES / 2d, ALTURA_TERRAPLEN);
             this.riel2.SetCamino(path);
+            this.riel2.LoadTextures(@"../../Imagenes/Texturas/Riel.bmp");
+            this.riel2.Build();
 
             this.tabla = new Tabla(DIST_TABLA, ALTURA_TERRAPLEN);
             this.tabla.SetCamino(detailPath);
-
-            //this.surfaceInitializer = new SurfaceInitializer();
-            //this.surfaceInitializer.BuildSurface();
+            //this.tabla.LoadTextures(@"../../Imagenes/Texturas/Madera.bmp");
+            this.tabla.Build();
 
             this.terrainInitializer = new TerrainInitializer();
             this.waterInitializer = new WaterInitializer();
-            Tren.Posicion = this.terraplen.GetPositionByDistancia(0);
+            //Tren.Posicion = this.terraplen.GetPositionByDistancia(0);
             arboles = Arbol.GenerarArbolesAleatorios(posicionArboles.Count());
         }
 
@@ -248,14 +252,12 @@ namespace Trochita3D
 
         public void DibujarSkybox()
         {
-
             skybox.Dibujar();
         }
 
         public void Dibujar()
         {
             this.InicializarLuces();
-            //this.surfaceInitializer.DrawSurface();
             this.terraplen.Dibujar();
             this.riel1.Dibujar();
             this.riel2.Dibujar();

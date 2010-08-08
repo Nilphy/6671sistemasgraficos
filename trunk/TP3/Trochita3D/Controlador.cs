@@ -35,5 +35,10 @@ namespace Trochita3D
         {
             this.Escena.Camara = new CamaraLocomotora();
         }
+
+        public void PonerCamaraLibre()
+        {
+            this.Escena.Camara = new CamaraLibre();
+        }
     }
 }
