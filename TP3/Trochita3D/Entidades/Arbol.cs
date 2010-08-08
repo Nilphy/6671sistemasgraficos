@@ -121,10 +121,8 @@ namespace Trochita3D.Entidades
             Gl.glEnable(Gl.GL_TEXTURE_2D);
             
             float[] colorBrown = new float[4] { 124.0f / 255.0f, 87.0f / 255.0f, 59.0f / 255.0f, .15f };
-            float[] colorNone  =  new float [4] { 0.0f, 0.0f, 0.0f, 0.0f };
             Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_AMBIENT_AND_DIFFUSE, colorBrown);
-            Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_SPECULAR, new float[] { 0, 0, 0, 0 });
-            Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_SHININESS, new float[] {1.0f});
+            Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_SPECULAR, new float[] { 0f, 0f, 0f, 1.0f });
             
             texturaTronco.Activate();
             Glu.gluQuadricDrawStyle(quadraticCylinder, Glu.GLU_FILL);
@@ -155,10 +153,8 @@ namespace Trochita3D.Entidades
             float[] colorNone = new float[4] { 0.0f, 0.0f, 0.0f, 0.0f };
 
             Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_AMBIENT_AND_DIFFUSE, colorGray);
-            Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_SPECULAR, new float[] { 0, 0, 0, 0 });
-            Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_SHININESS, new float[] { 1.0f });
+            Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_SPECULAR, new float[] { 0f, 0f, 0f, 1.0f });
 
-    
             Punto[] posicionesTextura = new Punto[] 
             {
                 new Punto ( 0,   0,  0 ),

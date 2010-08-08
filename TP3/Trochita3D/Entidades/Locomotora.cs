@@ -199,7 +199,9 @@ namespace Trochita3D.Core
             Gl.glLightfv(Gl.GL_LIGHT6, Gl.GL_POSITION, light_linterna_position);
             Gl.glLightfv(Gl.GL_LIGHT6, Gl.GL_SPOT_DIRECTION, light_linterna_direction);
             Gl.glLightfv(Gl.GL_LIGHT6, Gl.GL_DIFFUSE, locomotora_light_color);
-            Gl.glLightfv(Gl.GL_LIGHT6, Gl.GL_LINEAR_ATTENUATION, new float[] {.05f});
+            Gl.glLightfv(Gl.GL_LIGHT6, Gl.GL_AMBIENT, new float[4] {0f, 0f, 0f, 1f});
+            Gl.glLightfv(Gl.GL_LIGHT6, Gl.GL_SPECULAR, new float[4] { 1f, 1f, 1f, 1f });
+            Gl.glLightfv(Gl.GL_LIGHT6, Gl.GL_LINEAR_ATTENUATION, new float[] {.01f});
             Gl.glLightfv(Gl.GL_LIGHT6, Gl.GL_SPOT_CUTOFF, new float[] { 30.0f });
             
             Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_AMBIENT, LUZ_ROJO);
