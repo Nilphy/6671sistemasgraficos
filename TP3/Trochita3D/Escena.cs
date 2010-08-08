@@ -28,7 +28,7 @@ namespace Trochita3D
         private static float[] TREN_LUZ_BRILLO = new float[] { 0.2f, 0.2f, 0.2f, 1 };
         private static int TREN_SHININESS = 180;
 
-        private static double VELOCIDAD_TREN = 1000;
+        private static double VELOCIDAD_TREN = 500;
         private static double RADIO_RUEDA_TREN = 1.7d / 5d; 
         private static double VELOCIDAD_ANGULAR_RUEDAS = VELOCIDAD_TREN / RADIO_RUEDA_TREN;
         private static double tiempo = 0;
@@ -39,15 +39,15 @@ namespace Trochita3D
         #region Variables asociadas a las fuentes de luz de la escena
 
         private float[] day_light_color = new float[4] { 1.0f, 1.0f, 1.0f, 1.0f };
-        private float[] day_light_ambient = new float[4] { 0.15f, 0.15f, 0.15f, 1.0f };
+        private float[] day_light_ambient = new float[4] { 0.35f, 0.35f, 0.35f, 1.0f };
         private float[] night_light_color = new float[4] { 64f / 255f, 156f / 255f, 1.0f, 1.0f };
         private float[] night_light_ambient = new float[4] { 0.05f, 0.05f, 0.15f, 1.0f };
         private float[] light_position = new float[4] { 7.0f, 7.0f, 100.0f, 0.0f };
 
-        private float[] secondary_day_light_color = new float[4] { 0.20f, 0.20f, 0.20f, 1.0f };
-        private float[] secondary_day_light_ambient = new float[4] { 0.05f, 0.05f, 0.05f, 1.0f };
+        private float[] secondary_day_light_color = new float[4] { 0.70f, 0.70f, 0.70f, 1.0f };
+        private float[] secondary_day_light_ambient = new float[4] { 0f, 0f, 0f, 1.0f };
         private float[] secondary_night_light_color = new float[4] { 0.20f, 0.20f, 0.20f, 1.0f };
-        private float[] secondary_night_light_ambient = new float[4] { 0.05f, 0.05f, 0.05f, 1.0f };
+        private float[] secondary_night_light_ambient = new float[4] { 0f, 0f, 0f, 1.0f };
 
         private float[] light_linterna_position = new float[4] { 10.0f, 10.0f, 10.0f, 1.0f };
         private float[] light_linterna_direction = new float[3] { 1.0f, 1.0f, 1.0f };
@@ -200,7 +200,7 @@ namespace Trochita3D
             // Fuentes de luz secundarias
             
             Gl.glLightfv(Gl.GL_LIGHT1, Gl.GL_DIFFUSE, secondary_light_color);
-            Gl.glLightfv(Gl.GL_LIGHT1, Gl.GL_AMBIENT, new float[4] {0f, 0f, 0f, 1f});
+            Gl.glLightfv(Gl.GL_LIGHT1, Gl.GL_AMBIENT, secondary_light_ambient);
             Gl.glLightfv(Gl.GL_LIGHT1, Gl.GL_SPECULAR, new float[4] {0f, 0f, 0f, 1f});
             Gl.glLightfv(Gl.GL_LIGHT1, Gl.GL_POSITION, new float[4] { -100.0f, -100.0f, 50.0f, 1.0f });
             Gl.glEnable(Gl.GL_LIGHT1);
