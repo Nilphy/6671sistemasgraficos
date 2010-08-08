@@ -99,7 +99,7 @@ namespace Trochita3D.Core
         #region Parámetros que se setean de afuera del tren 
 
         public Punto Posicion { set; get; }
-        private double AnguloRotacionRuedas { set; get; }
+        public double AnguloRotacionRuedas { set; get; }
         public double InclinaciónLocomotora { set; get; }
 
         public float[] LuzBrillo { set; get; }
@@ -232,6 +232,7 @@ namespace Trochita3D.Core
         {
             foreach (Rueda rueda in ruedas)
             {
+                rueda.AnguloRotacion = this.AnguloRotacionRuedas;
                 rueda.Draw();
             }
         }

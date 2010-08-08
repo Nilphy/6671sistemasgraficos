@@ -28,7 +28,9 @@ namespace Trochita3D
         private static float[] TREN_LUZ_BRILLO = new float[] { 0.2f, 0.2f, 0.2f, 1 };
         private static int TREN_SHININESS = 180;
 
-        private static double VELOCIDAD_TREN = 500;
+        private static double VELOCIDAD_TREN = 1000;
+        private static double RADIO_RUEDA_TREN = 1.7d / 5d; 
+        private static double VELOCIDAD_ANGULAR_RUEDAS = VELOCIDAD_TREN / RADIO_RUEDA_TREN;
         private static double tiempo = 0;
 
 
@@ -282,6 +284,8 @@ namespace Trochita3D
 
             Tren.Posicion = posicion;
             Tren.InclinaciónLocomotora = inclinacion;
+            Tren.AnguloRotacionRuedas -= (VELOCIDAD_ANGULAR_RUEDAS / 1000) * tiempo;
+            Tren.AnguloRotacionRuedas %= (2 * Math.PI);
         }
 
         public void SwitchDayLight()
