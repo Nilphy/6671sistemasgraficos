@@ -58,6 +58,57 @@ namespace Trochita3D.Entidades
             Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_SHININESS, new float[] { 76.8f });
         }
 
+        protected override void BuildTextureCoordBuffer()
+        {
+            double v = 0;
+            double distV = 0;
+            IList<double> textCoord = new List<double>();
+
+            for (int i = 0; i < secciones.Count; i++)
+            {
+                Seccion seccion = secciones[i];
+
+                if (i != 0)
+                {
+                    Punto verticeAnt = secciones[i - 1].Vertices[secciones[i - 1].Vertices.Count / 2];
+                    Punto verticeActual = seccion.Vertices[seccion.Vertices.Count / 2];
+                    distV = (verticeActual - verticeAnt).Modulo();
+                    v += distV * VTextureAspectRatio;
+                }
+
+                textCoord.Add(0);
+                textCoord.Add(v);
+                textCoord.Add(0.01);
+                textCoord.Add(v);
+                textCoord.Add(0.1);
+                textCoord.Add(v);
+                textCoord.Add(0.2);
+                textCoord.Add(v);
+                textCoord.Add(0.3);
+                textCoord.Add(v);
+                textCoord.Add(0.35);
+                textCoord.Add(v);
+                
+                textCoord.Add(0.40);
+                textCoord.Add(v);
+                textCoord.Add(0.55);
+                textCoord.Add(v);
+
+                textCoord.Add(0.6);
+                textCoord.Add(v);
+                textCoord.Add(0.7);
+                textCoord.Add(v);
+                textCoord.Add(0.8);
+                textCoord.Add(v);
+                textCoord.Add(0.9);
+                textCoord.Add(v);
+                textCoord.Add(1);
+                textCoord.Add(v);
+            }
+
+            this.textures = textCoord.ToArray<double>();
+        }
+
         /// <summary>
         /// Obtiene la seccion representada por los puntos de control para dibujar
         /// la seccion del riel.

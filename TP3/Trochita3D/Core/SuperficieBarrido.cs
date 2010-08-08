@@ -49,9 +49,6 @@ namespace Trochita3D.Core
 
                 puntoAnterior = puntoActual;
             }
-
-            // Con las secciones armadas se cargan los buffers de vertices, índices y normales.
-            this.BuildSurfaceDataBuffers();
         }
 
         /// <summary>

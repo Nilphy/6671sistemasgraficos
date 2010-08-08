@@ -21,7 +21,8 @@ namespace Trochita3D.Entidades
 
         public Terraplen(double altura)
         {
-            this.RENDER_MODE = Gl.GL_TRIANGLE_STRIP;
+            //this.RENDER_MODE = Gl.GL_TRIANGLE_STRIP;
+            this.RENDER_MODE = Gl.GL_QUAD_STRIP;
 
             // Curva del terraplen
             puntosControl.Add(new Punto(0, -2, 0));

@@ -158,6 +158,22 @@ namespace Trochita3D.Entidades
             this.indexes = indices.ToArray<int>();
         }
 
+        protected override void BuildTextureCoordBuffer()
+        {
+            IList<double> textCoord = new List<double>();
+
+            for (int i = 0; i < this.secciones.Count; i += 2)
+            {
+                Seccion seccionAbajo = this.secciones[i];
+                Seccion seccionArriba = this.secciones[i + 1];
+
+                textCoord.Add(0.1);
+                textCoord.Add(0);
+            }
+
+            this.textures = textCoord.ToArray<double>();
+        }
+
         protected override void LoadMaterialProperties()
         {
             Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_AMBIENT, new float[] { 128f / 255f, 64f / 255f, 0.0f, 0.25f });
