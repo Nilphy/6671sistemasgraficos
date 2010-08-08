@@ -40,14 +40,14 @@ namespace Trochita3D
 
         private float[] day_light_color = new float[4] { 1.0f, 1.0f, 1.0f, 1.0f };
         private float[] day_light_ambient = new float[4] { 0.15f, 0.15f, 0.15f, 1.0f };
-        private float[] night_light_color = new float[4] { 64f / 255f, 156f / 255f, 1.0f, .3f };
-        private float[] night_light_ambient = new float[4] { 0.05f, 0.05f, 0.15f, .3f };
+        private float[] night_light_color = new float[4] { 64f / 255f, 156f / 255f, 1.0f, 1.0f };
+        private float[] night_light_ambient = new float[4] { 0.05f, 0.05f, 0.15f, 1.0f };
         private float[] light_position = new float[4] { 7.0f, 7.0f, 100.0f, 0.0f };
 
         private float[] secondary_day_light_color = new float[4] { 0.20f, 0.20f, 0.20f, 1.0f };
         private float[] secondary_day_light_ambient = new float[4] { 0.05f, 0.05f, 0.05f, 1.0f };
-        private float[] secondary_night_light_color = new float[4] { 0.20f, 0.20f, 0.20f, .3f };
-        private float[] secondary_night_light_ambient = new float[4] { 0.05f, 0.05f, 0.05f, .3f };
+        private float[] secondary_night_light_color = new float[4] { 0.20f, 0.20f, 0.20f, 1.0f };
+        private float[] secondary_night_light_ambient = new float[4] { 0.05f, 0.05f, 0.05f, 1.0f };
 
         private float[] light_linterna_position = new float[4] { 10.0f, 10.0f, 10.0f, 1.0f };
         private float[] light_linterna_direction = new float[3] { 1.0f, 1.0f, 1.0f };
@@ -178,6 +178,7 @@ namespace Trochita3D
         /// </summary>
         private void InicializarLuces()
         {
+            Gl.glPushMatrix();
             float[] light_color;
             float[] light_ambient;
             float[] secondary_light_color;
@@ -189,17 +190,21 @@ namespace Trochita3D
             secondary_light_ambient = (daylight) ? secondary_day_light_ambient : secondary_night_light_ambient;
             
             // Fuente de luz principal
-            Gl.glLightfv(Gl.GL_LIGHT0, Gl.GL_DIFFUSE, light_color);
+            Gl.glLightfv(Gl.GL_LIGHT0, Gl.GL_DIFFUSE, new float[4] {0f, 0f, 0f, 1f});
+            Gl.glLightfv(Gl.GL_LIGHT0, Gl.GL_SPECULAR, light_color);
             Gl.glLightfv(Gl.GL_LIGHT0, Gl.GL_AMBIENT, light_ambient);
             Gl.glLightfv(Gl.GL_LIGHT0, Gl.GL_POSITION, light_position);
+         
+              
 
             // Fuentes de luz secundarias
+            
             Gl.glLightfv(Gl.GL_LIGHT1, Gl.GL_DIFFUSE, secondary_light_color);
-            Gl.glLightfv(Gl.GL_LIGHT1, Gl.GL_AMBIENT, secondary_light_ambient);
-            Gl.glLightfv(Gl.GL_LIGHT1, Gl.GL_POSITION, new float[4] { -100.0f, -100.0f, 1.0f, 0.0f });
-            Gl.glLightf(Gl.GL_LIGHT1, Gl.GL_SPOT_CUTOFF, 180.0f);
+            Gl.glLightfv(Gl.GL_LIGHT1, Gl.GL_AMBIENT, new float[4] {0f, 0f, 0f, 1f});
+            Gl.glLightfv(Gl.GL_LIGHT1, Gl.GL_SPECULAR, new float[4] {0f, 0f, 0f, 1f});
+            Gl.glLightfv(Gl.GL_LIGHT1, Gl.GL_POSITION, new float[4] { -100.0f, -100.0f, 50.0f, 1.0f });
             Gl.glEnable(Gl.GL_LIGHT1);
-
+            
             Gl.glLightfv(Gl.GL_LIGHT2, Gl.GL_DIFFUSE, secondary_light_color);
             Gl.glLightfv(Gl.GL_LIGHT2, Gl.GL_AMBIENT, secondary_light_ambient);
             Gl.glLightfv(Gl.GL_LIGHT2, Gl.GL_POSITION, new float[4] { -100.0f, 100.0f, 1.0f, 0.0f });
@@ -238,6 +243,7 @@ namespace Trochita3D
             }
 
             Gl.glEnable(Gl.GL_LIGHTING);
+            Gl.glPopMatrix();
         }
 
         public void DibujarSkybox()
@@ -248,6 +254,7 @@ namespace Trochita3D
 
         public void Dibujar()
         {
+            this.InicializarLuces();
             //this.surfaceInitializer.DrawSurface();
             this.terraplen.Dibujar();
             this.riel1.Dibujar();

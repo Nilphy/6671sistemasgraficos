@@ -132,9 +132,8 @@ namespace Trochita3D.Core
 
             Gl.glEnable(Gl.GL_LIGHTING);
             Gl.glTranslated(-(double)X_MAX / (double)2, -(double)Y_MAX / (double)2, 0.0f);
-            
-            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_AMBIENT, new float[] { 0.5f, 0.5f, 0.5f, 1 });
-            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_DIFFUSE, new float[] { 0.1f, 0.3f, 0.15f, 1 });
+
+            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_AMBIENT_AND_DIFFUSE, new float[] { .5f, .5f, .5f, 1 });
             Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_SPECULAR, new float[] { 0.0f, 0.0f, 0.0f, 1 });
 
             Gl.glEnable(Gl.GL_TEXTURE_2D);
