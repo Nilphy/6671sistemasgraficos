@@ -61,6 +61,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\Laguna.cs" />
     <Compile Include="Core\CamaraLibre.cs" />
     <Compile Include="Core\CamaraTerreno.cs" />
     <Compile Include="Controlador.cs" />
@@ -82,7 +83,6 @@
     <Compile Include="Entidades\GuardabarroTren.cs" />
     <Compile Include="Core\OrientacionesCara.cs" />
     <Compile Include="Entidades\Locomotora.cs" />
-    <Compile Include="Core\WaterInitializer.cs" />
     <Compile Include="Core\Seccion.cs" />
     <Compile Include="Curvas\CurvaBsplineSegmentosCubicos.cs" />
     <Compile Include="Curvas\CurvaBzierSegmentosCubicos.cs" />

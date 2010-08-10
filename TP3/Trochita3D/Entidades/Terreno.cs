@@ -43,6 +43,12 @@ namespace Trochita3D.Entidades
             }
         }
 
+        protected override void LoadMaterialProperties()
+        {
+            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_AMBIENT_AND_DIFFUSE, new float[] { .5f, .5f, .5f, 1 });
+            Gl.glMaterialfv(Gl.GL_FRONT_AND_BACK, Gl.GL_SPECULAR, new float[] { 0.0f, 0.0f, 0.0f, 1 });
+        }
+
         protected override Punto CalculateNormalForPunto(int posVertexActual, Punto verticeActual, int posSeccionActual, Seccion seccionActual)
         {
             Punto puntoNorte = null;
