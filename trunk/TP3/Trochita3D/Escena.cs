@@ -58,7 +58,6 @@ namespace Trochita3D
         private IList<Punto> detailPath;
 
         // Partes de la escena
-        private WaterInitializer waterInitializer;
         private Skybox skybox;
         private Train Tren = new Train(TREN_LUZ_BRILLO, TREN_SHININESS);
         private Terraplen terraplen;
@@ -66,6 +65,7 @@ namespace Trochita3D
         private Riel riel2;
         private Tabla tabla;
         private Terreno terreno;
+        private Laguna laguna;
 
         private IList<Superficie> superficies = new List<Superficie>();
 
@@ -115,6 +115,14 @@ namespace Trochita3D
             this.terreno.Build();
             this.superficies.Add(this.terreno);
 
+            this.laguna = new Laguna();
+            this.laguna.Width = width;
+            this.laguna.Height = height;
+            this.laguna.Altura = 0.5;
+            this.laguna.LoadTextures(@"../../Imagenes/Texturas/Agua.bmp", 0.3, 0.3);
+            this.laguna.Build();
+            this.superficies.Add(laguna);
+
             this.terraplen = new Terraplen(ALTURA_TERRAPLEN);
             this.terraplen.SetCamino(path);
             this.terraplen.LoadTextures(@"../../Imagenes/Texturas/Tierra.bmp", 0.3, 0.3);
@@ -143,7 +151,6 @@ namespace Trochita3D
             this.tabla.Build();
             this.superficies.Add(this.tabla);
             
-            this.waterInitializer = new WaterInitializer();
             Tren.Posicion = this.terraplen.GetPositionByDistancia(0);
             arboles = Arbol.GenerarArbolesAleatorios(posicionArboles.Count());
         }
@@ -270,8 +277,6 @@ namespace Trochita3D
 
             foreach (Superficie superficie in this.superficies)
                 superficie.Dibujar();
-
-            waterInitializer.DrawPlaneOfWater();
             
             if (Camara is CamaraLocomotora)
                 Tren.Draw(!this.daylight, (CamaraLocomotora)Camara);
