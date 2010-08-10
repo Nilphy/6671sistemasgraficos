@@ -58,7 +58,6 @@ namespace Trochita3D
         private IList<Punto> detailPath;
 
         // Partes de la escena
-        private TerrainInitializer terrainInitializer;
         private WaterInitializer waterInitializer;
         private Skybox skybox;
         private Train Tren = new Train(TREN_LUZ_BRILLO, TREN_SHININESS);
@@ -66,6 +65,9 @@ namespace Trochita3D
         private Riel riel1;
         private Riel riel2;
         private Tabla tabla;
+        private Terreno terreno;
+
+        private IList<Superficie> superficies = new List<Superficie>();
 
         private bool daylight = true;
 
@@ -106,10 +108,18 @@ namespace Trochita3D
             this.skybox = new Skybox(width);
             this.skybox.CargarTexturas(daylight);
 
+            this.terreno = new Terreno();
+            this.terreno.Width = width;
+            this.terreno.Height = height;
+            this.terreno.LoadTextures(@"../../Imagenes/Texturas/PastoClaro.bmp", 0.3, 0.3);
+            this.terreno.Build();
+            this.superficies.Add(this.terreno);
+
             this.terraplen = new Terraplen(ALTURA_TERRAPLEN);
             this.terraplen.SetCamino(path);
             this.terraplen.LoadTextures(@"../../Imagenes/Texturas/Tierra.bmp", 0.3, 0.3);
             this.terraplen.Build();
+            this.superficies.Add(this.terraplen);
 
             this.riel1 = new Riel();
             this.riel1.Escalar(1, 0.2, 0.2);
@@ -117,6 +127,7 @@ namespace Trochita3D
             this.riel1.SetCamino(path);
             this.riel1.LoadTextures(@"../../Imagenes/Texturas/Riel.bmp");
             this.riel1.Build();
+            this.superficies.Add(this.riel1);
 
             this.riel2 = new Riel();
             this.riel2.Escalar(1, 0.2, 0.2);
@@ -124,15 +135,16 @@ namespace Trochita3D
             this.riel2.SetCamino(path);
             this.riel2.LoadTextures(@"../../Imagenes/Texturas/Riel.bmp");
             this.riel2.Build();
+            this.superficies.Add(this.riel2);
 
             this.tabla = new Tabla(DIST_TABLA, ALTURA_TERRAPLEN);
             this.tabla.SetCamino(detailPath);
             //this.tabla.LoadTextures(@"../../Imagenes/Texturas/Madera.bmp");
             this.tabla.Build();
-
-            this.terrainInitializer = new TerrainInitializer();
+            this.superficies.Add(this.tabla);
+            
             this.waterInitializer = new WaterInitializer();
-            //Tren.Posicion = this.terraplen.GetPositionByDistancia(0);
+            Tren.Posicion = this.terraplen.GetPositionByDistancia(0);
             arboles = Arbol.GenerarArbolesAleatorios(posicionArboles.Count());
         }
 
@@ -194,15 +206,12 @@ namespace Trochita3D
             secondary_light_ambient = (daylight) ? secondary_day_light_ambient : secondary_night_light_ambient;
             
             // Fuente de luz principal
-            Gl.glLightfv(Gl.GL_LIGHT0, Gl.GL_DIFFUSE, new float[4] {0f, 0f, 0f, 1f});
+            Gl.glLightfv(Gl.GL_LIGHT0, Gl.GL_DIFFUSE, new float[4] {1f, 1f, 1f, 1f});
             Gl.glLightfv(Gl.GL_LIGHT0, Gl.GL_SPECULAR, light_color);
             Gl.glLightfv(Gl.GL_LIGHT0, Gl.GL_AMBIENT, light_ambient);
             Gl.glLightfv(Gl.GL_LIGHT0, Gl.GL_POSITION, light_position);
-         
-              
 
             // Fuentes de luz secundarias
-            
             Gl.glLightfv(Gl.GL_LIGHT1, Gl.GL_DIFFUSE, secondary_light_color);
             Gl.glLightfv(Gl.GL_LIGHT1, Gl.GL_AMBIENT, secondary_light_ambient);
             Gl.glLightfv(Gl.GL_LIGHT1, Gl.GL_SPECULAR, new float[4] {0f, 0f, 0f, 1f});
@@ -258,19 +267,17 @@ namespace Trochita3D
         public void Dibujar()
         {
             this.InicializarLuces();
-            this.terraplen.Dibujar();
-            this.riel1.Dibujar();
-            this.riel2.Dibujar();
-            this.tabla.Dibujar();
 
-            terrainInitializer.DrawTerrain();
+            foreach (Superficie superficie in this.superficies)
+                superficie.Dibujar();
+
             waterInitializer.DrawPlaneOfWater();
-
+            
             if (Camara is CamaraLocomotora)
                 Tren.Draw(!this.daylight, (CamaraLocomotora)Camara);
             else
                 Tren.Draw(!this.daylight, null);
-
+            
             for (int i = 0; i < arboles.Count(); ++i)
             {
                 Gl.glPushMatrix();

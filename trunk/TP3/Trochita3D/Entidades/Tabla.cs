@@ -103,12 +103,12 @@ namespace Trochita3D.Entidades
                     vertices.Add(seccion2.Vertices[j].Z);
 
                     // Normales
-                    Punto normal = this.GetNormalForVertex(seccion1, j);
+                    Punto normal = this.CalculateNormalForPunto(j, seccion1.Vertices[j], i, seccion1);
                     normales.Add(normal.X);
                     normales.Add(normal.Y);
                     normales.Add(normal.Z);
 
-                    normal = this.GetNormalForVertex(seccion2, j);
+                    normal = this.CalculateNormalForPunto(j, seccion2.Vertices[j], i, seccion2);
                     normales.Add(normal.X);
                     normales.Add(normal.Y);
                     normales.Add(normal.Z);

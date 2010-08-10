@@ -74,6 +74,7 @@
     <Compile Include="Core\ConfigurationManager.cs" />
     <Compile Include="Core\Cuboide.cs" />
     <Compile Include="Core\Figura.cs" />
+    <Compile Include="Core\IndexStrategy.cs" />
     <Compile Include="Core\Skybox.cs" />
     <Compile Include="Core\Superficie.cs" />
     <Compile Include="Core\SuperficieBarrido.cs" />
@@ -82,7 +83,6 @@
     <Compile Include="Core\OrientacionesCara.cs" />
     <Compile Include="Entidades\Locomotora.cs" />
     <Compile Include="Core\WaterInitializer.cs" />
-    <Compile Include="Core\TerrainInitializer.cs" />
     <Compile Include="Core\Seccion.cs" />
     <Compile Include="Curvas\CurvaBsplineSegmentosCubicos.cs" />
     <Compile Include="Curvas\CurvaBzierSegmentosCubicos.cs" />
@@ -92,6 +92,7 @@
     <Compile Include="Entidades\Rueda.cs" />
     <Compile Include="Entidades\Tabla.cs" />
     <Compile Include="Entidades\Terraplen.cs" />
+    <Compile Include="Entidades\Terreno.cs" />
     <Compile Include="Escena.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
@@ -131,6 +132,7 @@
     <Content Include="Imagenes\Texturas\Arbol\copa.bmp" />
     <Content Include="Imagenes\Texturas\Madera.bmp" />
     <Content Include="Imagenes\Texturas\Pasto.bmp" />
+    <Content Include="Imagenes\Texturas\PastoClaro.bmp" />
     <Content Include="Imagenes\Texturas\Piedras.bmp" />
     <Content Include="Imagenes\Texturas\Riel.bmp" />
     <Content Include="Imagenes\Texturas\Skybox\mpa23bk.bmp" />

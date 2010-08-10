@@ -21,6 +21,8 @@ namespace Trochita3D.Core
 
         protected int RENDER_MODE { get; set; }
 
+        public bool ShowNormals { get; set; }
+
         public Superficie()
         {
             this.RENDER_MODE = Gl.GL_TRIANGLE_STRIP; // Render mode default
@@ -54,6 +56,8 @@ namespace Trochita3D.Core
 
             Gl.glDrawElements(this.RENDER_MODE, indexes.Length, Gl.GL_UNSIGNED_INT, indexes);
 
+            if (this.ShowNormals) DibujarNormales();
+
             if (this.HasTextures())
             {
                 Gl.glDisableClientState(Gl.GL_TEXTURE_COORD_ARRAY);
@@ -82,13 +86,12 @@ namespace Trochita3D.Core
         protected virtual void BuildSurfaceDataBuffers()
         {
             IList<double> vertices = new List<double>();
-            IList<int> indices = new List<int>();
+            IList<int> indices;
+            //IList<int> indices = new List<int>();
             IList<double> normales = new List<double>();
+            IndexStrategy indexStrategy = new IndexStrategy();
             Seccion seccion;
-            int indexCount = 0;
-            vertices.Clear();
-            indices.Clear();
-            normales.Clear();
+            //int indexCount = 0;
 
             // Armo la lista de vertices e indices. Esta ultima pensada que 
             // se arma con TRIANGLE.
@@ -103,22 +106,39 @@ namespace Trochita3D.Core
                     vertices.Add(seccion.Vertices[j].Y);
                     vertices.Add(seccion.Vertices[j].Z);
 
-                    // Indices
-                    indices.Add(indexCount);
-                    indices.Add((indexCount + seccion.Vertices.Count) % (secciones.Count * seccion.Vertices.Count));
-                    indexCount++;
-
                     // Normales
-                    Punto normal = this.GetNormalForVertex(seccion, j);
+                    //Punto normal = this.GetNormalForVertex(seccion, j);
+                    Punto normal = this.CalculateNormalForPunto(j, seccion.Vertices[j], i, seccion);
                     normales.Add(normal.X);
                     normales.Add(normal.Y);
                     normales.Add(normal.Z);
                 }
             }
 
+            // Indices
+            indices = indexStrategy.GetIndexForSecciones(this.RENDER_MODE, secciones);
+
             this.vertex = vertices.ToArray<double>();
             this.normals = normales.ToArray<double>();
             this.indexes = indices.ToArray<int>();
+        }
+
+        protected virtual Punto CalculateNormalForPunto(int posVertexActual, Punto verticeActual, int posSeccionActual, Seccion seccionActual)
+        {
+            Punto normalSeccion = (seccionActual.Vertices[1] - seccionActual.Vertices[0]) * (seccionActual.Vertices[2] - seccionActual.Vertices[1]);
+
+            if (posVertexActual == 0)
+            {
+                return (seccionActual.Vertices[posVertexActual + 1] - seccionActual.Vertices[posVertexActual]) * normalSeccion;
+            }
+            else if (posVertexActual == (seccionActual.Vertices.Count - 1))
+            {
+                return (seccionActual.Vertices[posVertexActual] - seccionActual.Vertices[posVertexActual - 1]) * normalSeccion;
+            }
+            else
+            {
+                return (seccionActual.Vertices[posVertexActual + 1] - seccionActual.Vertices[posVertexActual - 1]) * normalSeccion;
+            }
         }
 
         /// <summary>
@@ -212,24 +232,6 @@ namespace Trochita3D.Core
         private bool HasTextures()
         {
             return this.texture != null;
-        }
-
-        protected Punto GetNormalForVertex(Seccion seccion, int vertexPos)
-        {
-            Punto normalSeccion = (seccion.Vertices[1] - seccion.Vertices[0]) * (seccion.Vertices[2] - seccion.Vertices[1]);
-
-            if (vertexPos == 0)
-            {
-                return (seccion.Vertices[vertexPos + 1] - seccion.Vertices[vertexPos]) * normalSeccion;
-            }
-            else if (vertexPos == (seccion.Vertices.Count - 1))
-            {
-                return (seccion.Vertices[vertexPos] - seccion.Vertices[vertexPos - 1]) * normalSeccion;
-            }
-            else
-            {
-                return (seccion.Vertices[vertexPos + 1] - seccion.Vertices[vertexPos - 1]) * normalSeccion;
-            }
         }
 
         #endregion
