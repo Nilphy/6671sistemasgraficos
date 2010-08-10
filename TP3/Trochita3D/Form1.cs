@@ -31,25 +31,11 @@ namespace TPAlgoritmos3D
         public Double PASO_TIEMPO = 0.001;
         private Timer timer;
 
-        private const int WIDTH_ESCENA = 400;
-        private const int HEIGHT_ESCENA = 400;
+        private const int WIDTH_ESCENA = 200;
+        private const int HEIGHT_ESCENA = 200;
 
         private int MAXIMA_COORDENADA = 100;
         private bool mousing = false;
-
-        #region ids de display lists
-
-        private int dl_handle;
-
-        public int DL_AXIS
-        {
-            get { return (dl_handle + 0); }
-        }
-
-        public int DL_GRID
-        {
-            get { return (dl_handle + 1); }
-        }
 
         public int W_WIDTH
         {
@@ -60,8 +46,6 @@ namespace TPAlgoritmos3D
         {
             get { return glControl.Height; }
         }
-
-        #endregion
 
         #endregion
 
@@ -87,8 +71,6 @@ namespace TPAlgoritmos3D
             this.glControl.MouseDown += new MouseEventHandler(this.glControl_OnMouseDown);
             this.glControl.MouseUp += new MouseEventHandler(this.glControl_OnMouseUp);
 
-            dl_handle = Gl.glGenLists(2);
-
             Gl.glClearColor(0.02f, 0.02f, 0.04f, 0.0f);
             Gl.glShadeModel(Gl.GL_SMOOTH);
             Gl.glEnable(Gl.GL_DEPTH_TEST);
@@ -98,18 +80,10 @@ namespace TPAlgoritmos3D
 
             // Crea objetos e inicializa luces 
             // TODO poner la creación de objetos en display lists
-            controlador.Escena.Inicializar(480, 480);
+            controlador.Escena.Inicializar(WIDTH_ESCENA, HEIGHT_ESCENA);
 
             // Se configura el Timer para la simulación.
             this.InicializarTimer(TimerEventProcessor);
-
-            // Generación de las Display Lists
-            Gl.glNewList(DL_AXIS, Gl.GL_COMPILE);
-            DrawAxis();
-            Gl.glEndList();
-            Gl.glNewList(DL_GRID, Gl.GL_COMPILE);
-            DrawXYGrid();
-            Gl.glEndList();
         }
 
         public void InicializarTimer(EventHandler TimerEventProcessor)
@@ -134,12 +108,6 @@ namespace TPAlgoritmos3D
             controlador.Escena.Camara.Look();
 
             controlador.Escena.DibujarSkybox();
-            
-            // Si corresponde se dibujan los ejes
-            if (controlador.view_axis) Gl.glCallList(DL_AXIS);
-            // Se corresponde se dibuja la grilla
-            if (controlador.view_grid) Gl.glCallList(DL_GRID);
-
             controlador.Escena.Dibujar();
         }
 
@@ -257,53 +225,6 @@ namespace TPAlgoritmos3D
         }
 
         #endregion
-        #region Axis y Grid
-
-        private void DrawAxis()
-        {
-            Gl.glDisable(Gl.GL_LIGHTING);
-            Gl.glBegin(Gl.GL_LINES);
-
-            // X
-            Gl.glColor3d(1, 0, 0);
-            Gl.glVertex3d(0, 0, 0);
-            Gl.glColor3d(0, 0, 0);
-            Gl.glVertex3d(15, 0, 0);
-
-            // Y
-            Gl.glColor3d(0, 1, 0);
-            Gl.glVertex3d(0, 0, 0);
-            Gl.glColor3d(0, 0, 0);
-            Gl.glVertex3d(0, 15, 0);
-
-            // Z
-            Gl.glColor3d(0, 0, 1);
-            Gl.glVertex3d(0, 0, 0);
-            Gl.glColor3d(0, 0, 0);
-            Gl.glVertex3d(0, 0, 15);
-
-            Gl.glEnd();
-            Gl.glEnable(Gl.GL_LIGHTING);
-        }
-
-        private void DrawXYGrid()
-        {
-            int i;
-            Gl.glDisable(Gl.GL_LIGHTING);
-            Gl.glColor3d(0.15d, 0.1d, 0.1d);
-            Gl.glBegin(Gl.GL_LINES);
-            for (i = -MAXIMA_COORDENADA; i < MAXIMA_COORDENADA+1; i++)
-            {
-                Gl.glVertex3d(i, -MAXIMA_COORDENADA, 0);
-                Gl.glVertex3d(i, MAXIMA_COORDENADA, 0);
-                Gl.glVertex3d(-MAXIMA_COORDENADA, i, 0);
-                Gl.glVertex3d(MAXIMA_COORDENADA, i, 0);
-            }
-            Gl.glEnd();
-            Gl.glEnable(Gl.GL_LIGHTING);
-        }
-
-        #endregion
         #region Configuración de Escena (viewports)
 
         private void Set3DEnv()
@@ -315,6 +236,11 @@ namespace TPAlgoritmos3D
         }
 
         #endregion
-        
+
+        private void rielesOxidadosToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            System.Console.Out.WriteLine("Hola");
+        }
+
     }
 }
