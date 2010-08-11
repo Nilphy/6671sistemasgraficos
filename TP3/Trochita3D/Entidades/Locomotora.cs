@@ -177,8 +177,8 @@ namespace Trochita3D.Core
 
             if (camara != null)
             {
-                camara.Eye = this.Posicion.SumarPunto(new Punto(3, 0, 5).RotarProyeccionXY(this.InclinaciónLocomotora + 90));
-                camara.At = this.Posicion.SumarPunto(new Punto(5, 0, 4.5).RotarProyeccionXY(this.InclinaciónLocomotora + 90));
+                camara.Eye = this.Posicion.SumarPunto(new Punto(4.5, 0, 5).RotarProyeccionXY(this.InclinaciónLocomotora + 90));
+                camara.At = this.Posicion.SumarPunto(new Punto(7, 0, 4).RotarProyeccionXY(this.InclinaciónLocomotora + 90));
                 camara.Look();
             }
 

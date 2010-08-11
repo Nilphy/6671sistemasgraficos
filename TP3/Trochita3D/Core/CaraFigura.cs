@@ -65,7 +65,11 @@ namespace Trochita3D.Core
         { 
             get 
             {
-                if (recalcularIndices) pIndices = this.indices.ToArray<int>();
+                if (recalcularIndices)
+                {
+                    pIndices = this.indices.ToArray<int>();
+                    recalcularIndices = false;
+                }
                 return pIndices;
             } 
         }

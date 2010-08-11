@@ -17,7 +17,7 @@ namespace Trochita3D
         public Camara Camara { get; set; }
 
         private const double DELTA_U = 0.05;
-        private const double DELTA_U2 = 0.0005;
+        private const double DELTA_U2 = 0.00005;
         private const double ALTURA_TERRAPLEN = 2.2;
         private const double DIST_RIELES = 0.8;
         private const int DIST_TABLA = 2; // Distancia entre tablas de la vía.
@@ -28,7 +28,7 @@ namespace Trochita3D
         private static float[] TREN_LUZ_BRILLO = new float[] { 0.2f, 0.2f, 0.2f, 1 };
         private static int TREN_SHININESS = 180;
 
-        private static double VELOCIDAD_TREN = 500;
+        private static double VELOCIDAD_TREN = 2000;
         private static double RADIO_RUEDA_TREN = 1.7d / 5d; 
         private static double VELOCIDAD_ANGULAR_RUEDAS = VELOCIDAD_TREN / RADIO_RUEDA_TREN;
         private static double tiempo = 0;
@@ -171,6 +171,7 @@ namespace Trochita3D
             ptsControl.Add(new Punto(72, 60, 0));
             ptsControl.Add(new Punto(76, 35, 0));
             ptsControl.Add(new Punto(46, 11, 0));
+            ptsControl.Add(new Punto(46, 0, 0));
             ptsControl.Add(new Punto(46, -15, 0));
             ptsControl.Add(new Punto(60, -30, 0));
             ptsControl.Add(new Punto(75, -35, 0));
