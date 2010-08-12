@@ -147,7 +147,7 @@ namespace Trochita3D
 
             this.tabla = new Tabla(DIST_TABLA, ALTURA_TERRAPLEN);
             this.tabla.SetCamino(detailPath);
-            //this.tabla.LoadTextures(@"../../Imagenes/Texturas/Madera.bmp");
+            this.tabla.LoadTextures(@"../../Imagenes/Texturas/Madera.bmp");
             this.tabla.Build();
             this.superficies.Add(this.tabla);
             

@@ -164,10 +164,28 @@ namespace Trochita3D.Entidades
 
             for (int i = 0; i < this.secciones.Count; i += 2)
             {
-                Seccion seccionAbajo = this.secciones[i];
-                Seccion seccionArriba = this.secciones[i + 1];
+                textCoord.Add(0);//0.975
+                textCoord.Add(0.875);
 
-                textCoord.Add(0.1);
+                textCoord.Add(0);
+                textCoord.Add(0.975);
+
+                textCoord.Add(0.025);
+                textCoord.Add(0.875);
+
+                textCoord.Add(0.025);
+                textCoord.Add(0.975);
+
+                textCoord.Add(0.975);
+                textCoord.Add(0.125);
+
+                textCoord.Add(0.975);
+                textCoord.Add(0.025);
+
+                textCoord.Add(1);
+                textCoord.Add(0);
+
+                textCoord.Add(1);
                 textCoord.Add(0);
             }
 
