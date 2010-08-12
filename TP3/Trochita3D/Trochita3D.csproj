@@ -147,6 +147,7 @@
     <Content Include="Imagenes\Texturas\Skybox\night_mpa23lf.bmp" />
     <Content Include="Imagenes\Texturas\Skybox\night_mpa23rt.bmp" />
     <Content Include="Imagenes\Texturas\Skybox\night_mpa23up.bmp" />
+    <Content Include="Imagenes\Texturas\Tabla.bmp" />
     <Content Include="Imagenes\Texturas\Tierra.bmp" />
     <Content Include="Imagenes\Texturas\Arbol\tronco_1.bmp" />
   </ItemGroup>
